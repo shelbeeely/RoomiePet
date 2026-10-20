@@ -8,7 +8,7 @@
 // after a cleaning one, mostly about the living room otherwise. Where they
 // walk is decided here, on each phone; how they are comes from the server.
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CATALOG, ROOMS, footprint, layoutProblem, wallsOf } from "@shared/home.js";
+import { CATALOG, ROOMS, footprint, layoutProblem, snap, wallsOf } from "@shared/home.js";
 import { animFor, draw, frameAt, petKey } from "./sprites.js";
 import { PX, dollCamera, floorSprite, order, pieceBox, pieceSprite, wallBox, wallPieceBox, wallSprite } from "./dollhouse.js";
 import { allLayouts, bedroomOf, destination, findPath, gridOf, roomAt } from "./house.js";
@@ -17,7 +17,6 @@ import RoomBuilder from "./RoomBuilder.jsx";
 const SPRITE = 64;
 const BG = "#2a2236";
 const rand = (a, b) => a + Math.random() * (b - a);
-const snap = (n) => Math.round(n * 2) / 2;
 
 // What a pet is doing decides where it goes; when that changes, it sets off.
 function modeOf(cond, effect) {

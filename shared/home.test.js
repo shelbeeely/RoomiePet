@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import {
-  CATALOG, DEFAULT_LAYOUTS, DOORS, FLAT, FLOORS, MATERIALS, MAX_ITEMS, ROOMS, WALLPAPERS,
+  CATALOG, DEFAULT_LAYOUTS, DOORS, FLAT, FLOORS, GRID, MATERIALS, MAX_ITEMS, ROOMS, WALLPAPERS,
   cleanLayout, footprint, freeSpot, layoutProblem, roomAt, turned, wallsOf,
 } from "./home.js";
 
@@ -60,7 +60,8 @@ describe("what a layout may be", () => {
     expect(layoutProblem("bedB", withItems([{ ...bed, x: 7.5, y: 17 }]))).toMatch(/blocks a doorway/);
     expect(layoutProblem("bedB", withItems([bed, { ...bed, x: 3 }]))).toMatch(/overlaps/);
     expect(layoutProblem("bedB", withItems([bed, { ...bed, x: 4 }]))).toBe(null);
-    expect(layoutProblem("bedB", withItems([{ ...bed, x: 0.25 }]))).toMatch(/out of place/);   // on the half foot
+    expect(layoutProblem("bedB", withItems([{ ...bed, x: 0.25 }]))).toBe(null);               // on the 3 inch grid
+    expect(layoutProblem("bedB", withItems([{ ...bed, x: 0.1 }]))).toMatch(/out of place/);
   });
 
   test("rugs go under anything, but not under each other; the bowl can't go on furniture", () => {
@@ -98,6 +99,33 @@ describe("what a layout may be", () => {
   });
 });
 
+describe("room to live in", () => {
+  test("pieces are their real sizes: a twin bed is 39 inches by 75, a desk 42 by 21", () => {
+    expect(CATALOG.bed.w).toBe(3.25);
+    expect(CATALOG.bed.d).toBeGreaterThanOrEqual(6.25);
+    expect(CATALOG.desk.w * 12).toBe(42);
+    for (const c of Object.values(CATALOG)) {
+      for (const [x, y, , w, d] of c.boxes) {
+        if (c.layer === "wall") continue;
+        // Drawer fronts and handles stand an inch proud at most; nothing more.
+        expect(x >= -0.1 && y >= -0.1 && x + w <= c.w + 0.1 && y + d <= c.d + 0.1, `${c.label} model inside its footprint`).toBe(true);
+      }
+    }
+  });
+
+  test("Bedroom 2 takes a twin bed against each side wall, a nightstand each, a desk, a dresser and more", () => {
+    const l = DEFAULT_LAYOUTS.bedB;
+    expect(layoutProblem("bedB", l)).toBe(null);
+    const beds = l.items.filter((i) => i.kind === "bed").map(footprint);
+    expect(beds.length).toBe(2);
+    expect(beds.map((f) => f.x0).sort((a, b) => a - b)[0]).toBe(0);    // against the left wall
+    expect(Math.max(...beds.map((f) => f.x1))).toBe(11);               // and the right
+    for (const kind of ["nightstand", "desk", "dresser", "pet_bed"]) expect(l.items.some((i) => i.kind === kind), kind).toBe(true);
+    // And there is still room to add things.
+    for (const kind of ["beanbag", "bookshelf", "lamp"]) expect(freeSpot("bedB", l, kind), kind).not.toBe(null);
+  });
+});
+
 describe("the builder's moves", () => {
   test("a quarter turn keeps a piece where it was; four bring it back", () => {
     const bed = { kind: "bed", color: "blue", x: 3, y: 15, rot: 0 };
@@ -105,7 +133,8 @@ describe("the builder's moves", () => {
     const [a, b] = [footprint(bed), footprint(t)];
     expect(t.rot).toBe(1);
     expect(b.x1 - b.x0).toBe(6.5);
-    expect((a.x0 + a.x1) / 2).toBeCloseTo((b.x0 + b.x1) / 2, 5);
+    expect(Math.abs((a.x0 + a.x1) / 2 - (b.x0 + b.x1) / 2)).toBeLessThanOrEqual(GRID);
+    expect(Math.abs((a.y0 + a.y1) / 2 - (b.y0 + b.y1) / 2)).toBeLessThanOrEqual(GRID);
     expect(turned(turned(turned(t)))).toEqual(bed);
   });
 

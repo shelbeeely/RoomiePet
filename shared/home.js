@@ -309,6 +309,41 @@ export const CATALOG = {
   },
 };
 
+// What the pieces really measure, in feet (width x depth). The models above were drawn at
+// round sizes, a little big -- a "twin" 42 inches wide, a desk 4 ft -- so a bedroom held
+// less than a real one; each is scaled to these, boxes, spots and lamp glow with it.
+// Bedroom 2 (11 x 13 ft) takes a twin bed against each side wall with a nightstand each,
+// a desk, a dresser and a pet bed (shared/home.test.js).
+const REAL = {
+  bed: [3.25, 6.5],           // twin: 39 x 75 in mattress, and its headboard
+  double_bed: [4.5, 6.5],     // full: 54 in
+  nightstand: [1.5, 1.25],
+  wardrobe: [3, 2],
+  desk: [3.5, 1.75],          // 42 x 21 in
+  chair: [1.5, 1.5],
+  bookshelf: [2.5, 1],
+  plant: [1.25, 1.25],
+  pet_bed: [1.75, 1.75],
+  toybox: [2, 1.25],
+  armchair: [2.75, 2.75],
+  tv: [4, 1.25],
+  table: [4, 2.5],            // 48 x 30 in, seats four
+  toilet: [1.5, 2.25],
+  washer: [2.25, 2.25],       // 27 in
+  basket: [1.25, 1.25],
+  mat: [2.5, 1.75],
+};
+for (const [kind, [w, d]] of Object.entries(REAL)) {
+  const c = CATALOG[kind];
+  const kx = w / c.w;
+  const ky = d / c.d;
+  c.boxes = c.boxes.map(([x, y, z, bw, bd, h, mat]) => [x * kx, y * ky, z, bw * kx, bd * ky, h, mat]);
+  if (c.spots) c.spots = c.spots.map(([x, y, z]) => [x * kx, y * ky, z]);
+  if (c.glow) c.glow = [c.glow[0] * kx, c.glow[1] * ky, c.glow[2]];
+  c.w = w;
+  c.d = d;
+}
+
 export const WALLPAPERS = {
   rose: { label: "Rose", base: "#e7b8c6", pattern: "stripe" },
   lilac: { label: "Lilac", base: "#c3b3e0", pattern: "dots" },
@@ -391,7 +426,10 @@ export function spotsOf(item) {
 }
 
 const overlaps = (a, b) => a.x0 < b.x1 - EPS && b.x0 < a.x1 - EPS && a.y0 < b.y1 - EPS && b.y0 < a.y1 - EPS;
-const onHalf = (n) => Number.isFinite(n) && Math.abs(n * 2 - Math.round(n * 2)) < EPS;
+// Pieces go on a quarter-foot (3 inch) grid: real sizes (a twin bed is 39 inches wide) then
+// sit flush against each other and the walls, where a half-foot grid left gaps.
+export const GRID = 0.25;
+const onGrid = (n) => Number.isFinite(n) && Math.abs(n / GRID - Math.round(n / GRID)) < EPS;
 
 /** Room in front of each door a piece of furniture mustn't stand in, so pets (and people) get through. */
 export function doorways(room) {
@@ -407,8 +445,8 @@ export function doorways(room) {
 }
 
 function insideRoom(room, f) {
-  for (let x = f.x0 + 0.25; x < f.x1; x += 0.5) {
-    for (let y = f.y0 + 0.25; y < f.y1; y += 0.5) if (roomAt(x, y) !== room) return false;
+  for (let x = f.x0 + GRID / 2; x < f.x1; x += GRID) {
+    for (let y = f.y0 + GRID / 2; y < f.y1; y += GRID) if (roomAt(x, y) !== room) return false;
   }
   return true;
 }
@@ -417,7 +455,7 @@ function insideRoom(room, f) {
 function onWall(room, item) {
   const c = CATALOG[item.kind];
   const walls = wallsOf(room).filter((w) => w.side === item.side && w.line === item.line && (!c.outer || w.outer));
-  for (let a = item.at + 0.25; a < item.at + c.w; a += 0.5) {
+  for (let a = item.at + GRID / 2; a < item.at + c.w; a += GRID) {
     if (!walls.some((w) => a >= w.from && a <= w.to)) return false;
   }
   return true;
@@ -440,7 +478,7 @@ export function layoutProblem(room, layout) {
     if (!c || !Object.hasOwn(CATALOG, item.kind)) return "Something in the room isn't in the catalog";
     if (!c.colors.includes(item.color)) return `${c.label} doesn't come in that colour`;
     if (c.layer === "wall") {
-      if (!["n", "e", "s", "w"].includes(item.side) || !onHalf(item.at) || !Number.isInteger(item.line)) return `${c.label} must hang on a wall`;
+      if (!["n", "e", "s", "w"].includes(item.side) || !onGrid(item.at) || !Number.isInteger(item.line)) return `${c.label} must hang on a wall`;
       if (!onWall(room, item)) return c.outer ? `${c.label} must go on an outside wall` : `${c.label} must hang on one of the room's walls`;
       const span = { side: item.side, line: item.line, from: item.at, to: item.at + c.w };
       if (placed.some((p) => p.span && p.span.side === span.side && p.span.line === span.line && p.span.from < span.to - EPS && span.from < p.span.to - EPS)) {
@@ -449,7 +487,7 @@ export function layoutProblem(room, layout) {
       placed.push({ span, c });
       continue;
     }
-    if (![0, 1, 2, 3].includes(item.rot) || !onHalf(item.x) || !onHalf(item.y)) return `${c.label} is out of place`;
+    if (![0, 1, 2, 3].includes(item.rot) || !onGrid(item.x) || !onGrid(item.y)) return `${c.label} is out of place`;
     const f = footprint(item);
     if (!insideRoom(room, f)) return `${c.label} doesn't fit there`;
     for (const p of placed) {
@@ -489,11 +527,15 @@ export const DEFAULT_LAYOUTS = {
     ],
   },
   bedB: {
+    // Two twin beds, one against each side wall, a nightstand each, the desk and dresser along
+    // the front wall, the pet bed between them; the doorway on the right kept clear.
     wall: "lilac", floor: "oak",
     items: [
-      W("window", "white", "w", 0, 15.5), W("picture", "blue", "n", 12, 1),
-      F("rug", "sage", 3.5, 17), F("bed", "blue", 0.5, 12), F("nightstand", "oak", 4, 12), F("pet_bed", "pink", 8.5, 12.5),
-      F("desk", "oak", 6.5, 23), F("chair", "teal", 7.5, 21.5, 2), F("plant", "teal", 0.5, 23.5),
+      W("window", "white", "s", 25, 4), W("picture", "blue", "n", 12, 4), W("clock", "white", "n", 12, 6.25),
+      F("small_rug", "sage", 3.5, 15.5), F("bed", "blue", 0, 12), F("bed", "pink", 7.75, 12),
+      F("nightstand", "oak", 3.25, 12), F("nightstand", "oak", 6.25, 12),
+      F("desk", "oak", 0, 23.25), F("chair", "teal", 1, 21.5), F("pet_bed", "pink", 4, 23.25),
+      F("dresser", "white", 6.5, 23.5), F("plant", "teal", 9.75, 23.75),
     ],
   },
   main: {
@@ -522,16 +564,18 @@ export function layoutOf(layouts, room) {
 
 // -- the builder's moves, kept here so they are tested ----------------------------------
 
-const snap = (n) => Math.round(n * 2) / 2;
+export const snap = (n) => Math.round(n / GRID) * GRID;
 
-/** A piece turned a quarter, about its middle, kept on the half foot. */
+/**
+ * A piece turned a quarter, about its middle, kept on the grid. The shift that keeps it
+ * centred is rounded (not the position), and undone on the way back, so four turns bring
+ * it back where it was -- rounding each new position let a 3.25 ft bed creep.
+ */
 export function turned(item) {
-  const f = footprint(item);
-  const cx = (f.x0 + f.x1) / 2;
-  const cy = (f.y0 + f.y1) / 2;
-  const next = { ...item, rot: (item.rot + 1) % 4 };
-  const g = footprint({ ...next, x: 0, y: 0 });
-  return { ...next, x: snap(cx - g.x1 / 2), y: snap(cy - g.y1 / 2) };
+  const c = CATALOG[item.kind];
+  const shift = Math.trunc((c.w - c.d) / 2 / GRID) * GRID;
+  const sign = item.rot % 2 === 0 ? 1 : -1;
+  return { ...item, rot: (item.rot + 1) % 4, x: item.x + sign * shift, y: item.y - sign * shift };
 }
 
 /** Somewhere a new piece fits in a room, nearest its middle (and on a wall for wall pieces), or null. */

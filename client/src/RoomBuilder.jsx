@@ -4,7 +4,7 @@
 // Every change is checked as shared/home.js checks it on the server, so what
 // can be saved is what the room shows.
 import { useEffect, useRef, useState } from "react";
-import { CATALOG, COLORWAYS, FLOORS, ROOMS, WALLPAPERS, freeSpot, layoutProblem, turned } from "@shared/home.js";
+import { CATALOG, COLORWAYS, FLOORS, GRID, ROOMS, WALLPAPERS, freeSpot, layoutProblem, turned } from "@shared/home.js";
 import { dollCamera, pieceSprite } from "./dollhouse.js";
 
 const GROUPS = [
@@ -39,11 +39,11 @@ const sample = (kind, color) => (CATALOG[kind].layer === "wall"
 /** A turned piece, nudged to the nearest place it fits, or null. */
 function turnIn(room, draft, index) {
   const t = turned(draft.items[index]);
-  for (let r = 0; r <= 4; r++) {
+  for (let r = 0; r <= 8; r++) {
     for (let dx = -r; dx <= r; dx++) {
       for (let dy = -r; dy <= r; dy++) {
         if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
-        const it = { ...t, x: t.x + dx / 2, y: t.y + dy / 2 };
+        const it = { ...t, x: t.x + dx * GRID, y: t.y + dy * GRID };
         const items = draft.items.map((x, k) => (k === index ? it : x));
         if (!layoutProblem(room, { ...draft, items })) return items;
       }

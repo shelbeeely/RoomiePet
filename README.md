@@ -137,7 +137,7 @@ walls inside it cut down so no room hides another; tap a room or its chip
 to see it alone, its back walls standing.
 
 The room builder (✏️ under a room, `client/src/RoomBuilder.jsx`) is a small
-Sims-style editor: drag pieces about on a half-foot grid, turn, recolour or
+Sims-style editor: drag pieces about on a 3-inch grid, at real sizes, turn, recolour or
 remove them, add from the catalog (beds, pet beds, sofas, lamps, rugs,
 windows, pictures...), and pick the wallpaper and floor. Layouts are saved
 per household (`PUT /api/rooms/:room`, the `room_layouts` table) and checked
