@@ -112,8 +112,9 @@ npm test           # server API tests (node:test) and the shared rules (vitest)
 ## Art
 
 The pets are 64 x 64 pixel art drawn from shapes in `art/pets.py` -- animals
-facing us, the head and face first, the body on four feet below and the
-tail out from behind. Every species shares the build and each adds its
+on all fours facing us, seen from a little above: the head and face first,
+the back stretching away behind it with the tail up off the rump, front legs
+under the chest and the hind feet further back. Every species shares the build and each adds its
 ears, snout, markings and tail, so all of them have every mood and
 animation, always facing us (mirrored to walk the other way).
 `art/make_spec.py` gives them their colours and writes

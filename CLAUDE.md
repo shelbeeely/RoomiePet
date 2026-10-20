@@ -23,7 +23,7 @@ Roommates' chores with a tamagotchi pet each (README.md has the whole picture).
   catalog (pieces are boxes), default layouts, and `layoutProblem`, which
   the server checks saved rooms with (`PUT /api/rooms/:room`). A new piece
   goes in `CATALOG`; `shared/home.test.js` checks its materials.
-- Art: pets are 64 x 64 animals facing us (no side views), drawn from shapes in `art/pets.py`; colours
+- Art: pets are 64 x 64 animals on all fours facing us (no side views), drawn from shapes in `art/pets.py`; colours
   in `art/make_spec.py`. Then `npm run art` (the pixel-art skill renders it).
   Never hand-edit `client/public/sprites/*`. Furniture isn't sprites: `dollhouse.js`
   draws it from the catalog.
