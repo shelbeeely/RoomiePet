@@ -11,16 +11,17 @@
 export const FLAT = { w: 30, d: 25 };
 
 export const ROOMS = {
-  bedA: { label: "Bedroom 1", areas: [{ x0: 0, x1: 11, y0: 0, y1: 12 }] },
-  bedB: { label: "Bedroom 2", areas: [{ x0: 0, x1: 11, y0: 12, y1: 25 }] },
-  main: { label: "Kitchen & living room", areas: [{ x0: 11, x1: 21, y0: 0, y1: 25 }, { x0: 21, x1: 30, y0: 9, y1: 25 }] },
+  // The bedrooms are 12 ft wide (11 felt small), the kitchen end of the main area 9.
+  bedA: { label: "Bedroom 1", areas: [{ x0: 0, x1: 12, y0: 0, y1: 12 }] },
+  bedB: { label: "Bedroom 2", areas: [{ x0: 0, x1: 12, y0: 12, y1: 25 }] },
+  main: { label: "Kitchen & living room", areas: [{ x0: 12, x1: 21, y0: 0, y1: 25 }, { x0: 21, x1: 30, y0: 9, y1: 25 }] },
   bath: { label: "Bathroom & laundry", areas: [{ x0: 21, x1: 30, y0: 0, y1: 9 }] },
 };
 
 // A door is a gap in the wall on a line: x = at (axis "x") or y = at (axis "y"), from..to along it.
 export const DOORS = [
-  { rooms: ["bedA", "main"], axis: "x", at: 11, from: 8, to: 11 },
-  { rooms: ["bedB", "main"], axis: "x", at: 11, from: 20, to: 23 },
+  { rooms: ["bedA", "main"], axis: "x", at: 12, from: 8, to: 11 },
+  { rooms: ["bedB", "main"], axis: "x", at: 12, from: 20, to: 23 },
   { rooms: ["bath", "main"], axis: "y", at: 9, from: 22, to: 25 },
 ];
 
@@ -166,18 +167,6 @@ export const CATALOG = {
       [1.5, 2.04, 2.8, 0.15, 0.06, 0.8, "gold"], [1.85, 2.04, 2.8, 0.15, 0.06, 0.8, "gold"],
     ],
   },
-  closet: {
-    // A reach-in closet with a pair of doors, tall as the room's walls allow; built to stand
-    // flat against a wall (between Bedroom 2's beds as it comes).
-    label: "Double-door closet", group: "bedroom", w: 3.5, d: 2, layer: "solid", colors: ["white", "oak", "walnut", "sage", "lilac"],
-    boxes: [
-      [0, 0, 0, 3.5, 2, 6.6, "main"], [0, 0, 6.6, 3.5, 2, 0.15, "main_"], [0, 1.9, 0, 3.5, 0.1, 0.25, "main_"],
-      [0.12, 2, 0.3, 1.58, 0.04, 6.1, "main^"], [1.8, 2, 0.3, 1.58, 0.04, 6.1, "main^"],
-      [0.35, 2.04, 3.7, 1.12, 0.02, 2.5, "main"], [0.35, 2.04, 0.6, 1.12, 0.02, 2.7, "main"],
-      [2.03, 2.04, 3.7, 1.12, 0.02, 2.5, "main"], [2.03, 2.04, 0.6, 1.12, 0.02, 2.7, "main"],
-      [1.5, 2.04, 3.0, 0.12, 0.06, 0.5, "gold"], [1.88, 2.04, 3.0, 0.12, 0.06, 0.5, "gold"],
-    ],
-  },
   desk: {
     label: "Desk", group: "bedroom", w: 4, d: 2, layer: "solid", colors: ["oak", "white", "walnut", "black"],
     boxes: [
@@ -303,6 +292,23 @@ export const CATALOG = {
     label: "Window", group: "wall", w: 3, d: 0.15, layer: "wall", outer: true, colors: ["white", "oak", "teal"],
     boxes: [[0, 0, 1.2, 3, 0.12, 2.6, "main"], [0.2, 0.12, 1.4, 1.2, 0.03, 2.2, "sky"], [1.6, 0.12, 1.4, 1.2, 0.03, 2.2, "sky"], [-0.1, 0, 1.1, 3.2, 0.3, 0.12, "main"]],
   },
+  closet: {
+    // A built-in closet: a pair of doors set in the wall, not a cabinet on the floor. clear is
+    // the floor kept free in front of it so the doors open.
+    label: "Closet (built in)", group: "wall", w: 6, d: 0.12, layer: "wall", clear: 2, colors: ["white", "oak", "walnut", "sage", "lilac"],
+    boxes: [
+      [0, 0, 0, 6, 0.06, 6.8, "main_"],
+      [0.15, 0.06, 0, 2.8, 0.05, 6.6, "main^"], [3.05, 0.06, 0, 2.8, 0.05, 6.6, "main^"],
+      [0.4, 0.11, 3.7, 2.3, 0.01, 2.6, "main"], [0.4, 0.11, 0.5, 2.3, 0.01, 2.8, "main"],
+      [3.3, 0.11, 3.7, 2.3, 0.01, 2.6, "main"], [3.3, 0.11, 0.5, 2.3, 0.01, 2.8, "main"],
+      [2.75, 0.11, 3.0, 0.12, 0.06, 0.5, "gold"], [3.13, 0.11, 3.0, 0.12, 0.06, 0.5, "gold"],
+    ],
+  },
+  basement_window: {
+    // Small and up high, with a deep sill: a basement room's window, above a headboard.
+    label: "Small window", group: "wall", w: 2.5, d: 0.4, layer: "wall", outer: true, colors: ["white", "oak", "teal"],
+    boxes: [[0, 0, 3, 2.5, 0.12, 0.95, "main"], [0.15, 0.12, 3.1, 2.2, 0.03, 0.75, "sky"], [0, 0, 2.88, 2.5, 0.4, 0.12, "main_"]],
+  },
   picture: {
     label: "Picture", group: "wall", w: 2, d: 0.1, layer: "wall", colors: ["blue", "pink", "sage", "sun"],
     boxes: [[0, 0, 2.2, 2, 0.08, 1.4, "frame"], [0.15, 0.08, 2.35, 1.7, 0.02, 1.1, "main"], [0.4, 0.1, 2.5, 0.6, 0.01, 0.5, "white"]],
@@ -324,7 +330,7 @@ export const CATALOG = {
 // What the pieces really measure, in feet (width x depth). The models above were drawn at
 // round sizes, a little big -- a "twin" 42 inches wide, a desk 4 ft -- so a bedroom held
 // less than a real one; each is scaled to these, boxes, spots and lamp glow with it.
-// Bedroom 2 (11 x 13 ft) takes a twin bed against each side wall with a nightstand each,
+// Bedroom 2 (12 x 13 ft) takes two twin beds against the left wall with the closet between,
 // a desk, a dresser and a pet bed (shared/home.test.js).
 const REAL = {
   bed: [3.25, 6.5],           // twin: 39 x 75 in mattress, and its headboard
@@ -357,6 +363,7 @@ for (const [kind, [w, d]] of Object.entries(REAL)) {
 }
 
 export const WALLPAPERS = {
+  white: { label: "White", base: "#fdfcf8", pattern: "plain" },
   rose: { label: "Rose", base: "#e7b8c6", pattern: "stripe" },
   lilac: { label: "Lilac", base: "#c3b3e0", pattern: "dots" },
   butter: { label: "Butter", base: "#f0dc9c", pattern: "plain" },
@@ -411,10 +418,10 @@ export function wallPlace(item, u, v) {
   return [line - v, at + u];
 }
 
-function wallBox(item) {
+function wallBox(item, out = CATALOG[item.kind].d) {
   const c = CATALOG[item.kind];
   const [ax, ay] = wallPlace(item, 0, 0);
-  const [bx, by] = wallPlace(item, c.w, c.d);
+  const [bx, by] = wallPlace(item, c.w, out);
   return { x0: Math.min(ax, bx), x1: Math.max(ax, bx), y0: Math.min(ay, by), y1: Math.max(ay, by) };
 }
 
@@ -511,6 +518,14 @@ export function layoutProblem(room, layout) {
     if (c.layer === "solid" && doorways(room).some((d) => overlaps(f, d))) return `${c.label} blocks a doorway`;
     placed.push({ f, c });
   }
+  // A built-in closet's doors need room to open: nothing solid on the floor in front of them.
+  for (const item of layout.items) {
+    const c = CATALOG[item.kind];
+    if (!c.clear) continue;
+    const front = wallBox({ ...item, kind: item.kind }, c.clear);
+    const blocker = placed.find((p) => p.f && p.c.layer === "solid" && overlaps(p.f, front));
+    if (blocker) return `The ${blocker.c.label.toLowerCase()} is in front of the ${c.label.toLowerCase()}`;
+  }
   return null;
 }
 
@@ -539,26 +554,25 @@ export const DEFAULT_LAYOUTS = {
     ],
   },
   bedB: {
-    // Two twin beds with their headboards against the left wall, one in each corner, a
-    // nightstand by each head and a double-door closet between them; the desk, dresser and
-    // pet bed along the right, the doorway clear.
-    wall: "lilac", floor: "oak",
+    // A white basement bedroom: two twin beds with their headboards against the left wall, one
+    // in each corner, a small high window above each, and the built-in closet in the wall
+    // between them; the desk, dresser and pet bed along the right, the doorway clear.
+    wall: "white", floor: "oak",
     items: [
-      W("window", "white", "s", 25, 7.25), W("picture", "blue", "n", 12, 8.25), W("clock", "white", "n", 12, 3),
-      F("small_rug", "sage", 2, 17), F("bed", "blue", 0, 12, 3), F("bed", "pink", 0, 21.75, 3),
-      F("nightstand", "oak", 0, 15.25, 3), F("nightstand", "oak", 0, 20.25, 3),
-      F("closet", "white", 0, 16.75, 3),
-      F("desk", "oak", 7.5, 12), F("chair", "teal", 8.5, 13.75, 2), F("dresser", "white", 9.5, 16, 1),
-      F("pet_bed", "pink", 7.25, 23.25), F("plant", "teal", 9.75, 23.75),
+      W("basement_window", "white", "w", 0, 12.5), W("basement_window", "white", "w", 0, 22.25),
+      W("closet", "white", "w", 0, 15.5), W("picture", "blue", "n", 12, 9), W("clock", "white", "n", 12, 4),
+      F("small_rug", "sage", 3, 17), F("bed", "blue", 0, 12, 3), F("bed", "pink", 0, 21.75, 3),
+      F("desk", "white", 8.5, 12), F("chair", "white", 9.5, 13.75, 2), F("dresser", "white", 10.5, 16, 1),
+      F("pet_bed", "pink", 8.25, 23.25), F("plant", "white", 10.75, 23.75),
     ],
   },
   main: {
     wall: "butter", floor: "oak",
     items: [
       W("clock", "white", "n", 0, 19.5), W("window", "white", "n", 0, 15.5), W("picture", "sun", "n", 9, 26.5),
-      F("fridge", "white", 11.5, 0), F("counter", "white", 14, 0), F("bowl", "blue", 12, 4.5), F("table", "oak", 14.5, 6),
-      F("chair", "oak", 16, 4.5), F("chair", "oak", 16, 9, 2),
-      F("bookshelf", "oak", 11, 14, 3), F("rug", "pink", 22.5, 14.5), F("tv", "walnut", 25.5, 9), F("sofa", "teal", 23, 20, 2),
+      F("fridge", "white", 12.25, 0), F("counter", "white", 14.75, 0), F("bowl", "blue", 12.75, 4.5), F("table", "oak", 14.5, 6),
+      F("chair", "oak", 16, 4.5), F("chair", "oak", 16, 8.5, 2),
+      F("bookshelf", "oak", 12, 14, 3), F("rug", "pink", 22.5, 14.5), F("tv", "walnut", 25.5, 9), F("sofa", "teal", 23, 20, 2),
       F("plant", "coral", 19.5, 23.5), F("lamp", "sun", 29, 24), F("armchair", "coral", 18, 13.5, 1),
     ],
   },

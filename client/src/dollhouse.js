@@ -22,9 +22,11 @@ const DEPTH = 0.75;       // floors seen a little squashed, from a little above
 // a closet seen from above, like everything else in a dollhouse.
 export const CUTAWAY = WALL + 0.5;
 
-/** A piece's boxes as drawn: anything above the cutaway is cut off. */
+/** A piece's boxes as drawn: anything above the cutaway is cut off -- for things in a wall
+ * (a built-in closet's doors), where the wall is cut. */
 function cutBoxes(item) {
-  return boxesOf(item).filter((b) => b.z0 < CUTAWAY).map((b) => (b.z1 > CUTAWAY ? { ...b, z1: CUTAWAY } : b));
+  const top = CATALOG[item.kind].layer === "wall" ? WALL : CUTAWAY;
+  return boxesOf(item).filter((b) => b.z0 < top).map((b) => (b.z1 > top ? { ...b, z1: top } : b));
 }
 const THICK = 0.25;       // ft: walls
 const OUTLINE = [43, 34, 56];
