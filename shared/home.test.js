@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import {
   CATALOG, DEFAULT_LAYOUTS, DOORS, FLAT, FLOORS, GRID, MATERIALS, MAX_ITEMS, ROOMS, WALLPAPERS,
-  cleanLayout, footprint, freeSpot, layoutProblem, roomAt, turned, wallsOf,
+  cleanLayout, footprint, freeSpot, layoutProblem, place, roomAt, turned, wallsOf,
 } from "./home.js";
 
 const area = (id) => ROOMS[id].areas.reduce((s, a) => s + (a.x1 - a.x0) * (a.y1 - a.y0), 0);
@@ -113,17 +113,23 @@ describe("room to live in", () => {
     }
   });
 
-  test("Bedroom 2 takes a twin bed against each side wall, a nightstand each, a desk, a dresser and more", () => {
+  test("Bedroom 2 takes two twin beds, headboards on the left wall, a nightstand each, a desk, a dresser and more", () => {
     const l = DEFAULT_LAYOUTS.bedB;
     expect(layoutProblem("bedB", l)).toBe(null);
-    const beds = l.items.filter((i) => i.kind === "bed").map(footprint);
+    const beds = l.items.filter((i) => i.kind === "bed");
     expect(beds.length).toBe(2);
-    expect(beds.map((f) => f.x0).sort((a, b) => a - b)[0]).toBe(0);    // against the left wall
-    expect(Math.max(...beds.map((f) => f.x1))).toBe(11);               // and the right
-    for (const kind of ["nightstand", "desk", "dresser", "pet_bed"]) expect(l.items.some((i) => i.kind === kind), kind).toBe(true);
+    for (const bed of beds) {
+      expect(bed.rot).toBe(3);                                         // turned so the headboard is on the left...
+      expect(footprint(bed).x0).toBe(0);                               // ...against the wall
+      const [hx] = place(bed, CATALOG.bed.w / 2, 0);                   // where the headboard's middle lands
+      expect(hx).toBe(0);
+    }
+    expect(l.items.filter((i) => i.kind === "nightstand").length).toBe(2);
+    for (const kind of ["desk", "dresser", "pet_bed"]) expect(l.items.some((i) => i.kind === kind), kind).toBe(true);
     // And there is still room to add things.
     for (const kind of ["beanbag", "bookshelf", "lamp"]) expect(freeSpot("bedB", l, kind), kind).not.toBe(null);
   });
+
 });
 
 describe("the builder's moves", () => {

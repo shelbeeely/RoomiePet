@@ -527,15 +527,15 @@ export const DEFAULT_LAYOUTS = {
     ],
   },
   bedB: {
-    // Two twin beds, one against each side wall, a nightstand each, the desk and dresser along
-    // the front wall, the pet bed between them; the doorway on the right kept clear.
+    // Two twin beds with their headboards against the left wall, one in each corner, a
+    // nightstand by each head; the desk, dresser and pet bed along the right, the doorway clear.
     wall: "lilac", floor: "oak",
     items: [
-      W("window", "white", "s", 25, 4), W("picture", "blue", "n", 12, 4), W("clock", "white", "n", 12, 6.25),
-      F("small_rug", "sage", 3.5, 15.5), F("bed", "blue", 0, 12), F("bed", "pink", 7.75, 12),
-      F("nightstand", "oak", 3.25, 12), F("nightstand", "oak", 6.25, 12),
-      F("desk", "oak", 0, 23.25), F("chair", "teal", 1, 21.5), F("pet_bed", "pink", 4, 23.25),
-      F("dresser", "white", 6.5, 23.5), F("plant", "teal", 9.75, 23.75),
+      W("window", "white", "s", 25, 7.25), W("picture", "blue", "n", 12, 8.25), W("clock", "white", "n", 12, 3),
+      F("small_rug", "sage", 2, 17), F("bed", "blue", 0, 12, 3), F("bed", "pink", 0, 21.75, 3),
+      F("nightstand", "oak", 0, 15.25, 3), F("nightstand", "oak", 0, 20.25, 3),
+      F("desk", "oak", 7.5, 12), F("chair", "teal", 8.5, 13.75, 2), F("dresser", "white", 9.5, 16, 1),
+      F("pet_bed", "pink", 7.25, 23.25), F("plant", "teal", 9.75, 23.75),
     ],
   },
   main: {
