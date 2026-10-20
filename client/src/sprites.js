@@ -53,7 +53,7 @@ export function draw(ctx, atlas, frame, x, y, scale, flip = false) {
 export function animFor(cond, { walking = false, effect = null } = {}) {
   if (cond.state === "egg") return "wobble";
   if (effect === "eat") return "eat";
-  if (effect === "happy") return "happy";
+  if (effect === "happy" || effect === "clean") return "happy";
   if (cond.state === "asleep") return "sleep";
   if (cond.state === "poorly") return "poorly";
   if (walking) return "walk";

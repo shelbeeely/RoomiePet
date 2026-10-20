@@ -171,7 +171,8 @@ LOP = [
 # there); stuffing (W) puffs out of a split seam on top of its head; its right
 # ear is bandaged (B, a darker fold C, a loose end hanging off); and its tummy
 # has a patch (q) sewn on one side and a shaded heart (h light, r, R dark) on
-# the other, below the mouth. Its feelings show through the right eye and mouth.
+# the other, below the mouth. Its right eye is a sewn-on button (u, holes v),
+# so neither eye moves: its feelings show in its mouth, cheeks and brows.
 STITCHED = [
     "....oo....oo....",
     "...obpo..opbo...",
@@ -179,9 +180,9 @@ STITCHED = [
     "...obpo.Copbo...",
     "...obbo" + "WW" + "obbo...",
     "..obbbxWWxbbbo..",
-    ".oblxnxbbbbbbbo.",
-    ".obbnxnbbbbbbbo.",
-    ".obbxnxbbbbbbbo.",
+    ".oblxnxbbuuubbo.",
+    ".obbnxnbbvUvbbo.",
+    ".obbxnxbbuuubbo.",
     ".obbbbbbbbbbbbo.",
     ".obbbbbbbbbbbbo.",
     ".obxqbwwwhrbrro.",
@@ -255,6 +256,194 @@ def bed():
     return rows(g)
 
 
+def ellipse(g, cx, cy, rx, ry, ch):
+    for y in range(len(g)):
+        for x in range(len(g[0])):
+            if ((x + 0.5 - cx) / rx) ** 2 + ((y + 0.5 - cy) / ry) ** 2 <= 1:
+                g[y][x] = ch
+
+
+def outline(g, ch="o"):
+    """A dark line round everything drawn, where it meets nothing."""
+    h, w = len(g), len(g[0])
+    edge = [(x, y) for y in range(h) for x in range(w) if g[y][x] == "." and any(
+        0 <= x + dx < w and 0 <= y + dy < h and g[y + dy][x + dx] not in ".o"
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))]
+    for x, y in edge:
+        g[y][x] = ch
+
+
+# -- the house's rooms ---------------------------------------------------------
+# Drawn front-on like the pets: a back wall, a floor, things standing against
+# the wall or on the floor. Letters per piece; o is the shared outline.
+
+def counter():
+    """Kitchen counter with a sink and a hob, 32 x 22."""
+    g = canvas(32, 22)
+    rect(g, 1, 4, 30, 3, "T")          # worktop
+    rect(g, 1, 7, 30, 14, "c")          # cupboards
+    for x in (1, 11, 21):
+        rect(g, x, 7, 1, 14, "C")       # cupboard joins
+        rect(g, x + 7, 12, 1, 3, "h")   # handles
+    rect(g, 4, 5, 8, 2, "S")            # sink
+    rect(g, 7, 1, 2, 4, "S")            # tap
+    rect(g, 7, 1, 4, 1, "S")
+    for x in (20, 26):                  # hob rings
+        rect(g, x, 5, 4, 1, "k")
+    outline(g)
+    return rows(g)
+
+
+def fridge():
+    g = canvas(16, 32)
+    rect(g, 1, 1, 14, 30, "f")
+    rect(g, 1, 11, 14, 1, "F")          # freezer door line
+    rect(g, 12, 4, 1, 5, "h")
+    rect(g, 12, 14, 1, 8, "h")
+    rect(g, 2, 2, 2, 8, "W")            # shine
+    rect(g, 3, 15, 4, 3, "m")           # a magnet / note
+    outline(g)
+    return rows(g)
+
+
+def table():
+    """Kitchen table with two stools, 32 x 18."""
+    g = canvas(32, 18)
+    rect(g, 2, 3, 28, 4, "t")
+    rect(g, 2, 6, 28, 1, "u")
+    rect(g, 4, 7, 2, 9, "u")
+    rect(g, 26, 7, 2, 9, "u")
+    rect(g, 12, 1, 4, 2, "r")           # a little fruit bowl
+    rect(g, 13, 0, 2, 1, "R")
+    outline(g)
+    return rows(g)
+
+
+def sofa():
+    g = canvas(48, 22)
+    rect(g, 3, 2, 42, 10, "a")          # back
+    rect(g, 1, 8, 5, 12, "A")           # arms
+    rect(g, 42, 8, 5, 12, "A")
+    rect(g, 6, 11, 36, 7, "a")          # seat
+    rect(g, 6, 11, 36, 1, "s")
+    rect(g, 24, 3, 1, 15, "s")          # cushion seam
+    rect(g, 3, 19, 2, 2, "u")           # feet
+    rect(g, 43, 19, 2, 2, "u")
+    rect(g, 9, 4, 8, 6, "p")            # a cushion
+    outline(g)
+    return rows(g)
+
+
+def shelf():
+    """A low bookcase with a TV on it, 24 x 26."""
+    g = canvas(24, 26)
+    rect(g, 2, 10, 20, 15, "u")
+    for y in (14, 19):
+        rect(g, 3, y, 18, 1, "U")
+    books = "rgbyrbg"
+    for i, ch in enumerate(books):
+        rect(g, 4 + i * 2, 15 + (i % 2), 1, 4 - (i % 2), ch)
+        rect(g, 5 + i * 2, 20, 1, 4, books[(i + 3) % len(books)])
+    rect(g, 3, 0, 18, 10, "k")          # TV
+    rect(g, 4, 1, 16, 8, "v")
+    rect(g, 5, 2, 4, 2, "V")
+    outline(g)
+    return rows(g)
+
+
+def rug(w=48, h=20):
+    g = canvas(w, h)
+    ellipse(g, w / 2, h / 2, w / 2 - 0.5, h / 2 - 0.5, "r")
+    ellipse(g, w / 2, h / 2, w / 2 - 3, h / 2 - 3, "R")
+    ellipse(g, w / 2, h / 2, w / 2 - 6, h / 2 - 5, "r")
+    return rows(g)
+
+
+def bathtub():
+    g = canvas(34, 20)
+    rect(g, 1, 4, 32, 12, "w")
+    rect(g, 3, 5, 28, 4, "B")           # water
+    rect(g, 4, 5, 8, 1, "b")            # ripple
+    rect(g, 18, 6, 6, 1, "b")
+    rect(g, 1, 9, 32, 1, "W")
+    rect(g, 3, 16, 3, 3, "S")           # feet
+    rect(g, 28, 16, 3, 3, "S")
+    rect(g, 28, 0, 2, 4, "S")           # tap
+    rect(g, 26, 0, 4, 1, "S")
+    for x, y in ((6, 3), (9, 2), (13, 3), (20, 2)):   # bubbles
+        rect(g, x, y, 2, 2, "q")
+    outline(g)
+    return rows(g)
+
+
+def toilet():
+    g = canvas(14, 20)
+    rect(g, 2, 0, 10, 7, "w")           # cistern
+    rect(g, 2, 6, 10, 1, "W")
+    rect(g, 1, 8, 12, 4, "w")           # seat
+    rect(g, 3, 9, 8, 2, "W")
+    rect(g, 4, 12, 6, 7, "w")           # base
+    rect(g, 10, 2, 1, 1, "S")
+    outline(g)
+    return rows(g)
+
+
+def washer():
+    g = canvas(18, 22)
+    rect(g, 1, 1, 16, 20, "w")
+    rect(g, 1, 1, 16, 4, "W")           # control strip
+    rect(g, 3, 2, 2, 2, "k")
+    rect(g, 12, 2, 3, 2, "g")
+    ellipse(g, 9, 13, 6, 6, "S")        # door
+    ellipse(g, 9, 13, 4.5, 4.5, "g")
+    rect(g, 6, 11, 2, 2, "G")           # glint
+    outline(g)
+    return rows(g)
+
+
+def basket():
+    g = canvas(16, 14)
+    rect(g, 2, 5, 12, 8, "t")
+    for y in (7, 10):
+        rect(g, 2, y, 12, 1, "u")
+    rect(g, 3, 2, 4, 3, "p")            # clothes
+    rect(g, 7, 1, 4, 4, "b")
+    rect(g, 10, 3, 3, 2, "y")
+    outline(g)
+    return rows(g)
+
+
+def nightstand():
+    g = canvas(14, 24)
+    rect(g, 2, 13, 10, 10, "t")
+    rect(g, 2, 17, 10, 1, "u")
+    rect(g, 6, 15, 2, 1, "h")
+    rect(g, 6, 20, 2, 1, "h")
+    rect(g, 6, 7, 2, 6, "u")            # lamp
+    rect(g, 3, 1, 8, 6, "L")
+    rect(g, 4, 2, 2, 3, "l")
+    outline(g)
+    return rows(g)
+
+
+def doorway():
+    """An open door in a wall, 18 x 30."""
+    g = canvas(18, 30)
+    rect(g, 0, 0, 18, 30, "f")
+    rect(g, 2, 2, 14, 28, "k")
+    rect(g, 3, 3, 12, 27, "K")
+    return rows(g)
+
+
+def picture(w=14, h=11, art="g"):
+    g = canvas(w, h)
+    rect(g, 0, 0, w, h, "f")
+    rect(g, 1, 1, w - 2, h - 2, "s")
+    rect(g, 2, h - 4, w - 4, 2, art)    # a little landscape
+    rect(g, w - 5, 2, 2, 2, "y")
+    return rows(g)
+
+
 def plant():
     g = canvas(16, 24)
     leaves = [(7, 0, 2, 12, "g"), (3, 3, 4, 3, "g"), (9, 2, 4, 3, "g"), (2, 7, 5, 2, "G"),
@@ -298,6 +487,7 @@ spec = {
             "bone": ("#e8e4dc", {"x": "#2b2238", "q": "#9fb4c8"}),
         }, {
             "x": "#4a2c4a", "n": {"from": "b"}, "W": "#fffaf0",
+            "u": "#2b2238", "v": "#8c7aa6", "U": "#2b2238",
             "r": "#d64560", "h": {"from": "r", "shade": 1.35}, "R": {"from": "r", "shade": 0.68},
             "B": "#f4ecd8", "C": {"from": "B", "shade": 0.82},
             "q": {"from": "b", "hue": 70, "shade": 0.85, "sat": 1.3}, "p": "#f2a6b8",
@@ -352,17 +542,57 @@ spec = {
         },
         "wall": {
             "tile": True,
-            "palette": {"a": "#8fa8c8", "A": "#7f98b8", "t": "#5a6d8c", "T": "#46566f"},
+            "palette": {"a": "#8fa8c8", "A": {"from": "a", "shade": 0.9}, "t": {"from": "a", "shade": 0.62},
+                        "T": {"from": "a", "shade": 0.48}},
             "frames": {
                 "paper": ["aaAaaaAaaaAaaaAa"] * 16,
                 "base": ["aaAaaaAaaaAaaaAa"] * 11 + ["tttttttttttttttt"] * 3 + ["TTTTTTTTTTTTTTTT"] * 2,
             },
+            # One colour per room: rose and lilac bedrooms, a butter kitchen.
+            "variants": {"rose": {"a": "#e7b8c6"}, "lilac": {"a": "#c3b3e0"}, "butter": {"a": "#f0dc9c"}},
+        },
+        # Tiles: the kitchen floor and the bathroom's walls and floor.
+        "tile": {
+            "tile": True,
+            "palette": {"a": "#f4efe6", "g": {"from": "a", "shade": 0.8}, "A": "#e0d2bd"},
+            "frames": {
+                "check": ["aaaaaaaAAAAAAAAg"] * 7 + ["gggggggggggggggg"] + ["AAAAAAAaaaaaaaag"] * 7 + ["gggggggggggggggg"],
+                "wall": (["aaaaaaagaaaaaaag"] * 7 + ["gggggggggggggggg"]) * 2,
+            },
+            "variants": {"aqua": {"a": "#d8f0ee", "A": "#9fd3cf"}},
         },
         "window": {
             "palette": {"f": "#f2ede4", "g": "#9fd3f0", "G": "#e6f6ff", "s": "#d9cdb8", "S": "#b8aa92"},
             "frames": {"day": window(), "night": {"base": "day", "replace": {"g": "n", "G": "N"}}},
             "variants": {},
         },
+        "counter": {"palette": {"T": "#d9d2c5", "c": "#8fc1b5", "C": "#6f9f94", "h": "#3d5a52", "S": "#b8c0c8", "k": "#3a3540"},
+                    "frames": {"counter": counter()}},
+        "fridge": {"palette": {"f": "#eef1f4", "F": "#c9d0d8", "h": "#8a94a0", "W": "#ffffff", "m": "#f08a8a"},
+                   "frames": {"fridge": fridge()}},
+        "table": {"palette": {"t": "#c08a5c", "u": "#8a5d3a", "r": "#e2c34a", "R": "#e05d5d"}, "frames": {"table": table()}},
+        "sofa": {"palette": {"a": "#e08a6a", "A": "#c8705a", "s": "#b8604c", "u": "#5a3a2a", "p": "#f2d36b"},
+                 "frames": {"sofa": sofa()}},
+        "shelf": {"palette": {"u": "#8a5d3a", "U": "#6a4428", "k": "#2b2238", "v": "#4a6b9a", "V": "#8fb8e8",
+                              "r": "#e05d5d", "g": "#5ab86a", "b": "#5a8ad8", "y": "#e8c84a"},
+                  "frames": {"shelf": shelf()}},
+        "rug": {"palette": {"r": "#7fa8c8", "R": "#f1ece2"}, "frames": {"oval": rug()},
+                "variants": {"pink": {"r": "#e7a1b6"}}},
+        "mat": {"palette": {"r": "#7fcac2", "R": "#f1ece2"}, "frames": {"mat": rug(26, 12)},
+                "variants": {"rose": {"r": "#e7a1b6"}}},
+        "bathtub": {"palette": {"w": "#f7f7f7", "W": "#dcdcdc", "B": "#8fd0ef", "b": "#c8ecfb", "S": "#a8b0b8", "q": "#ffffff"},
+                    "frames": {"tub": bathtub()}},
+        "toilet": {"palette": {"w": "#f7f7f7", "W": "#dcdcdc", "S": "#a8b0b8"}, "frames": {"toilet": toilet()}},
+        "washer": {"palette": {"w": "#f2f4f6", "W": "#d7dce2", "k": "#3a3540", "g": "#8fb8d8", "G": "#e6f6ff", "S": "#b8c0c8"},
+                   "frames": {"washer": washer()}},
+        "basket": {"palette": {"t": "#d2a86e", "u": "#a87c48", "p": "#f2a6b8", "b": "#8fb8e8", "y": "#f2d36b"},
+                   "frames": {"basket": basket()}},
+        "nightstand": {"palette": {"t": "#a87652", "u": "#7a4b2e", "h": "#e8c84a", "L": "#f6d98a", "l": "#fff3c4", "s": "#b8b0a0"},
+                       "frames": {"lamp": nightstand(), "lamp_off": {"base": "lamp", "replace": {"L": "s", "l": "s"}}},
+                       "variants": {}},
+        "door": {"palette": {"f": "#f2ede4", "k": "#2b2238", "K": "#3a2f48"}, "frames": {"open": doorway()}},
+        "picture": {"palette": {"f": "#8a5d3a", "s": "#bfe0f2", "g": "#5ab86a", "y": "#ffd166", "b": "#5a8ad8"},
+                    "frames": {"hills": picture(), "sea": picture(art="b")}, "variants": {}},
         "bed": {
             "palette": {"h": "#7a4b2e", "m": "#f1ece2", "W": "#ddd5c5", "q": "#e07a8a", "Q": "#c25d6e"},
             "frames": {"bed": bed()},

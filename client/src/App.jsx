@@ -9,7 +9,10 @@ import { ChoreForm, ChoreList, Feed, PetCard, PetPicker } from "./components.jsx
 import { InstallCard, NotificationsCard, ShortcutsCard, TagPage, TagsCard, TagWriter } from "./integrations.jsx";
 import { resyncPush, setBadge } from "./pwa.js";
 
-const EFFECT_MS = 4500;
+// A chore done plays on the doer's pet for a few seconds: a kitchen chore sends
+// it to the bowl, a cleaning one to the bath, anything else is a happy hop.
+const EFFECT_MS = 9000;
+const effectFor = (category) => ({ food: "eat", clean: "clean" })[CATEGORIES[category]?.need] || "happy";
 
 const TABS = ["home", "chores", "house", "me"];
 
@@ -84,7 +87,7 @@ export default function App() {
     const add = {};
     for (const e of fresh) {
       if (seen.current.has(e.id)) continue;
-      add[e.memberId] = { kind: CATEGORIES[e.data.category]?.need === "food" ? "eat" : "happy", until: Date.now() + EFFECT_MS };
+      add[e.memberId] = { kind: effectFor(e.data.category), until: Date.now() + EFFECT_MS };
       if (e.memberId !== state.me) say(`${e.who} did ${e.data.title}! Send a 💖?`);
     }
     state.feed.forEach((e) => seen.current.add(e.id));
@@ -145,8 +148,7 @@ export default function App() {
     try {
       const out = await run(() => api("POST", `/api/chores/${c.id}/done`, {}));
       seen.current?.add(out.eventId);
-      const need = CATEGORIES[c.category]?.need;
-      setEffects((cur) => ({ ...cur, [state.me]: { kind: need === "food" ? "eat" : "happy", until: Date.now() + EFFECT_MS } }));
+      setEffects((cur) => ({ ...cur, [state.me]: { kind: effectFor(c.category), until: Date.now() + EFFECT_MS } }));
       const bits = Object.entries(out.gain).filter(([, v]) => v > 0).map(([k, v]) => `+${v} ${k}`);
       if (out.stage.after !== out.stage.before) {
         say(out.stage.after === "baby" ? `🐣 ${me.pet.name} hatched!` : `✨ ${me.pet.name} grew up!`);

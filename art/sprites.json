@@ -1055,6 +1055,9 @@
      "from": "b"
     },
     "W": "#fffaf0",
+    "u": "#2b2238",
+    "v": "#8c7aa6",
+    "U": "#2b2238",
     "r": "#d64560",
     "h": {
      "from": "r",
@@ -1085,9 +1088,9 @@
      "...obpo.Copbo...",
      "...obboWWobbo...",
      "..obbbxWWxbbbo..",
-     ".oblxnxbbbbbbbo.",
-     ".obbnxnbbbbbbbo.",
-     ".obbxnxbbbbbbbo.",
+     ".oblxnxbbuuubbo.",
+     ".obbnxnbbvUvbbo.",
+     ".obbxnxbbuuubbo.",
      ".obbbbbbbbbbbbo.",
      ".obbbbbbbbbbbbo.",
      ".obxqbwwwhrbrro.",
@@ -2145,9 +2148,18 @@
    "tile": true,
    "palette": {
     "a": "#8fa8c8",
-    "A": "#7f98b8",
-    "t": "#5a6d8c",
-    "T": "#46566f"
+    "A": {
+     "from": "a",
+     "shade": 0.9
+    },
+    "t": {
+     "from": "a",
+     "shade": 0.62
+    },
+    "T": {
+     "from": "a",
+     "shade": 0.48
+    }
    },
    "frames": {
     "paper": [
@@ -2186,6 +2198,72 @@
      "TTTTTTTTTTTTTTTT",
      "TTTTTTTTTTTTTTTT"
     ]
+   },
+   "variants": {
+    "rose": {
+     "a": "#e7b8c6"
+    },
+    "lilac": {
+     "a": "#c3b3e0"
+    },
+    "butter": {
+     "a": "#f0dc9c"
+    }
+   }
+  },
+  "tile": {
+   "tile": true,
+   "palette": {
+    "a": "#f4efe6",
+    "g": {
+     "from": "a",
+     "shade": 0.8
+    },
+    "A": "#e0d2bd"
+   },
+   "frames": {
+    "check": [
+     "aaaaaaaAAAAAAAAg",
+     "aaaaaaaAAAAAAAAg",
+     "aaaaaaaAAAAAAAAg",
+     "aaaaaaaAAAAAAAAg",
+     "aaaaaaaAAAAAAAAg",
+     "aaaaaaaAAAAAAAAg",
+     "aaaaaaaAAAAAAAAg",
+     "gggggggggggggggg",
+     "AAAAAAAaaaaaaaag",
+     "AAAAAAAaaaaaaaag",
+     "AAAAAAAaaaaaaaag",
+     "AAAAAAAaaaaaaaag",
+     "AAAAAAAaaaaaaaag",
+     "AAAAAAAaaaaaaaag",
+     "AAAAAAAaaaaaaaag",
+     "gggggggggggggggg"
+    ],
+    "wall": [
+     "aaaaaaagaaaaaaag",
+     "aaaaaaagaaaaaaag",
+     "aaaaaaagaaaaaaag",
+     "aaaaaaagaaaaaaag",
+     "aaaaaaagaaaaaaag",
+     "aaaaaaagaaaaaaag",
+     "aaaaaaagaaaaaaag",
+     "gggggggggggggggg",
+     "aaaaaaagaaaaaaag",
+     "aaaaaaagaaaaaaag",
+     "aaaaaaagaaaaaaag",
+     "aaaaaaagaaaaaaag",
+     "aaaaaaagaaaaaaag",
+     "aaaaaaagaaaaaaag",
+     "aaaaaaagaaaaaaag",
+     "gggggggggggggggg"
+    ]
+   },
+   "variants": {
+    "aqua": {
+     "a": "#d8f0ee",
+     "A": "#9fd3cf"
+    }
    }
   },
   "window": {
@@ -2236,6 +2314,510 @@
       "G": "N"
      }
     }
+   },
+   "variants": {}
+  },
+  "counter": {
+   "palette": {
+    "T": "#d9d2c5",
+    "c": "#8fc1b5",
+    "C": "#6f9f94",
+    "h": "#3d5a52",
+    "S": "#b8c0c8",
+    "k": "#3a3540"
+   },
+   "frames": {
+    "counter": [
+     ".......oooo.....................",
+     "......oSSSSo....................",
+     "......oSSoo.....................",
+     ".ooooooSSoooooooooooooooooooooo.",
+     "oTTTTTTSSTTTTTTTTTTTTTTTTTTTTTTo",
+     "oTTTSSSSSSSSTTTTTTTTkkkkTTkkkkTo",
+     "oTTTSSSSSSSSTTTTTTTTTTTTTTTTTTTo",
+     "oCcccccccccCcccccccccCccccccccco",
+     "oCcccccccccCcccccccccCccccccccco",
+     "oCcccccccccCcccccccccCccccccccco",
+     "oCcccccccccCcccccccccCccccccccco",
+     "oCcccccccccCcccccccccCccccccccco",
+     "oCcccccchccCcccccchccCcccccchcco",
+     "oCcccccchccCcccccchccCcccccchcco",
+     "oCcccccchccCcccccchccCcccccchcco",
+     "oCcccccccccCcccccccccCccccccccco",
+     "oCcccccccccCcccccccccCccccccccco",
+     "oCcccccccccCcccccccccCccccccccco",
+     "oCcccccccccCcccccccccCccccccccco",
+     "oCcccccccccCcccccccccCccccccccco",
+     "oCcccccccccCcccccccccCccccccccco",
+     ".oooooooooooooooooooooooooooooo."
+    ]
+   }
+  },
+  "fridge": {
+   "palette": {
+    "f": "#eef1f4",
+    "F": "#c9d0d8",
+    "h": "#8a94a0",
+    "W": "#ffffff",
+    "m": "#f08a8a"
+   },
+   "frames": {
+    "fridge": [
+     ".oooooooooooooo.",
+     "offffffffffffffo",
+     "ofWWfffffffffffo",
+     "ofWWfffffffffffo",
+     "ofWWffffffffhffo",
+     "ofWWffffffffhffo",
+     "ofWWffffffffhffo",
+     "ofWWffffffffhffo",
+     "ofWWffffffffhffo",
+     "ofWWfffffffffffo",
+     "offffffffffffffo",
+     "oFFFFFFFFFFFFFFo",
+     "offffffffffffffo",
+     "offffffffffffffo",
+     "offfffffffffhffo",
+     "offmmmmfffffhffo",
+     "offmmmmfffffhffo",
+     "offmmmmfffffhffo",
+     "offfffffffffhffo",
+     "offfffffffffhffo",
+     "offfffffffffhffo",
+     "offfffffffffhffo",
+     "offffffffffffffo",
+     "offffffffffffffo",
+     "offffffffffffffo",
+     "offffffffffffffo",
+     "offffffffffffffo",
+     "offffffffffffffo",
+     "offffffffffffffo",
+     "offffffffffffffo",
+     "offffffffffffffo",
+     ".oooooooooooooo."
+    ]
+   }
+  },
+  "table": {
+   "palette": {
+    "t": "#c08a5c",
+    "u": "#8a5d3a",
+    "r": "#e2c34a",
+    "R": "#e05d5d"
+   },
+   "frames": {
+    "table": [
+     "............oRRo................",
+     "...........orrrro...............",
+     "..oooooooooorrrroooooooooooooo..",
+     ".otttttttttttttttttttttttttttto.",
+     ".otttttttttttttttttttttttttttto.",
+     ".otttttttttttttttttttttttttttto.",
+     ".ouuuuuuuuuuuuuuuuuuuuuuuuuuuuo.",
+     "..oouuoooooooooooooooooooouuoo..",
+     "...ouuo..................ouuo...",
+     "...ouuo..................ouuo...",
+     "...ouuo..................ouuo...",
+     "...ouuo..................ouuo...",
+     "...ouuo..................ouuo...",
+     "...ouuo..................ouuo...",
+     "...ouuo..................ouuo...",
+     "...ouuo..................ouuo...",
+     "....oo....................oo....",
+     "................................"
+    ]
+   }
+  },
+  "sofa": {
+   "palette": {
+    "a": "#e08a6a",
+    "A": "#c8705a",
+    "s": "#b8604c",
+    "u": "#5a3a2a",
+    "p": "#f2d36b"
+   },
+   "frames": {
+    "sofa": [
+     "................................................",
+     "...oooooooooooooooooooooooooooooooooooooooooo...",
+     "..oaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaao..",
+     "..oaaaaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaaaao..",
+     "..oaaaaaappppppppaaaaaaasaaaaaaaaaaaaaaaaaaaao..",
+     "..oaaaaaappppppppaaaaaaasaaaaaaaaaaaaaaaaaaaao..",
+     "..oaaaaaappppppppaaaaaaasaaaaaaaaaaaaaaaaaaaao..",
+     ".ooaaaaaappppppppaaaaaaasaaaaaaaaaaaaaaaaaaaaoo.",
+     "oAAAAAaaappppppppaaaaaaasaaaaaaaaaaaaaaaaaAAAAAo",
+     "oAAAAAaaappppppppaaaaaaasaaaaaaaaaaaaaaaaaAAAAAo",
+     "oAAAAAaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaAAAAAo",
+     "oAAAAAssssssssssssssssssssssssssssssssssssAAAAAo",
+     "oAAAAAaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaAAAAAo",
+     "oAAAAAaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaAAAAAo",
+     "oAAAAAaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaAAAAAo",
+     "oAAAAAaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaAAAAAo",
+     "oAAAAAaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaAAAAAo",
+     "oAAAAAaaaaaaaaaaaaaaaaaasaaaaaaaaaaaaaaaaaAAAAAo",
+     "oAAAAAooooooooooooooooooooooooooooooooooooAAAAAo",
+     "oAAuuAo..................................oAuuAAo",
+     ".oouuo....................................ouuoo.",
+     "...oo......................................oo..."
+    ]
+   }
+  },
+  "shelf": {
+   "palette": {
+    "u": "#8a5d3a",
+    "U": "#6a4428",
+    "k": "#2b2238",
+    "v": "#4a6b9a",
+    "V": "#8fb8e8",
+    "r": "#e05d5d",
+    "g": "#5ab86a",
+    "b": "#5a8ad8",
+    "y": "#e8c84a"
+   },
+   "frames": {
+    "shelf": [
+     "..okkkkkkkkkkkkkkkkkko..",
+     "..okvvvvvvvvvvvvvvvvko..",
+     "..okvVVVVvvvvvvvvvvvko..",
+     "..okvVVVVvvvvvvvvvvvko..",
+     "..okvvvvvvvvvvvvvvvvko..",
+     "..okvvvvvvvvvvvvvvvvko..",
+     "..okvvvvvvvvvvvvvvvvko..",
+     "..okvvvvvvvvvvvvvvvvko..",
+     "..okvvvvvvvvvvvvvvvvko..",
+     "..okkkkkkkkkkkkkkkkkko..",
+     ".ouuuuuuuuuuuuuuuuuuuuo.",
+     ".ouuuuuuuuuuuuuuuuuuuuo.",
+     ".ouuuuuuuuuuuuuuuuuuuuo.",
+     ".ouuuuuuuuuuuuuuuuuuuuo.",
+     ".ouUUUUUUUUUUUUUUUUUUuo.",
+     ".ouuruuubuuuruuuguuuuuo.",
+     ".ouurugubuyurubuguuuuuo.",
+     ".ouurugubuyurubuguuuuuo.",
+     ".ouurugubuyurubuguuuuuo.",
+     ".ouUUUUUUUUUUUUUUUUUUuo.",
+     ".ouuuyurubugurugubuuuuo.",
+     ".ouuuyurubugurugubuuuuo.",
+     ".ouuuyurubugurugubuuuuo.",
+     ".ouuuyurubugurugubuuuuo.",
+     ".ouuuuuuuuuuuuuuuuuuuuo.",
+     "..oooooooooooooooooooo.."
+    ]
+   }
+  },
+  "rug": {
+   "palette": {
+    "r": "#7fa8c8",
+    "R": "#f1ece2"
+   },
+   "frames": {
+    "oval": [
+     "................................................",
+     "..............rrrrrrrrrrrrrrrrrrrr..............",
+     "..........rrrrrrrrrrrrrrrrrrrrrrrrrrrr..........",
+     ".......rrrrrrrrrRRRRRRRRRRRRRRRRrrrrrrrrr.......",
+     ".....rrrrrrRRRRRRRRRRRRRRRRRRRRRRRRRRrrrrrr.....",
+     "...rrrrrRRRRRRRRrrrrrrrrrrrrrrrrRRRRRRRRrrrrr...",
+     "..rrrrRRRRRrrrrrrrrrrrrrrrrrrrrrrrrrrRRRRRrrrr..",
+     ".rrrRRRRrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrRRRRrrr.",
+     ".rrRRRRrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrRRRRrr.",
+     ".rrRRRrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrRRRrr.",
+     ".rrRRRrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrRRRrr.",
+     ".rrRRRRrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrRRRRrr.",
+     ".rrrRRRRrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrRRRRrrr.",
+     "..rrrrRRRRRrrrrrrrrrrrrrrrrrrrrrrrrrrRRRRRrrrr..",
+     "...rrrrrRRRRRRRRrrrrrrrrrrrrrrrrRRRRRRRRrrrrr...",
+     ".....rrrrrrRRRRRRRRRRRRRRRRRRRRRRRRRRrrrrrr.....",
+     ".......rrrrrrrrrRRRRRRRRRRRRRRRRrrrrrrrrr.......",
+     "..........rrrrrrrrrrrrrrrrrrrrrrrrrrrr..........",
+     "..............rrrrrrrrrrrrrrrrrrrr..............",
+     "................................................"
+    ]
+   },
+   "variants": {
+    "pink": {
+     "r": "#e7a1b6"
+    }
+   }
+  },
+  "mat": {
+   "palette": {
+    "r": "#7fcac2",
+    "R": "#f1ece2"
+   },
+   "frames": {
+    "mat": [
+     "..........................",
+     "......rrrrrrrrrrrrrr......",
+     "...rrrrrrrrrrrrrrrrrrrr...",
+     "..rrrrrRRRRRRRRRRRRrrrrr..",
+     ".rrrRRRRRRRRRRRRRRRRRRrrr.",
+     ".rrRRRRrrrrrrrrrrrrRRRRrr.",
+     ".rrRRRRrrrrrrrrrrrrRRRRrr.",
+     ".rrrRRRRRRRRRRRRRRRRRRrrr.",
+     "..rrrrrRRRRRRRRRRRRrrrrr..",
+     "...rrrrrrrrrrrrrrrrrrrr...",
+     "......rrrrrrrrrrrrrr......",
+     ".........................."
+    ]
+   },
+   "variants": {
+    "rose": {
+     "r": "#e7a1b6"
+    }
+   }
+  },
+  "bathtub": {
+   "palette": {
+    "w": "#f7f7f7",
+    "W": "#dcdcdc",
+    "B": "#8fd0ef",
+    "b": "#c8ecfb",
+    "S": "#a8b0b8",
+    "q": "#ffffff"
+   },
+   "frames": {
+    "tub": [
+     ".........................oSSSSo...",
+     ".........oo.........oo....ooSSo...",
+     "......oooqqo.oo....oqqo....oSSo...",
+     ".oooooqqoqqooqqoooooqqooooooSSooo.",
+     "owwwwwqqwwwwwqqwwwwwwwwwwwwwwwwwwo",
+     "owwBbbbbbbbbBBBBBBBBBBBBBBBBBBBwwo",
+     "owwBBBBBBBBBBBBBBBbbbbbbBBBBBBBwwo",
+     "owwBBBBBBBBBBBBBBBBBBBBBBBBBBBBwwo",
+     "owwBBBBBBBBBBBBBBBBBBBBBBBBBBBBwwo",
+     "oWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWo",
+     "owwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwo",
+     "owwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwo",
+     "owwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwo",
+     "owwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwo",
+     "owwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwo",
+     "owwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwo",
+     ".ooSSSooooooooooooooooooooooSSSoo.",
+     "..oSSSo....................oSSSo..",
+     "..oSSSo....................oSSSo..",
+     "...ooo......................ooo..."
+    ]
+   }
+  },
+  "toilet": {
+   "palette": {
+    "w": "#f7f7f7",
+    "W": "#dcdcdc",
+    "S": "#a8b0b8"
+   },
+   "frames": {
+    "toilet": [
+     ".owwwwwwwwwwo.",
+     ".owwwwwwwwwwo.",
+     ".owwwwwwwwSwo.",
+     ".owwwwwwwwwwo.",
+     ".owwwwwwwwwwo.",
+     ".owwwwwwwwwwo.",
+     ".oWWWWWWWWWWo.",
+     ".oooooooooooo.",
+     "owwwwwwwwwwwwo",
+     "owwWWWWWWWWwwo",
+     "owwWWWWWWWWwwo",
+     "owwwwwwwwwwwwo",
+     ".ooowwwwwwooo.",
+     "...owwwwwwo...",
+     "...owwwwwwo...",
+     "...owwwwwwo...",
+     "...owwwwwwo...",
+     "...owwwwwwo...",
+     "...owwwwwwo...",
+     "....oooooo...."
+    ]
+   }
+  },
+  "washer": {
+   "palette": {
+    "w": "#f2f4f6",
+    "W": "#d7dce2",
+    "k": "#3a3540",
+    "g": "#8fb8d8",
+    "G": "#e6f6ff",
+    "S": "#b8c0c8"
+   },
+   "frames": {
+    "washer": [
+     ".oooooooooooooooo.",
+     "oWWWWWWWWWWWWWWWWo",
+     "oWWkkWWWWWWWgggWWo",
+     "oWWkkWWWWWWWgggWWo",
+     "oWWWWWWWWWWWWWWWWo",
+     "owwwwwwwwwwwwwwwwo",
+     "owwwwwwwwwwwwwwwwo",
+     "owwwwwwSSSSwwwwwwo",
+     "owwwwSSSSSSSSwwwwo",
+     "owwwSSggggggSSwwwo",
+     "owwwSggggggggSwwwo",
+     "owwSSgGGgggggSSwwo",
+     "owwSSgGGgggggSSwwo",
+     "owwSSggggggggSSwwo",
+     "owwSSggggggggSSwwo",
+     "owwwSggggggggSwwwo",
+     "owwwSSggggggSSwwwo",
+     "owwwwSSSSSSSSwwwwo",
+     "owwwwwwSSSSwwwwwwo",
+     "owwwwwwwwwwwwwwwwo",
+     "owwwwwwwwwwwwwwwwo",
+     ".oooooooooooooooo."
+    ]
+   }
+  },
+  "basket": {
+   "palette": {
+    "t": "#d2a86e",
+    "u": "#a87c48",
+    "p": "#f2a6b8",
+    "b": "#8fb8e8",
+    "y": "#f2d36b"
+   },
+   "frames": {
+    "basket": [
+     ".......oooo.....",
+     "...oooobbbbo....",
+     "..oppppbbbboo...",
+     "..oppppbbbyyyo..",
+     "..oppppbbbyyyo..",
+     ".otttttttttttto.",
+     ".otttttttttttto.",
+     ".ouuuuuuuuuuuuo.",
+     ".otttttttttttto.",
+     ".otttttttttttto.",
+     ".ouuuuuuuuuuuuo.",
+     ".otttttttttttto.",
+     ".otttttttttttto.",
+     "..oooooooooooo.."
+    ]
+   }
+  },
+  "nightstand": {
+   "palette": {
+    "t": "#a87652",
+    "u": "#7a4b2e",
+    "h": "#e8c84a",
+    "L": "#f6d98a",
+    "l": "#fff3c4",
+    "s": "#b8b0a0"
+   },
+   "frames": {
+    "lamp": [
+     "...oooooooo...",
+     "..oLLLLLLLLo..",
+     "..oLllLLLLLo..",
+     "..oLllLLLLLo..",
+     "..oLllLLLLLo..",
+     "..oLLLLLLLLo..",
+     "..oLLLLLLLLo..",
+     "...ooouuooo...",
+     ".....ouuo.....",
+     ".....ouuo.....",
+     ".....ouuo.....",
+     ".....ouuo.....",
+     "..oooouuoooo..",
+     ".otttttttttto.",
+     ".otttttttttto.",
+     ".otttthhtttto.",
+     ".otttttttttto.",
+     ".ouuuuuuuuuuo.",
+     ".otttttttttto.",
+     ".otttttttttto.",
+     ".otttthhtttto.",
+     ".otttttttttto.",
+     ".otttttttttto.",
+     "..oooooooooo.."
+    ],
+    "lamp_off": {
+     "base": "lamp",
+     "replace": {
+      "L": "s",
+      "l": "s"
+     }
+    }
+   },
+   "variants": {}
+  },
+  "door": {
+   "palette": {
+    "f": "#f2ede4",
+    "k": "#2b2238",
+    "K": "#3a2f48"
+   },
+   "frames": {
+    "open": [
+     "ffffffffffffffffff",
+     "ffffffffffffffffff",
+     "ffkkkkkkkkkkkkkkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff",
+     "ffkKKKKKKKKKKKKkff"
+    ]
+   }
+  },
+  "picture": {
+   "palette": {
+    "f": "#8a5d3a",
+    "s": "#bfe0f2",
+    "g": "#5ab86a",
+    "y": "#ffd166",
+    "b": "#5a8ad8"
+   },
+   "frames": {
+    "hills": [
+     "ffffffffffffff",
+     "fssssssssssssf",
+     "fssssssssyyssf",
+     "fssssssssyyssf",
+     "fssssssssssssf",
+     "fssssssssssssf",
+     "fssssssssssssf",
+     "fsggggggggggsf",
+     "fsggggggggggsf",
+     "fssssssssssssf",
+     "ffffffffffffff"
+    ],
+    "sea": [
+     "ffffffffffffff",
+     "fssssssssssssf",
+     "fssssssssyyssf",
+     "fssssssssyyssf",
+     "fssssssssssssf",
+     "fssssssssssssf",
+     "fssssssssssssf",
+     "fsbbbbbbbbbbsf",
+     "fsbbbbbbbbbbsf",
+     "fssssssssssssf",
+     "ffffffffffffff"
+    ]
    },
    "variants": {}
   },

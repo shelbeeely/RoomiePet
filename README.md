@@ -119,6 +119,17 @@ pixel-art skill in `.claude/skills/pixel-art`:
 npm run art        # -> client/public/sprites/sheet.png + sheet.json, art/preview.png, client/public/icons/
 ```
 
+The house is a doll's-house cutaway (`client/src/house.js`: rooms, doors,
+furniture, where pets go): two bedrooms upstairs, the kitchen-living room and
+the bathroom-laundry downstairs. Pets sleep in their bedroom (alternating
+between the two), run to the bowl after a kitchen chore and to the bath after
+a cleaning one, hang about the kitchen when hungry, and otherwise mostly the
+living room.
+
+Pets are drawn on a 16 x 16 grid and the house in 16-pixel tiles.
+`art/sample32.py` draws one pet at 32 x 32 (`art/sample32-preview.png`) to
+show what a bigger grid looks like before redrawing the rest.
+
 ## Layout
 
 ```
