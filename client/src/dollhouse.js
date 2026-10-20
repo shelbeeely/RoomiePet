@@ -17,6 +17,15 @@ const WALL = 4;           // ft: walls standing (the room is seen cut away above
 const CUT = 1;            // ft: walls inside the flat, cut down
 const NEAR = 0.5;         // ft: walls nearest us, cut to a stub
 const DEPTH = 0.75;       // floors seen a little squashed, from a little above
+// ft: furniture is cut away above this, as the walls are. Drawn whole, a 6.5 ft closet against
+// the left wall stood up the screen as a tall panel over the bed behind it; cut, it reads as
+// a closet seen from above, like everything else in a dollhouse.
+export const CUTAWAY = WALL + 0.5;
+
+/** A piece's boxes as drawn: anything above the cutaway is cut off. */
+function cutBoxes(item) {
+  return boxesOf(item).filter((b) => b.z0 < CUTAWAY).map((b) => (b.z1 > CUTAWAY ? { ...b, z1: CUTAWAY } : b));
+}
 const THICK = 0.25;       // ft: walls
 const OUTLINE = [43, 34, 56];
 const WALL_TOP = [59, 48, 73];
@@ -323,7 +332,7 @@ function cached(key, make) {
 export function pieceSprite(item, cam, tint = null) {
   const key = `${cam.key}|${JSON.stringify(item)}|${tint || ""}`;
   return cached(key, () => {
-    const boxes = boxesOf(item);
+    const boxes = cutBoxes(item);
     const r = new Raster(...screenBounds(boxes, cam));
     drawBoxes(r, boxes, cam, (box) => {
       const c = colorOf(box.mat, item);
@@ -336,7 +345,7 @@ export function pieceSprite(item, cam, tint = null) {
 
 /** The world box a piece takes up, for putting it in order with everything else. */
 export function pieceBox(item) {
-  const boxes = boxesOf(item);
+  const boxes = cutBoxes(item);
   return {
     x0: Math.min(...boxes.map((b) => b.x0)), x1: Math.max(...boxes.map((b) => b.x1)),
     y0: Math.min(...boxes.map((b) => b.y0)), y1: Math.max(...boxes.map((b) => b.y1)),

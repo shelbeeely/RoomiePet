@@ -125,6 +125,13 @@ describe("room to live in", () => {
       expect(hx).toBe(0);
     }
     expect(l.items.filter((i) => i.kind === "nightstand").length).toBe(2);
+    // A double-door closet on the left wall between them, its doors facing into the room.
+    const closet = l.items.find((i) => i.kind === "closet");
+    const [back, front] = beds.map(footprint).sort((p, q) => p.y0 - q.y0);
+    const c = footprint(closet);
+    expect(c.x0).toBe(0);
+    expect(c.y0 >= back.y1 && c.y1 <= front.y0).toBe(true);
+    expect(place(closet, CATALOG.closet.w / 2, CATALOG.closet.d)[0]).toBe(c.x1);   // the doors face right
     for (const kind of ["desk", "dresser", "pet_bed"]) expect(l.items.some((i) => i.kind === kind), kind).toBe(true);
     // And there is still room to add things.
     for (const kind of ["beanbag", "bookshelf", "lamp"]) expect(freeSpot("bedB", l, kind), kind).not.toBe(null);

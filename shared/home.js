@@ -166,6 +166,18 @@ export const CATALOG = {
       [1.5, 2.04, 2.8, 0.15, 0.06, 0.8, "gold"], [1.85, 2.04, 2.8, 0.15, 0.06, 0.8, "gold"],
     ],
   },
+  closet: {
+    // A reach-in closet with a pair of doors, tall as the room's walls allow; built to stand
+    // flat against a wall (between Bedroom 2's beds as it comes).
+    label: "Double-door closet", group: "bedroom", w: 3.5, d: 2, layer: "solid", colors: ["white", "oak", "walnut", "sage", "lilac"],
+    boxes: [
+      [0, 0, 0, 3.5, 2, 6.6, "main"], [0, 0, 6.6, 3.5, 2, 0.15, "main_"], [0, 1.9, 0, 3.5, 0.1, 0.25, "main_"],
+      [0.12, 2, 0.3, 1.58, 0.04, 6.1, "main^"], [1.8, 2, 0.3, 1.58, 0.04, 6.1, "main^"],
+      [0.35, 2.04, 3.7, 1.12, 0.02, 2.5, "main"], [0.35, 2.04, 0.6, 1.12, 0.02, 2.7, "main"],
+      [2.03, 2.04, 3.7, 1.12, 0.02, 2.5, "main"], [2.03, 2.04, 0.6, 1.12, 0.02, 2.7, "main"],
+      [1.5, 2.04, 3.0, 0.12, 0.06, 0.5, "gold"], [1.88, 2.04, 3.0, 0.12, 0.06, 0.5, "gold"],
+    ],
+  },
   desk: {
     label: "Desk", group: "bedroom", w: 4, d: 2, layer: "solid", colors: ["oak", "white", "walnut", "black"],
     boxes: [
@@ -528,12 +540,14 @@ export const DEFAULT_LAYOUTS = {
   },
   bedB: {
     // Two twin beds with their headboards against the left wall, one in each corner, a
-    // nightstand by each head; the desk, dresser and pet bed along the right, the doorway clear.
+    // nightstand by each head and a double-door closet between them; the desk, dresser and
+    // pet bed along the right, the doorway clear.
     wall: "lilac", floor: "oak",
     items: [
       W("window", "white", "s", 25, 7.25), W("picture", "blue", "n", 12, 8.25), W("clock", "white", "n", 12, 3),
       F("small_rug", "sage", 2, 17), F("bed", "blue", 0, 12, 3), F("bed", "pink", 0, 21.75, 3),
       F("nightstand", "oak", 0, 15.25, 3), F("nightstand", "oak", 0, 20.25, 3),
+      F("closet", "white", 0, 16.75, 3),
       F("desk", "oak", 7.5, 12), F("chair", "teal", 8.5, 13.75, 2), F("dresser", "white", 9.5, 16, 1),
       F("pet_bed", "pink", 7.25, 23.25), F("plant", "teal", 9.75, 23.75),
     ],
