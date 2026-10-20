@@ -1054,13 +1054,26 @@
     "n": {
      "from": "b"
     },
+    "W": "#fffaf0",
     "r": "#d64560",
+    "h": {
+     "from": "r",
+     "shade": 1.35
+    },
+    "R": {
+     "from": "r",
+     "shade": 0.68
+    },
     "B": "#f4ecd8",
+    "C": {
+     "from": "B",
+     "shade": 0.82
+    },
     "q": {
      "from": "b",
      "hue": 70,
      "shade": 0.85,
-     "sat": 1.2
+     "sat": 1.3
     },
     "p": "#f2a6b8"
    },
@@ -1068,18 +1081,18 @@
     "_body": [
      "....oo....oo....",
      "...obpo..opbo...",
-     "...obpo..BBBB...",
-     "...obpo..opbo...",
-     "...obbo..obbo...",
-     "..obbbbbbbbqqo..",
-     ".obblbbbbbbqqbo.",
+     "...obpo.BBBCB...",
+     "...obpo.Copbo...",
+     "...obboWWobbo...",
+     "..obbbxWWxbbbo..",
      ".oblxnxbbbbbbbo.",
      ".obbnxnbbbbbbbo.",
      ".obbxnxbbbbbbbo.",
      ".obbbbbbbbbbbbo.",
-     ".obbbbrwrwbbbbo.",
-     "..obbwrrrwwbbo..",
-     "..odddxrxddddo..",
+     ".obbbbbbbbbbbbo.",
+     ".obxqbwwwhrbrro.",
+     "..oqqwwwwrrrRo..",
+     "..odddddddrRdo..",
      "...oo......oo...",
      "................"
     ],

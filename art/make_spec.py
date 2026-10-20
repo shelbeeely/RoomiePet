@@ -168,23 +168,25 @@ LOP = [
 
 # The stitched bunny: a creepy-cute plush. Its left eye is sewn shut with an X
 # (x stitches; n is body-coloured filling the X's gaps, so no face is drawn
-# there), its right ear is bandaged (B), a patch (q) is sewn on its head and a
-# little heart (r) on its tummy. Faces show through the right eye and mouth.
+# there); stuffing (W) puffs out of a split seam on top of its head; its right
+# ear is bandaged (B, a darker fold C, a loose end hanging off); and its tummy
+# has a patch (q) sewn on one side and a shaded heart (h light, r, R dark) on
+# the other, below the mouth. Its feelings show through the right eye and mouth.
 STITCHED = [
     "....oo....oo....",
     "...obpo..opbo...",
-    "...obpo..BBBB...",
-    "...obpo..opbo...",
-    "...obbo..obbo...",
-    "..obbbbbbbbqqo..",
-    ".obblbbbbbbqqbo.",
+    "...obpo.BBBCB...",
+    "...obpo.Copbo...",
+    "...obbo" + "WW" + "obbo...",
+    "..obbbxWWxbbbo..",
     ".oblxnxbbbbbbbo.",
     ".obbnxnbbbbbbbo.",
     ".obbxnxbbbbbbbo.",
     ".obbbbbbbbbbbbo.",
-    ".obbbbrwrwbbbbo.",
-    "..obbwrrrwwbbo..",
-    "..odddxrxddddo..",
+    ".obbbbbbbbbbbbo.",
+    ".obxqbwwwhrbrro.",
+    "..oqqwwwwrrrRo..",
+    "..odddddddrRdo..",
     "...oo......oo...",
     "................",
 ]
@@ -295,8 +297,10 @@ spec = {
             "bubblegum": ("#f7b2cf", {"r": "#b8264a"}),
             "bone": ("#e8e4dc", {"x": "#2b2238", "q": "#9fb4c8"}),
         }, {
-            "x": "#4a2c4a", "n": {"from": "b"}, "r": "#d64560", "B": "#f4ecd8",
-            "q": {"from": "b", "hue": 70, "shade": 0.85, "sat": 1.2}, "p": "#f2a6b8",
+            "x": "#4a2c4a", "n": {"from": "b"}, "W": "#fffaf0",
+            "r": "#d64560", "h": {"from": "r", "shade": 1.35}, "R": {"from": "r", "shade": 0.68},
+            "B": "#f4ecd8", "C": {"from": "B", "shade": 0.82},
+            "q": {"from": "b", "hue": 70, "shade": 0.85, "sat": 1.3}, "p": "#f2a6b8",
         }),
         "raccoon": pet(RACCOON, (4, 6), 14, "..oo_......_oo..", "#a9a6b2", {
             "cinnamon": ("#b88a64", {}),
