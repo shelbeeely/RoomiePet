@@ -111,13 +111,12 @@ npm test           # server API tests (node:test) and the shared rules (vitest)
 
 ## Art
 
-The pets are 64 x 64 pixel art drawn from shapes in `art/pets.py` -- animals,
-not people: a head, a body on four legs and a tail from the rump, seen
-three-quarter from above. Every species shares the build and each adds its
+The pets are 64 x 64 pixel art drawn from shapes in `art/pets.py` -- animals
+facing us, the head and face first, the body on four feet below and the
+tail out from behind. Every species shares the build and each adds its
 ears, snout, markings and tail, so all of them have every mood and
-animation, always facing us (mirrored to walk the other way). The
-apartment's furniture is drawn the same way at 16 pixels to the foot in
-`art/house64.py`. `art/make_spec.py` gives them their colours and writes
+animation, always facing us (mirrored to walk the other way).
+`art/make_spec.py` gives them their colours and writes
 `art/sprites.json`, rendered with the pixel-art skill in
 `.claude/skills/pixel-art` (whose `painter.py` does the shapes, shading and
 outlines):
@@ -131,9 +130,11 @@ feet (about 750 sq ft -- the two bedrooms on the left, each opening onto the
 main area, kitchen along its back wall and living room in front, and the
 bathroom with the laundry in the back right corner), its walls and doors, a
 catalog of furniture made of boxes, and how each room comes furnished.
-`client/src/iso.js` draws it as pixel art: the whole flat front-on like a
-doll's house, with the walls inside cut down so nothing hides behind them,
-or one room isometric, turned a quarter at a time -- tap a room or its chip.
+`client/src/dollhouse.js` draws it as pixel art, as a dollhouse: front-on
+from a little above, so the furniture faces us as the pets do, turned a
+quarter at a time (⟲ ⟳) to see it from any side. The whole flat has the
+walls inside it cut down so no room hides another; tap a room or its chip
+to see it alone, its back walls standing.
 
 The room builder (✏️ under a room, `client/src/RoomBuilder.jsx`) is a small
 Sims-style editor: drag pieces about on a half-foot grid, turn, recolour or

@@ -2,13 +2,10 @@
 // piece of furniture are boxes, rasterised here into pixel art -- flat faces
 // lit from above and the left, a darker line where faces meet, a dark
 // outline round each piece -- so a bed the builder turns or recolours is
-// drawn as crisply as anything in the sprite sheet. Two cameras:
-//
-//   plan  the whole flat front-on from a little above, like a doll's house;
-//         back walls of the flat stand full height, the walls inside are cut
-//         down so they hide nothing (the Sims' walls-down)
-//   iso   one room, isometric, turned a quarter at a time; the two far walls
-//         stand, the near ones are cut to a stub
+// drawn as crisply as anything in the sprite sheet. One camera, a
+// dollhouse: the whole flat or one room of it, front-on from a little above
+// (so furniture faces us as the pets do), turned a quarter at a time to see
+// it from any side. An isometric view was tried and dropped for it.
 //
 // Everything is in scene pixels, 16 to the foot; the canvas scales them up.
 import {
@@ -16,10 +13,10 @@ import {
 } from "@shared/home.js";
 
 export const PX = 16;
-const PLAN_WALL = 4;      // ft: the flat's back walls in the plan
-const PLAN_CUT = 1;       // ft: walls inside the flat, cut down
-const ISO_WALL = 4.5;     // ft: a room's far walls
-const ISO_CUT = 0.5;      // ft: its near walls
+const WALL = 4;           // ft: walls standing (the room is seen cut away above that)
+const CUT = 1;            // ft: walls inside the flat, cut down
+const NEAR = 0.5;         // ft: walls nearest us, cut to a stub
+const DEPTH = 0.75;       // floors seen a little squashed, from a little above
 const THICK = 0.25;       // ft: walls
 const OUTLINE = [43, 34, 56];
 const WALL_TOP = [59, 48, 73];
@@ -85,7 +82,7 @@ export function wallColor(wall, along, z) {
     const dz = z * 2 - iz - 0.5;
     return (ia + iz) % 2 === 0 && da * da + dz * dz < 0.06 ? mul(base, 1.12) : base;
   }
-  if (w.pattern === "stars") return hash(a >> 2, h >> 2) > 0.97 ? [255, 240, 190] : base;
+  if (w.pattern === "stars") return hash(a >> 1, h >> 1) > 0.985 ? [255, 240, 190] : base;
   if (w.pattern === "tile") {
     if (a % 8 === 0 || h % 8 === 0) return mul(base, 0.82);
     return base;
@@ -103,84 +100,64 @@ const TURNS = [
   (x, y) => [-y, x],
 ];
 
-export function planCamera() {
-  const top = PLAN_WALL * PX;
-  return {
-    kind: "plan",
-    key: "plan",
-    width: FLAT.w * PX,
-    height: FLAT.d * PX + top,
-    project: (x, y, z) => [x * PX, y * PX + top - z * PX],
-    unproject: (sx, sy) => [sx / PX, (sy - top) / PX],
-    // The viewer is towards +y (and up): what is further back is drawn first.
-    behind: (a, b) => a.y1 <= b.y0 + 1e-6 || a.z1 <= b.z0 + 1e-6,
-    depth: (x, y) => y,
-    faces: { top: 1.04, s: 0.8 },
-    wallHeight: (wall) => (wall.side === "s" && wall.outer ? 0.5 : wall.outer ? PLAN_WALL : PLAN_CUT),
-  };
-}
-
-export function isoCamera(room, rot) {
+/**
+ * The dollhouse camera: the flat (or one room of it) seen front-on from a
+ * little above, from whichever side rot turns it to. Floors are squashed a
+ * little, walls and furniture fronts stand up full height, so pieces face
+ * us as the pets do. The walls furthest from us stand; the ones nearest are
+ * cut to a stub, and seeing the whole flat, every wall inside it is cut
+ * down too so no room hides another (the Sims' walls-down).
+ */
+export function dollCamera(room = null, rot = 0) {
   const turn = TURNS[rot];
-  const b = bounds(room);
+  const b = room ? bounds(room) : { x0: 0, x1: FLAT.w, y0: 0, y1: FLAT.d };
   const corners = [[b.x0, b.y0], [b.x1, b.y0], [b.x0, b.y1], [b.x1, b.y1]].map(([x, y]) => turn(x, y));
-  const sxs = corners.map(([x, y]) => (x - y) * PX);
-  const sys = corners.map(([x, y]) => ((x + y) * PX) / 2);
-  const margin = 10;
-  const ox = -Math.min(...sxs) + margin;
-  const oy = -Math.min(...sys) + (ISO_WALL + 0.6) * PX + margin;
-  const width = Math.ceil(Math.max(...sxs) - Math.min(...sxs) + margin * 2);
-  const height = Math.ceil(Math.max(...sys) - Math.min(...sys) + (ISO_WALL + 0.6) * PX + margin * 2);
-  // Which way, in the flat, is towards the viewer: (1, 1) in turned coordinates.
-  const toward = [[1, 1], [-1, 1], [-1, -1], [1, -1]][rot];
+  const us = corners.map(([u]) => u);
+  const vs = corners.map(([, v]) => v);
+  const margin = room ? 8 : 0;
+  const top = (WALL + 0.5) * PX + margin;
+  const u0 = Math.min(...us);
+  const v0 = Math.min(...vs);
+  const width = Math.ceil((Math.max(...us) - u0) * PX + margin * 2);
+  const height = Math.ceil((Math.max(...vs) - v0) * PX * DEPTH + top + margin + (room ? 4 : 0));
+  // Which way, in the flat, is towards the viewer: +v once turned.
+  const toward = [[0, 1], [-1, 0], [0, -1], [1, 0]][rot];
   const ext = (box) => {
     const [ax, ay] = turn(box.x0, box.y0);
     const [bx, by] = turn(box.x1, box.y1);
-    return { x0: Math.min(ax, bx), x1: Math.max(ax, bx), y0: Math.min(ay, by), y1: Math.max(ay, by) };
+    return { v0: Math.min(ay, by), v1: Math.max(ay, by) };
   };
-  const shade = { top: 1.04 };
-  // The two side faces we see: the one whose normal turns to +y is on the left (mid), +x on the right (dark).
-  for (const [side, n] of [["n", [0, -1]], ["s", [0, 1]], ["w", [-1, 0]], ["e", [1, 0]]]) {
-    const [tx, ty] = turn(n[0], n[1]);
-    if (ty > 0.5) shade[side] = 0.88;
-    if (tx > 0.5) shade[side] = 0.72;
-  }
+  const normal = { n: [0, -1], s: [0, 1], w: [-1, 0], e: [1, 0] };
+  const facing = (side) => normal[side][0] * toward[0] + normal[side][1] * toward[1];
+  // We see the tops of things and the faces turned towards us.
+  const faces = { top: 1.04 };
+  for (const side of Object.keys(normal)) if (facing(side) > 0.5) faces[side] = 0.84;
   return {
-    kind: "iso",
-    key: `iso:${room}:${rot}`,
+    key: `doll:${room || "flat"}:${rot}`,
     room,
     rot,
     width,
     height,
-    toward,
     project: (x, y, z) => {
       const [u, v] = turn(x, y);
-      return [ox + (u - v) * PX, oy + ((u + v) * PX) / 2 - z * PX];
+      return [margin + (u - u0) * PX, top + (v - v0) * PX * DEPTH - z * PX];
     },
-    unproject: (sx, sy) => {
-      const d = (sx - ox) / PX;          // u - v
-      const s = ((sy - oy) * 2) / PX;    // u + v
-      const u = (s + d) / 2;
-      const v = (s - d) / 2;
-      // Turn back.
+    /** The point on the floor (or at height z) under a point on the screen. */
+    unproject: (sx, sy, z = 0) => {
+      const u = (sx - margin) / PX + u0;
+      const v = (sy - top + z * PX) / (PX * DEPTH) + v0;
       return [[u, v], [-v, u], [-u, -v], [v, -u]][rot];
     },
-    behind: (a, b) => {
-      const ea = ext(a);
-      const eb = ext(b);
-      return ea.x1 <= eb.x0 + 1e-6 || ea.y1 <= eb.y0 + 1e-6 || a.z1 <= b.z0 + 1e-6;
-    },
-    depth: (x, y) => {
-      const [u, v] = turn(x, y);
-      return u + v;
-    },
-    faces: shade,
-    far: (wall) => {
-      const n = { n: [0, -1], s: [0, 1], w: [-1, 0], e: [1, 0] }[wall.side];
-      return n[0] * toward[0] + n[1] * toward[1] < 0;
-    },
+    behind: (a, c) => ext(a).v1 <= ext(c).v0 + 1e-6 || a.z1 <= c.z0 + 1e-6,
+    depth: (x, y) => turn(x, y)[1],
+    faces,
+    /** A wall at the back, as we look: its room side faces us. */
+    far: (wall) => facing(wall.side) < -0.5,
     wallHeight(wall) {
-      return this.far(wall) ? ISO_WALL : ISO_CUT;
+      const f = facing(wall.side);
+      if (f > 0.5) return room || wall.outer ? NEAR : CUT;   // nearest us: a stub
+      if (room) return WALL;                                   // one room: its back and sides stand
+      return wall.outer ? WALL : CUT;                          // the whole flat: only its outside walls
     },
   };
 }
@@ -378,21 +355,25 @@ export function wallBox(wall, height) {
   return { x0: line, x1: line + THICK, y0: a, y1: b, z0: 0, z1: height };
 }
 
-/** A wall's sprite: wallpaper on the face towards its room, plain everywhere else. */
-export function wallSprite(wall, height, paper, cam) {
-  const key = `${cam.key}|wall|${JSON.stringify(wall)}|${height}|${paper}`;
+/**
+ * A wall's sprite: wallpaper on the face towards its room, and on the other
+ * face the next room's (outside walls are plain).
+ */
+export function wallSprite(wall, height, paper, cam, nextPaper = null) {
+  const key = `${cam.key}|wall|${JSON.stringify(wall)}|${height}|${paper}|${nextPaper}`;
   return cached(key, () => {
     const box = wallBox(wall, height);
     const r = new Raster(...screenBounds([box], cam));
     const inner = { n: "s", s: "n", w: "e", e: "w" }[wall.side];
     drawBoxes(r, [box], cam, (_b, side) => {
       if (side === "top") return WALL_TOP;
-      if (side !== inner || !paper) return OUTSIDE;
+      const which = side === inner ? paper : nextPaper;
+      if (!which) return OUTSIDE;
       const shade = cam.faces[side];
       // a runs along the wall from its start, b up it.
       const along0 = side === "s" || side === "n" ? box.x0 : box.y0;
       const len = side === "s" || side === "n" ? box.x1 - box.x0 : box.y1 - box.y0;
-      return (a, b) => mul(wallColor(paper, along0 + a * len, b * height), shade);
+      return (a, b) => mul(wallColor(which, along0 + a * len, b * height), shade);
     }, { edge: 0 });
     return r.toCanvas();
   });
@@ -437,14 +418,4 @@ export function floorSprite(rooms, layouts, cam) {
   });
 }
 
-/** Every wall of the flat once, for the plan: each room's back and left walls, and the flat's front and right. */
-export function planWalls() {
-  const out = [];
-  for (const room of Object.keys(ROOMS)) {
-    for (const w of wallsOf(room)) {
-      if (w.side === "n" || w.side === "w" || w.outer) out.push({ ...w, room });
-    }
-  }
-  return out;
-}
 

@@ -9,7 +9,7 @@ Roommates' chores with a tamagotchi pet each (README.md has the whole picture).
   so other phones refresh. Server tests: `server/test/api.test.js` (real HTTP,
   in-memory SQLite, a clock the test moves).
 - `client/src/` is React with Vite; `HouseScene.jsx` draws the shared flat on
-  a canvas (whole, or one room isometric and turnable) with `iso.js`, and
+  a canvas (a dollhouse, whole or one room, turnable) with `dollhouse.js`, and
   `RoomBuilder.jsx` arranges a room; `house.js` is how pets get about.
   `components.jsx` the rest, `integrations.jsx` install /
   notifications / Siri & Shortcuts / NFC tags, `pwa.js` the browser APIs.
@@ -23,9 +23,9 @@ Roommates' chores with a tamagotchi pet each (README.md has the whole picture).
   catalog (pieces are boxes), default layouts, and `layoutProblem`, which
   the server checks saved rooms with (`PUT /api/rooms/:room`). A new piece
   goes in `CATALOG`; `shared/home.test.js` checks its materials.
-- Art: pets are 64 x 64 animals, drawn from shapes in `art/pets.py`; colours
+- Art: pets are 64 x 64 animals facing us (no side views), drawn from shapes in `art/pets.py`; colours
   in `art/make_spec.py`. Then `npm run art` (the pixel-art skill renders it).
-  Never hand-edit `client/public/sprites/*`. Furniture isn't sprites: `iso.js`
+  Never hand-edit `client/public/sprites/*`. Furniture isn't sprites: `dollhouse.js`
   draws it from the catalog.
 
 Check a change with `npm test` and `npm run build`. Data in `data/` and any

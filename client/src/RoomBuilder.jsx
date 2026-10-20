@@ -5,13 +5,13 @@
 // can be saved is what the room shows.
 import { useEffect, useRef, useState } from "react";
 import { CATALOG, COLORWAYS, FLOORS, ROOMS, WALLPAPERS, freeSpot, layoutProblem, turned } from "@shared/home.js";
-import { isoCamera, pieceSprite } from "./iso.js";
+import { dollCamera, pieceSprite } from "./dollhouse.js";
 
 const GROUPS = [
   ["bedroom", "🛏️ Bedroom"], ["living", "🛋️ Living"], ["kitchen", "🍳 Kitchen"], ["bath", "🛁 Bath"],
   ["pets", "🐾 Pets"], ["floor", "🧶 Rugs"], ["wall", "🖼️ Walls"],
 ];
-const thumbCam = isoCamera("bedB", 0);
+const thumbCam = dollCamera("bedB", 0);
 
 /** A piece drawn small, as the room would show it. */
 export function Thumb({ item, size = 48 }) {

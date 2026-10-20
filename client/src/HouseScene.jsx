@@ -1,8 +1,8 @@
 // The shared apartment: every roommate's pet in a 750 sq ft flat -- two
 // bedrooms on the left opening onto the kitchen and living room, the
-// bathroom and laundry in the back right corner. The whole flat is seen
-// front-on like a doll's house; tap a room (or its chip) to see it alone,
-// isometric, turned whichever way round, and to arrange it in the room
+// bathroom and laundry in the back right corner. It's a dollhouse: the
+// whole flat front-on from a little above, turned to see it from any side;
+// tap a room (or its chip) to see it alone, and to arrange it in the room
 // builder. Pets walk between rooms round the furniture: to their bed at
 // night, to the bowl when their person did a kitchen chore, to the bath
 // after a cleaning one, mostly about the living room otherwise. Where they
@@ -10,7 +10,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CATALOG, ROOMS, footprint, layoutProblem, wallsOf } from "@shared/home.js";
 import { animFor, draw, frameAt, petKey } from "./sprites.js";
-import { PX, floorSprite, isoCamera, order, pieceBox, pieceSprite, planCamera, planWalls, wallBox, wallSprite } from "./iso.js";
+import { PX, dollCamera, floorSprite, order, pieceBox, pieceSprite, wallBox, wallSprite } from "./dollhouse.js";
 import { allLayouts, bedroomOf, destination, findPath, gridOf, roomAt } from "./house.js";
 import RoomBuilder from "./RoomBuilder.jsx";
 
@@ -35,6 +35,13 @@ function walkerFor(map, id, i) {
     map.set(id, w);
   }
   return w;
+}
+
+/** The room on the other side of a wall, if any. */
+function beyond(wall) {
+  const mid = (wall.from + wall.to) / 2;
+  const [x, y] = { n: [mid, wall.line - 0.5], s: [mid, wall.line + 0.5], w: [wall.line - 0.5, mid], e: [wall.line + 0.5, mid] }[wall.side];
+  return roomAt(x, y);
 }
 
 /** The canvas's pixels per scene pixel: enough for the screen it is on, whole numbers so pixels stay square. */
@@ -80,7 +87,7 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
     return all;
   }, [saved, edit]);
   const grid = useMemo(() => gridOf(layouts), [layouts]);
-  const cam = useMemo(() => (view.room ? isoCamera(view.room, view.rot) : planCamera()), [view]);
+  const cam = useMemo(() => dollCamera(view.room, view.rot), [view]);
 
   const latest = useRef({});
   latest.current = { pets, effects, selectedId, hour, layouts, grid, cam, edit };
@@ -170,37 +177,29 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
       });
 
       // The room(s) on show.
-      const rooms = cam.kind === "plan" ? Object.keys(ROOMS) : [cam.room];
+      const rooms = cam.room ? [cam.room] : Object.keys(ROOMS);
       blit(floorSprite(rooms, layouts, cam));
       const units = [];
       const glows = [];
       const wallHits = [];
-      if (cam.kind === "plan") {
-        for (const wall of planWalls()) {
+      for (const room of rooms) {
+        for (const wall of wallsOf(room)) {
           const h = cam.wallHeight(wall);
-          const paper = wall.side === "n" ? layouts[wall.room].wall : null;
-          units.push({ kind: "wall", box: wallBox(wall, h), sprite: wallSprite(wall, h, paper, cam) });
-          if (wall.side !== "n" || h < 3) continue;
-          for (const it of layouts[wall.room].items) {
-            if (CATALOG[it.kind].layer === "wall" && it.side === "n" && it.line === wall.line && it.at >= wall.from - 0.01 && it.at < wall.to) {
-              units.push({ kind: "piece", room: wall.room, item: it, box: pieceBox(it), sprite: pieceSprite(it, cam) });
-            }
-          }
-        }
-      } else {
-        // Far walls stand behind everything; near ones are stubs, in with the rest.
-        for (const wall of wallsOf(cam.room)) {
-          const h = cam.wallHeight(wall);
-          const sprite = wallSprite(wall, h, layouts[cam.room].wall, cam);
-          if (cam.far(wall)) blit(sprite);
+          const next = wall.outer ? null : beyond(wall);
+          const sprite = wallSprite(wall, h, layouts[room].wall, cam, next && layouts[next].wall);
+          // One room alone: its back and side walls are behind everything in it.
+          const back = cam.room && !(h < 1);
+          if (back) blit(sprite);
           else units.push({ kind: "wall", box: wallBox(wall, h), sprite });
-        }
-        const farWall = (it) => wallsOf(cam.room).some((wl) => cam.far(wl) && wl.side === it.side && wl.line === it.line && it.at >= wl.from - 0.01 && it.at < wl.to);
-        for (const it of layouts[cam.room].items) {
-          if (CATALOG[it.kind].layer === "wall" && farWall(it)) {
+          if (!cam.far(wall) || h < 3) continue;
+          // Pictures, windows and clocks on the walls that stand.
+          for (const it of layouts[room].items) {
+            if (CATALOG[it.kind].layer !== "wall" || it.side !== wall.side || it.line !== wall.line || it.at < wall.from - 0.01 || it.at >= wall.to) continue;
             const sp = pieceSprite(it, cam);
-            blit(sp);
-            wallHits.unshift({ room: cam.room, item: it, sprite: sp });
+            if (back) {
+              blit(sp);
+              wallHits.unshift({ room, item: it, sprite: sp });
+            } else units.push({ kind: "piece", room, item: it, box: pieceBox(it), sprite: sp });
           }
         }
       }
@@ -212,7 +211,7 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
           if (c.glow && night) glows.push(it);
         }
       }
-      const seen = cam.kind === "plan" ? placed : placed.filter((u) => u.w.room === cam.room);
+      const seen = cam.room ? placed.filter((u) => u.w.room === cam.room) : placed;
       units.push(...seen);
 
       // Picking up: the piece being dragged where it would go, red if it can't.
@@ -233,13 +232,13 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
         const [sx, sy] = cam.project(w.x, w.y, w.z);
         ctx.fillStyle = "rgba(40,25,20,.28)";
         ctx.beginPath();
-        ctx.ellipse(sx, sy - 2, 18 * size, (cam.kind === "iso" ? 8 : 5) * size, 0, 0, Math.PI * 2);
+        ctx.ellipse(sx, sy - 2, 18 * size, 5 * size, 0, 0, Math.PI * 2);
         ctx.fill();
         if (p.id === selectedId && !edit) {
           ctx.strokeStyle = "#ffd166";
           ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.ellipse(sx, sy - 2, 24 * size, (cam.kind === "iso" ? 11 : 7) * size, 0, 0, Math.PI * 2);
+          ctx.ellipse(sx, sy - 2, 24 * size, 7 * size, 0, 0, Math.PI * 2);
           ctx.stroke();
         }
         ctx.save();
@@ -276,12 +275,12 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
         }
       }
       // What a tap picks, top first: the pieces as drawn, and the wall pieces behind them.
-      const rugs = cam.kind === "iso"
+      const rugs = cam.room
         ? layouts[cam.room].items.filter((it) => CATALOG[it.kind].layer === "rug").reverse().map((it) => ({ room: cam.room, item: it, sprite: pieceSprite(it, cam) }))
         : [];
       drawn.current = [...hits.reverse(), ...wallHits, ...rugs];
 
-      if (edit && cam.kind === "iso") {
+      if (edit && cam.room) {
         const sel = edit.sel != null ? edit.draft.items[edit.sel] : null;
         if (held) {
           const sp = pieceSprite(held.ghost, cam, [230, 70, 90]);
@@ -495,12 +494,10 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
             {p.pet.name}
           </button>
         ))}
-        {view.room && (
-          <div className="scene-tools">
-            <button aria-label="Turn the room left" onClick={() => setView({ ...view, rot: (view.rot + 3) % 4 })}>⟲</button>
-            <button aria-label="Turn the room right" onClick={() => setView({ ...view, rot: (view.rot + 1) % 4 })}>⟳</button>
-          </div>
-        )}
+        <div className="scene-tools">
+          <button aria-label="Turn the view left" onClick={() => setView({ ...view, rot: (view.rot + 3) % 4 })}>⟲</button>
+          <button aria-label="Turn the view right" onClick={() => setView({ ...view, rot: (view.rot + 1) % 4 })}>⟳</button>
+        </div>
       </div>
       {view.room && !edit && (
         <div className="row room-row">
