@@ -90,17 +90,22 @@ function stillScene(layouts, cam, open) {
       }
     }
   }
-  // Built-in closets (Bedroom 2's): the walls round them are the room's, above; inside, the
-  // clothes on their rail, seen through the cutaway; and the doors in the front wall, cut
-  // where that wall is cut.
+  // Built-in closets (Bedroom 2's): the walls round them are the room's, above; the doors in
+  // the front wall, cut where that wall is cut; and only with the doors open, the clothes
+  // on their rail inside.
   for (const room of rooms) {
     for (const bi of ROOMS[room].builtins || []) {
       const front = wallsOf(room).find((w) => w.builtin && w.side === { n: "s", s: "n", w: "e", e: "w" }[bi.doors]);
       const h = cam.wallHeight(front);
-      const inside = closetInside(bi);
-      units.push({ kind: "wall", box: { x0: bi.x0 + 0.1, x1: bi.x1 - 0.1, y0: bi.y0 + 0.1, y1: bi.y1 - 0.1, z0: 0, z1: 4 }, sprite: boxesSprite(`closet-in|${JSON.stringify(bi)}`, inside, cam.room ? 4 : 1, cam) });
       const id = `${room}:${bi.kind}`;
       const isOpen = open.includes(id);
+      // Like a wardrobe built into the wall: shut, it is closed over at the top and nothing
+      // inside shows -- its doors have to be opened to see the clothes.
+      const top = cam.room ? 4 : 1;
+      const inside = isOpen
+        ? closetInside(bi)
+        : [{ x0: bi.x0, x1: bi.x1, y0: bi.y0, y1: bi.y1, z0: top - 0.12, z1: top, color: "#e8e5df" }];
+      units.push({ kind: "wall", box: { x0: bi.x0 + 0.1, x1: bi.x1 - 0.1, y0: bi.y0 + 0.1, y1: bi.y1 - 0.1, z0: 0, z1: top }, sprite: boxesSprite(`closet-in|${JSON.stringify(bi)}|${isOpen}`, inside, top, cam) });
       const doors = closetDoors(bi, isOpen);
       const box = { x0: Math.min(...doors.map((d) => d.x0)), x1: Math.max(...doors.map((d) => d.x1)), y0: Math.min(...doors.map((d) => d.y0)), y1: Math.max(...doors.map((d) => d.y1)), z0: 0, z1: h };
       const sprite = boxesSprite(`closet-doors|${JSON.stringify(bi)}|${isOpen}`, doors, h, cam);
