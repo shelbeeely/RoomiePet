@@ -113,7 +113,7 @@ describe("room to live in", () => {
     }
   });
 
-  test("Bedroom 2: white, two twin beds with headboards on the left wall, small windows above them, the closet built in between", () => {
+  test("Bedroom 2: white, two twin beds with headboards on the left wall, small windows above them, a built-in closet between", () => {
     const l = DEFAULT_LAYOUTS.bedB;
     expect(layoutProblem("bedB", l)).toBe(null);
     expect(l.wall).toBe("white");
@@ -132,13 +132,17 @@ describe("room to live in", () => {
       expect(w.at >= bed.y0 && w.at + CATALOG.basement_window.w <= bed.y1).toBe(true);
     }
     expect(Math.min(...CATALOG.basement_window.boxes.map((b) => b[2]))).toBeGreaterThan(2.8);   // above the headboards
-    // The closet is in the left wall between the beds, and nothing stands in front of its doors.
+    // The closet is built in on the left wall between the beds, standing out into the room,
+    // filling the space flush with both, its two full-size doors facing in, kept clear.
     const closet = l.items.find((i) => i.kind === "closet");
-    expect([closet.side, closet.line]).toEqual(["w", 0]);
-    expect(closet.at).toBe(back.y1);                                  // filling the space: flush with both beds
-    expect(closet.at + CATALOG.closet.w).toBe(front.y0);
+    const c = footprint(closet);
+    expect(c.x0).toBe(0);
+    expect(c.y0).toBe(back.y1);
+    expect(c.y1).toBe(front.y0);
+    expect(c.x1 - c.x0).toBeGreaterThanOrEqual(2);                    // a closet's depth, out into the room
+    expect(place(closet, CATALOG.closet.w / 2, CATALOG.closet.d)[0]).toBe(c.x1);   // doors facing in
     expect(CATALOG.closet.w / 2).toBeGreaterThanOrEqual(3);           // two full-size doors
-    expect(layoutProblem("bedB", { ...l, items: [...l.items, { kind: "beanbag", color: "teal", x: 0.5, y: 17, rot: 0 }] })).toMatch(/in front of the closet/);
+    expect(layoutProblem("bedB", { ...l, items: [...l.items, { kind: "beanbag", color: "teal", x: 3, y: 17, rot: 0 }] })).toMatch(/in front of the closet/);
     for (const kind of ["desk", "dresser", "pet_bed"]) expect(l.items.some((i) => i.kind === kind), kind).toBe(true);
     // And there is still room to add things.
     for (const kind of ["beanbag", "bookshelf", "lamp"]) expect(freeSpot("bedB", l, kind), kind).not.toBe(null);

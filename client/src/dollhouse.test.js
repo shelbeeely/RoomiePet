@@ -24,7 +24,7 @@ describe("the dollhouse's drawing order", () => {
 describe("the cutaway", () => {
   test("tall furniture is cut off where the walls are, so it doesn't stand up over what's behind it", () => {
     expect(pieceBox({ kind: "wardrobe", color: "white", x: 0, y: 0, rot: 0 }).z1).toBe(CUTAWAY);
-    expect(pieceBox({ kind: "closet", color: "white", side: "w", line: 0, at: 15.5 }).z1).toBe(4);       // a closet in the wall, as the wall
+    expect(pieceBox({ kind: "closet", color: "white", x: 0, y: 15.25, rot: 3 }).z1).toBe(4);            // built in: cut with the walls
     expect(pieceBox({ kind: "dresser", color: "white", x: 0, y: 0, rot: 0 }).z1).toBeLessThan(CUTAWAY);   // short things whole
   });
 });

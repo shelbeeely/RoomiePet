@@ -115,7 +115,8 @@ export const MATERIALS = {
 // to its front, at rotation 0 -- the front facing the room's front, as the flat is drawn.
 // "main" is the colour chosen; "main^" a little lighter, "main_" a little darker.
 // layer: solid pieces block the way and can't overlap; rugs lie under everything; small things
-// (the bowl) don't block the way but can't sit on furniture. bed and pets mark where pets sleep. Wall pieces hang on a wall: w along
+// (the bowl) don't block the way but can't sit on furniture. bed and pets mark where pets sleep.
+// clear keeps that much floor free in front of a piece's doors. Wall pieces hang on a wall: w along
 // it, z up it, d out from it. spots are where pets curl up on a piece: [x, y, z].
 const legs = (w, d, h, inset = 0.1, s = 0.25, mat = "wood") => [
   [inset, inset, 0, s, s, h, mat], [w - inset - s, inset, 0, s, s, h, mat],
@@ -165,6 +166,24 @@ export const CATALOG = {
       [0, 0, 0, 3.5, 2, 6.2, "main"], [0, 0, 6.2, 3.5, 2, 0.2, "main_"],
       [0.15, 2, 0.4, 1.55, 0.04, 5.6, "main^"], [1.8, 2, 0.4, 1.55, 0.04, 5.6, "main^"],
       [1.5, 2.04, 2.8, 0.15, 0.06, 0.8, "gold"], [1.85, 2.04, 2.8, 0.15, 0.06, 0.8, "gold"],
+    ],
+  },
+  closet: {
+    // A built-in closet: walls boxing it into the room from the wall behind, two full-size
+    // doors (37 in each, 6 ft 8 tall) on its front. In Bedroom 2 it fills the left wall
+    // between the beds and stands out into the room 2 ft 6 (a closet's depth). builtin: it is
+    // part of the room, so the dollhouse cuts it where it cuts the walls. clear is the floor
+    // kept free in front of the doors, as far as a full door swings out.
+    label: "Closet (built in)", group: "bedroom", w: 6.5, d: 2.5, layer: "solid", builtin: true, clear: 3,
+    colors: ["white", "oak", "walnut", "sage", "lilac"],
+    boxes: [
+      [0, 0, 0, 6.5, 2.44, 7, "main"],
+      [0, 2.44, 0, 6.5, 0.06, 7, "main_"],
+      ...[0.1, 3.27].flatMap((u) => [
+        [u, 2.5, 0, 3.13, 0.04, 6.67, "main^"],
+        [u + 0.3, 2.54, 3.7, 2.53, 0.01, 2.6, "main"], [u + 0.3, 2.54, 0.5, 2.53, 0.01, 2.8, "main"],
+      ]),
+      [2.95, 2.54, 3.0, 0.12, 0.06, 0.5, "gold"], [3.43, 2.54, 3.0, 0.12, 0.06, 0.5, "gold"],
     ],
   },
   desk: {
@@ -291,20 +310,6 @@ export const CATALOG = {
   window: {
     label: "Window", group: "wall", w: 3, d: 0.15, layer: "wall", outer: true, colors: ["white", "oak", "teal"],
     boxes: [[0, 0, 1.2, 3, 0.12, 2.6, "main"], [0.2, 0.12, 1.4, 1.2, 0.03, 2.2, "sky"], [1.6, 0.12, 1.4, 1.2, 0.03, 2.2, "sky"], [-0.1, 0, 1.1, 3.2, 0.3, 0.12, "main"]],
-  },
-  closet: {
-    // A built-in closet: two full-size doors (37 in each, 6 ft 8 tall) set in the wall, not a
-    // cabinet on the floor -- in Bedroom 2 it fills the wall between the beds. clear is the
-    // floor kept free in front of it, as far as a full door swings out.
-    label: "Closet (built in)", group: "wall", w: 6.5, d: 0.12, layer: "wall", clear: 3, colors: ["white", "oak", "walnut", "sage", "lilac"],
-    boxes: [
-      [0, 0, 0, 6.5, 0.06, 7, "main_"],
-      ...[0.1, 3.27].flatMap((u) => [
-        [u, 0.06, 0, 3.13, 0.05, 6.67, "main^"],
-        [u + 0.3, 0.11, 3.7, 2.53, 0.01, 2.6, "main"], [u + 0.3, 0.11, 0.5, 2.53, 0.01, 2.8, "main"],
-      ]),
-      [2.95, 0.11, 3.0, 0.12, 0.06, 0.5, "gold"], [3.43, 0.11, 3.0, 0.12, 0.06, 0.5, "gold"],
-    ],
   },
   basement_window: {
     // Small and up high, with a deep sill: a basement room's window, above a headboard.
@@ -452,6 +457,15 @@ const overlaps = (a, b) => a.x0 < b.x1 - EPS && b.x0 < a.x1 - EPS && a.y0 < b.y1
 export const GRID = 0.25;
 const onGrid = (n) => Number.isFinite(n) && Math.abs(n / GRID - Math.round(n / GRID)) < EPS;
 
+/** The floor just in front of a piece (its doors' side), out to `reach` feet. */
+export function frontOf(item, reach) {
+  const c = CATALOG[item.kind];
+  if (c.layer === "wall") return wallBox(item, reach);
+  const [ax, ay] = place(item, 0, c.d);
+  const [bx, by] = place(item, c.w, c.d + reach);
+  return { x0: Math.min(ax, bx), x1: Math.max(ax, bx), y0: Math.min(ay, by), y1: Math.max(ay, by) };
+}
+
 /** Room in front of each door a piece of furniture mustn't stand in, so pets (and people) get through. */
 export function doorways(room) {
   return DOORS.filter((d) => d.rooms.includes(room)).map((d) => {
@@ -524,7 +538,7 @@ export function layoutProblem(room, layout) {
   for (const item of layout.items) {
     const c = CATALOG[item.kind];
     if (!c.clear) continue;
-    const front = wallBox({ ...item, kind: item.kind }, c.clear);
+    const front = frontOf(item, c.clear);
     const blocker = placed.find((p) => p.f && p.c.layer === "solid" && overlaps(p.f, front));
     if (blocker) return `The ${blocker.c.label.toLowerCase()} is in front of the ${c.label.toLowerCase()}`;
   }
@@ -557,13 +571,14 @@ export const DEFAULT_LAYOUTS = {
   },
   bedB: {
     // A white basement bedroom: two twin beds with their headboards against the left wall, one
-    // in each corner, a small high window above each, and the built-in closet filling the wall
-    // between them (a tight fit, flush with both); the desk, dresser and pet bed along the right, the doorway clear.
+    // in each corner, a small high window above each, and the built-in closet standing out
+    // from the wall between them, filling the space (a tight fit, flush with both); the desk, dresser and pet bed along the right, the doorway clear.
     wall: "white", floor: "oak",
     items: [
       W("basement_window", "white", "w", 0, 12.5), W("basement_window", "white", "w", 0, 22.25),
-      W("closet", "white", "w", 0, 15.25), W("picture", "blue", "n", 12, 9), W("clock", "white", "n", 12, 4),
+      W("picture", "blue", "n", 12, 9), W("clock", "white", "n", 12, 4),
       F("small_rug", "sage", 3, 17), F("bed", "blue", 0, 12, 3), F("bed", "pink", 0, 21.75, 3),
+      F("closet", "white", 0, 15.25, 3),
       F("desk", "white", 8.5, 12), F("chair", "white", 9.5, 13.75, 2), F("dresser", "white", 10.5, 16, 1),
       F("pet_bed", "pink", 8.25, 23.25), F("plant", "white", 10.75, 23.75),
     ],
