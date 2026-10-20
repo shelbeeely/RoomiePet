@@ -1,0 +1,111 @@
+{
+  "palette": {
+    "o": "#2b2238",
+    "e": "#2b2238",
+    "m": "#a04060",
+    "c": "#ffb3c1",
+    "p": "#ff9fb2",
+    "w": "#fff8ee"
+  },
+  "parts": {
+    "face_open":  [".e....e.", ".e....e.", "c......c", "...mm..."],
+    "face_happy": [".e....e.", "e.e..e.e", "c......c", "..mmmm.."],
+    "face_blink": ["........", "ee....ee", "c......c", "...mm..."],
+    "face_sleep": ["........", "ee....ee", "........", "...m...."]
+  },
+  "sprites": {
+    "cat": {
+      "palette": {
+        "b": "#f4d9b0",
+        "d": {"from": "b", "shade": 0.78, "hue": -8},
+        "l": {"from": "b", "shade": 1.4}
+      },
+      "frames": {
+        "_body": [
+          "................",
+          "..oo........oo..",
+          ".obpo......opbo.",
+          ".obbboooooobbbo.",
+          ".obbbbbbbbbbbbo.",
+          "obblbbbbbbbbbbbo",
+          "oblbbbbbbbbbbbbo",
+          "obbbbbbbbbbbbbbo",
+          "obbbbbbbbbbbbbbo",
+          "obbbbbbbbbbbbbbo",
+          "obbbbbwwwwbbbbbo",
+          ".obbbwwwwwwbbbo.",
+          ".odbbwwwwwwbbdo.",
+          "..oddddddddddo..",
+          "...oo......oo...",
+          "................"
+        ],
+        "idle_0": {"base": "_body", "patch": [{"at": [4, 6], "part": "face_open", "onto": "bl"}]},
+        "idle_1": {"base": "idle_0", "shift": [0, 1]},
+        "blink":  {"base": "_body", "patch": [{"at": [4, 6], "part": "face_blink", "onto": "bl"}]},
+        "walk_0": {"base": "idle_0", "patch": [{"at": [0, 14], "rows": ["..oo_......_oo.."]}]},
+        "happy":  {"base": "_body", "patch": [{"at": [4, 6], "part": "face_happy", "onto": "bl"}]},
+        "sleep_0": {"base": "_body", "patch": [{"at": [4, 6], "part": "face_sleep", "onto": "bl"}]},
+        "sleep_1": {"base": "sleep_0", "shift": [0, 1]}
+      },
+      "animations": {
+        "idle":  {"frames": ["idle_0", "idle_1", "idle_0", "idle_1", "blink"], "fps": 3},
+        "walk":  {"frames": ["walk_0", "idle_1"], "fps": 6},
+        "happy": {"frames": ["happy", "idle_1"], "fps": 4},
+        "sleep": {"frames": ["sleep_0", "sleep_1"], "fps": 1.5}
+      },
+      "variants": {
+        "ginger":   {"b": "#f0a04b"},
+        "charcoal": {"b": "#5b5b6e", "w": "#d8d8e0", "o": "#17131c", "e": "#f6e27a"},
+        "mint":     {"b": "#9de0c8"}
+      }
+    },
+    "floor": {
+      "tile": true,
+      "palette": {"k": "#b07d4f", "K": "#9c6b40", "s": "#7a5232"},
+      "frames": {
+        "wood": [
+          "kkkkkkkkkkkkkkks",
+          "kkkkkkkkkkkkkkks",
+          "kkkkkkkkkkkkkkks",
+          "ssssssssssssssss",
+          "KKKKKKKsKKKKKKKK",
+          "KKKKKKKsKKKKKKKK",
+          "KKKKKKKsKKKKKKKK",
+          "ssssssssssssssss",
+          "kkkskkkkkkkkkkkk",
+          "kkkskkkkkkkkkkkk",
+          "kkkskkkkkkkkkkkk",
+          "ssssssssssssssss",
+          "KKKKKKKKKKKsKKKK",
+          "KKKKKKKKKKKsKKKK",
+          "KKKKKKKKKKKsKKKK",
+          "ssssssssssssssss"
+        ]
+      }
+    },
+    "bowl": {
+      "palette": {"r": "#e05d5d", "F": "#c08a50"},
+      "frames": {
+        "empty": [
+          "................",
+          "................",
+          "................",
+          "................",
+          "................",
+          "................",
+          "................",
+          "................",
+          "................",
+          "..oooooooooooo..",
+          "..o..........o..",
+          "..orrrrrrrrrro..",
+          "...orrrrrrrro...",
+          "....oooooooo....",
+          "................",
+          "................"
+        ],
+        "full": {"base": "empty", "patch": [{"at": [0, 8], "rows": ["....FF.FF.F.....", "..oFFFFFFFFFFo.."]}]}
+      }
+    }
+  }
+}
