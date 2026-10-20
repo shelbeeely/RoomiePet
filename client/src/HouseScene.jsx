@@ -1,15 +1,16 @@
-// The shared house: every roommate's pet in a doll's-house cutaway -- two
-// bedrooms upstairs, the kitchen-living room and the bathroom-laundry
-// downstairs. Pets walk between rooms through the doors: to their bed at
-// night, to the bowl when their person did a kitchen chore, to the bath after
-// a cleaning one, otherwise mostly about the living room. Where they walk is
-// decided here, on each phone; how they are comes from the server's numbers.
+// The shared apartment: every roommate's pet in a doll's-house view of a
+// 750 sq ft flat -- two bedrooms on the left opening onto the kitchen and
+// living room, the bathroom and laundry in the back right corner. Pets walk
+// between rooms through the doors: to their bed at night, to the bowl when
+// their person did a kitchen chore, to the bath after a cleaning one, mostly
+// about the living room otherwise. Where they walk is decided here, on each
+// phone; how they are comes from the server's numbers.
 import { useEffect, useRef } from "react";
 import { animFor, draw, frameAt, petKey } from "./sprites.js";
-import { BOWL, DOORS, FURNITURE, H, KITCHEN, ROOMS, T, W, destination, roomAt, route } from "./house.js";
+import { BOWL, DOORS, FT, FURNITURE, H, KITCHEN_FLOOR, ROOMS, W, WALL_H, destination, roomAt, route } from "./house.js";
 
-const S = 4; // canvas pixels per room pixel: pets at 1.5x land on whole pixels (6 per art pixel)
 const WALL = "#3b3049";
+const SPRITE = 64;
 
 const rand = (a, b) => a + Math.random() * (b - a);
 
@@ -24,41 +25,54 @@ function modeOf(cond, effect) {
 function walkerFor(map, id, i) {
   let w = map.get(id);
   if (!w) {
-    const start = { x: 96 + ((i * 29) % 70), y: 186 + ((i * 17) % 40) };
+    const start = { x: 220 + ((i * 47) % 100), y: 250 + ((i * 31) % 120) };
     w = { ...start, room: roomAt(start.x, start.y), path: [], mode: null, facing: 1, rest: rand(0.5, 3) };
     map.set(id, w);
   }
   return w;
 }
 
-function drawRoomShell(ctx, atlas) {
+function drawShell(ctx, atlas) {
   for (const [id, r] of Object.entries(ROOMS)) {
-    const [sprite, frame] = r.paper.includes("/") ? r.paper.split("/") : [r.paper, "paper"];
-    for (let x = r.wall.x0; x < r.wall.x1; x += T) {
-      draw(ctx, atlas, `${sprite}/${frame}`, x + T / 2, r.wall.y0 + T, 1);
-      draw(ctx, atlas, id === "bath" ? `${sprite}/${frame}` : `${sprite}/base`, x + T / 2, r.wall.y0 + 2 * T, 1);
-      for (let y = r.floor.y0; y < r.floor.y1; y += T) {
-        const tiled = id === "bath" ? "tile@aqua/check" : id === "living" && x < KITCHEN.x1 ? "tile/check" : "floor/wood";
-        draw(ctx, atlas, tiled, x + T / 2, y + T, 1);
+    const [paperSprite, paperFrame] = r.paper.includes("/") ? r.paper.split("/") : [r.paper, null];
+    for (const a of r.areas) {
+      for (let x = a.x0; x < a.x1; x += FT) {
+        // The back wall: paper, then the skirting (tiles all the way down in the bathroom).
+        for (let y = a.y0; y < a.y0 + WALL_H; y += FT) {
+          const last = y + FT >= a.y0 + WALL_H;
+          const frame = paperFrame ? `${paperSprite}/${paperFrame}` : `${paperSprite}/${last ? "base" : "paper"}`;
+          draw(ctx, atlas, frame, x + FT / 2, y + FT, 1);
+        }
+        for (let y = a.y0 + WALL_H; y < a.y1; y += FT) {
+          const kitchen = id === "main" && x >= KITCHEN_FLOOR.x0 && x < KITCHEN_FLOOR.x1 && y < KITCHEN_FLOOR.y1;
+          draw(ctx, atlas, kitchen ? "tile/check" : r.floor, x + FT / 2, y + FT, 1);
+        }
       }
     }
   }
-  // Walls between rooms: the floor between the storeys, and the two inside walls with their gaps.
+  // Walls between rooms, seen from above: a dark band, with gaps for doors.
   ctx.fillStyle = WALL;
-  ctx.fillRect(0, 110, W, 3);
-  ctx.fillRect(0, 0, W, 2);
-  ctx.fillRect(0, H - 2, W, 2);
-  ctx.fillRect(0, 0, 2, H);
-  ctx.fillRect(W - 2, 0, 2, H);
-  for (const d of DOORS) {
-    if (d.wall) {
-      const top = d.wall.x === 128 ? 0 : 112;
-      const bottom = d.wall.x === 128 ? 112 : H;
-      ctx.fillRect(d.wall.x - 2, top, 4, d.wall.y0 - top);
-      ctx.fillRect(d.wall.x - 2, d.wall.y1, 4, bottom - d.wall.y1);
-    }
-    if (d.door) draw(ctx, atlas, "door/open", d.door.x, d.door.y, 1);
+  ctx.fillRect(0, 0, W, 3);
+  ctx.fillRect(0, H - 3, W, 3);
+  ctx.fillRect(0, 0, 3, H);
+  ctx.fillRect(W - 3, 0, 3, H);
+  ctx.fillRect(0, 194, 176, 4);              // between the bedrooms
+  ctx.fillRect(334, 0, 4, 152);              // the bathroom's side wall
+  ctx.fillRect(336, 150, W - 336, 4);        // and its front wall's top
+  const gaps = DOORS.filter((d) => d.gap).map((d) => d.gap).sort((a, b) => a.y0 - b.y0);
+  let y = 0;
+  for (const g of gaps) {
+    ctx.fillRect(g.x - 3, y, 6, g.y0 - y);
+    y = g.y1;
   }
+  ctx.fillRect(176 - 3, y, 6, H - y);
+  for (const d of DOORS) if (d.doorway) draw(ctx, atlas, "door/main", d.doorway.x, d.doorway.y, 1);
+}
+
+/** The canvas's pixels per room pixel: enough for the screen it is on, whole numbers so pixels stay square. */
+function scaleFor(el) {
+  const css = el?.parentElement?.clientWidth || W;
+  return Math.max(1, Math.min(4, Math.ceil((css * (window.devicePixelRatio || 1)) / W)));
 }
 
 export default function HouseScene({ atlas, pets, effects, selectedId, onSelect, hour }) {
@@ -70,7 +84,19 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
 
   useEffect(() => {
     if (!atlas) return;
-    const ctx = canvas.current.getContext("2d");
+    const el = canvas.current;
+    const ctx = el.getContext("2d");
+    let S = 0;
+    const fit = () => {
+      const s = scaleFor(el);
+      if (s !== S) {
+        S = s;
+        el.width = W * S;
+        el.height = H * S;
+      }
+    };
+    fit();
+    window.addEventListener("resize", fit);
     let raf;
     let last = performance.now();
 
@@ -83,15 +109,13 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
       ctx.imageSmoothingEnabled = false;
       ctx.setTransform(S, 0, 0, S, 0, 0);
 
-      drawRoomShell(ctx, atlas);
-      for (const f of FURNITURE) {
-        const name = night ? f.night || f.frame : f.day || f.frame;
-        draw(ctx, atlas, name, f.x, f.y, 1, f.flip);
-      }
+      drawShell(ctx, atlas);
+      const pick = (f) => (night ? f.night || f.frame : f.day || f.frame);
+      for (const f of FURNITURE) if (f.wall || f.flat) draw(ctx, atlas, pick(f), f.x, f.y, 1, f.flip);
       const feeding = pets.some((p) => effects[p.id]?.kind === "eat" && effects[p.id].until > Date.now());
       draw(ctx, atlas, feeding ? "bowl/full" : "bowl/empty", BOWL.x, BOWL.y, 1);
 
-      // Where each goes now, then everyone drawn back to front.
+      // Where each pet goes now.
       const placed = pets.map((p, i) => {
         const w = walkerFor(walkers.current, p.id, i);
         const effect = effects[p.id]?.until > Date.now() ? effects[p.id].kind : null;
@@ -99,7 +123,7 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
         const mode = modeOf(p.cond, effect);
         if (mode !== w.mode) {
           w.mode = mode;
-          const dest = mode === "egg" ? null : mode === "wander" ? null : destination(p.cond, effect, i);
+          const dest = mode === "egg" || mode === "wander" ? null : destination(p.cond, effect, i);
           w.path = dest ? route(w.room, dest) : [];
           w.rest = mode === "wander" ? rand(0.5, 2) : 0;
         } else if (mode === "wander" && !w.path.length) {
@@ -116,8 +140,8 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
           const dx = goal.x - w.x;
           const dy = goal.y - w.y;
           const dist = Math.hypot(dx, dy);
-          const speed = state === "sad" || state === "poorly" ? 16 : 30;
-          if (dist < 1.5) {
+          const speed = state === "sad" || state === "poorly" ? 28 : 54;
+          if (dist < 2) {
             w.room = goal.room;
             w.path.shift();
           } else {
@@ -128,43 +152,53 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
             walking = true;
           }
         }
-        return { p, w, walking, effect };
+        return { kind: "pet", y: w.y, p, w, walking, effect };
       });
-      placed.sort((a, b) => a.w.y - b.w.y);
-      for (const { p, w, walking, effect } of placed) {
-        const size = p.pet.stage === "baby" || p.pet.stage === "egg" ? 1 : 1.5;
+
+      // Furniture that stands on the floor and the pets, back to front.
+      const things = [
+        ...FURNITURE.filter((f) => !f.wall && !f.flat).map((f) => ({ kind: "thing", y: f.y, f })),
+        ...placed,
+      ].sort((a, b) => a.y - b.y);
+      for (const thing of things) {
+        if (thing.kind === "thing") {
+          draw(ctx, atlas, pick(thing.f), thing.f.x, thing.f.y, 1, thing.f.flip);
+          continue;
+        }
+        const { p, w, walking, effect } = thing;
+        const size = p.pet.stage === "baby" || p.pet.stage === "egg" ? 0.75 : 1;
         const key = p.pet.stage === "egg" ? "egg" : petKey(p.pet.species, p.pet.color);
         const anim = animFor(p.cond, { walking, effect });
-        ctx.fillStyle = "rgba(60,35,20,.35)";
+        ctx.fillStyle = "rgba(60,35,20,.3)";
         ctx.beginPath();
-        ctx.ellipse(w.x, w.y, 6 * size, 2, 0, 0, Math.PI * 2);
+        ctx.ellipse(w.x, w.y - 3, 20 * size, 5 * size, 0, 0, Math.PI * 2);
         ctx.fill();
         if (p.id === selectedId) {
           ctx.strokeStyle = "#ffd166";
-          ctx.lineWidth = 1;
+          ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.ellipse(w.x, w.y, 9 * size, 3, 0, 0, Math.PI * 2);
+          ctx.ellipse(w.x, w.y - 3, 26 * size, 7 * size, 0, 0, Math.PI * 2);
           ctx.stroke();
         }
         ctx.save();
         ctx.translate(w.x, w.y);
         ctx.scale(size, size);
         draw(ctx, atlas, frameAt(atlas, key, anim, t + p.phase), 0, 0, 1, w.facing < 0);
-        if (p.pet.stage === "star") draw(ctx, atlas, "crown/crown", 0, -15, 1);
+        if (p.pet.stage === "star") draw(ctx, atlas, "crown/crown", 0, -SPRITE + 14, 1);
         ctx.restore();
-        const top = w.y - 16 * size;
+        const top = w.y - SPRITE * size;
         const need = p.cond.state === "asleep" ? "z" : p.cond.flags.hungry ? "🍖" : p.cond.flags.grubby ? "🫧" : null;
         if (need === "z") {
           ctx.fillStyle = "#fff";
-          ctx.font = "bold 7px system-ui";
-          ctx.fillText("z", w.x + 5, top - ((t * 4 + p.phase * 3) % 8));
+          ctx.font = "bold 14px system-ui";
+          ctx.fillText("z", w.x + 14, top + 12 - ((t * 8 + p.phase * 6) % 16));
         } else if (need && p.cond.state !== "egg") {
-          ctx.font = "8px system-ui";
-          ctx.fillText(need, w.x + 3, top - 1 - Math.abs(Math.sin(t * 2)) * 2);
+          ctx.font = "16px system-ui";
+          ctx.fillText(need, w.x + 12, top + 8 - Math.abs(Math.sin(t * 2)) * 4);
         }
         if (effect) {
-          ctx.font = "7px system-ui";
-          ctx.fillText(effect === "eat" ? "🍖" : effect === "clean" ? "🫧" : "💖", w.x - 4, top - ((t * 14) % 12));
+          ctx.font = "14px system-ui";
+          ctx.fillText(effect === "eat" ? "🍖" : effect === "clean" ? "🫧" : "💖", w.x - 8, top + 4 - ((t * 24) % 20));
         }
         const label = labels.current.get(p.id);
         if (label) {
@@ -179,7 +213,10 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", fit);
+    };
   }, [atlas]);
 
   const click = (e) => {
@@ -187,11 +224,11 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
     const x = ((e.clientX - r.left) / r.width) * W;
     const y = ((e.clientY - r.top) / r.height) * H;
     let best = null;
-    let dist = 22;
+    let dist = 40;
     for (const p of latest.current.pets) {
       const w = walkers.current.get(p.id);
       if (!w) continue;
-      const d = Math.hypot(x - w.x, y - (w.y - 10));
+      const d = Math.hypot(x - w.x, y - (w.y - 30));
       if (d < dist) [best, dist] = [p.id, d];
     }
     if (best) onSelect(best);
@@ -199,7 +236,7 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
 
   return (
     <div className="scene">
-      <canvas ref={canvas} width={W * S} height={H * S} onClick={click} aria-label="Your household's pets in their house" />
+      <canvas ref={canvas} width={W * 2} height={H * 2} onClick={click} aria-label="Your household's pets in their apartment" />
       {pets.map((p) => (
         <button
           key={p.id}

@@ -48,7 +48,9 @@ main > * + * { margin-top: 12px; }
 
 /* The house */
 .scene { position: relative; border-radius: var(--radius); overflow: hidden; background: #000; }
-.scene canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; cursor: pointer; touch-action: manipulation; }
+/* Drawn at the screen's own resolution (or a little over, then scaled down smoothly). */
+.scene canvas { display: block; width: 100%; height: auto; cursor: pointer; touch-action: manipulation; }
+.scene { aspect-ratio: 30 / 25; }
 .pet-label {
   position: absolute; transform: translate(-50%, 2px); background: rgba(31,26,43,.72); color: var(--fg);
   font-size: 11px; font-weight: 600; padding: 1px 7px; min-height: 0; border-radius: 999px; pointer-events: auto;

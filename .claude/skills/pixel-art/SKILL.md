@@ -40,6 +40,31 @@ turns a spec into images; you look at the preview, fix the grid, render again.
 Read `references/craft.md` before drawing anything new: sizes, outlines,
 shading, faces and animation, the things that make 16 pixels look alive.
 
+## Bigger sprites: draw with shapes
+
+Typing rows works up to about 24 x 24. Beyond that (32 x 32, 64 x 64 pets,
+furniture at 16 px to the foot) draw with `scripts/painter.py` in a small
+Python script that writes the spec's rows:
+
+```python
+from painter import Painter            # sys.path: <skill>/scripts
+p = Painter(64, 64)
+p.ellipse(32, 13, 5, 14, "b")          # ears, body, feet: shapes in palette letters
+p.ellipse(32, 40, 21, 17, "b")
+p.shade(body="b", dark="d", light="l") # light from the top-left, worked out from the shape
+p.ellipse(32, 50, 11, 7, "w", only="bld")  # markings only where there is body
+p.ellipse(23, 39, 3.2, 4.2, "e")       # then the face by hand
+p.outline("o")                         # the dark line round everything
+rows = p.rows()
+```
+
+Also `rect`, `poly`, `line`, `ring` (an ellipse's rim, or its top or bottom
+half -- closed eyes, smiles), `path` (thick strokes: tails), `blit` (paste
+typed rows: small details), `shift`. Build each frame from parameters (pose,
+expression) so every animation and every species shares them; colour
+variants still come from the spec's palette. Render with `--no-preview` when
+iterating on a big sheet, and look at the preview at the end.
+
 ## Spec format
 
 ```json

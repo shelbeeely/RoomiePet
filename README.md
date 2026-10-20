@@ -111,24 +111,26 @@ npm test           # server API tests (node:test) and the shared rules (vitest)
 
 ## Art
 
-The pets and the room are pixel art written as letter grids in
-`art/make_spec.py` (which writes `art/sprites.json`), rendered with the
-pixel-art skill in `.claude/skills/pixel-art`:
+The pets are 64 x 64 pixel art drawn from shapes in `art/pets64.py` -- one
+round chibi body and face shared by every species, each adding its ears,
+markings and tail, so all species share every mood and animation. The
+apartment's furniture is drawn the same way at 16 pixels to the foot in
+`art/house64.py`. `art/make_spec.py` gives them their colours and writes
+`art/sprites.json`, rendered with the pixel-art skill in
+`.claude/skills/pixel-art` (whose `painter.py` does the shapes, shading and
+outlines):
 
 ```bash
 npm run art        # -> client/public/sprites/sheet.png + sheet.json, art/preview.png, client/public/icons/
 ```
 
-The house is a doll's-house cutaway (`client/src/house.js`: rooms, doors,
-furniture, where pets go): two bedrooms upstairs, the kitchen-living room and
-the bathroom-laundry downstairs. Pets sleep in their bedroom (alternating
-between the two), run to the bowl after a kitchen chore and to the bath after
-a cleaning one, hang about the kitchen when hungry, and otherwise mostly the
-living room.
-
-Pets are drawn on a 16 x 16 grid and the house in 16-pixel tiles.
-`art/sample32.py` draws one pet at 32 x 32 (`art/sample32-preview.png`) to
-show what a bigger grid looks like before redrawing the rest.
+The apartment (`client/src/house.js`) is about 750 sq ft, seen front-on like a
+doll's house: the two bedrooms on the left, each opening onto the main area
+-- kitchen along its back wall, living room in front -- and the bathroom with
+the laundry in the back right corner. Pets sleep in their bedroom (roommates
+alternate between the two), go to the bowl after a kitchen chore and to the
+bathroom after a cleaning one, hang about the kitchen when hungry, and are
+mostly in the living room otherwise.
 
 ## Layout
 

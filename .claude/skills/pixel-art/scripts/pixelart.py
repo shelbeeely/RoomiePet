@@ -294,21 +294,23 @@ def write(path, data):
 
 # -- render ----------------------------------------------------------------
 
-def render(spec, out_dir, scale=1, preview_scale=None, frames_too=False, gif=False):
+def render(spec, out_dir, scale=1, preview_scale=None, frames_too=False, gif=False, preview=True):
     compiled = compile_spec(spec)
-    cell_w = max(len(next(iter(f.values()))[0]) for _, f, _ in compiled)
-    cell_h = max(len(next(iter(f.values()))) for _, f, _ in compiled)
-    cols = max(len(f) for _, f, _ in compiled)
+    # Each sprite's row is as tall as its frames and each frame as wide as itself,
+    # so a 120-pixel sofa doesn't make every 16-pixel icon's cell 120 wide.
+    sizes = [(len(next(iter(f.values()))[0]), len(next(iter(f.values())))) for _, f, _ in compiled]
+    sheet_w = max(w * len(f) for (w, _), (_, f, _) in zip(sizes, compiled)) * scale
+    sheet_h = sum(h for _, h in sizes) * scale
 
-    # The sheet: a row per sprite/variant, a cell per frame, each frame at its own size.
-    sheet = blank(cols * cell_w * scale, len(compiled) * cell_h * scale)
+    sheet = blank(sheet_w, sheet_h)
     atlas = {"frames": {}, "animations": {}, "meta": {
         "app": "pixelart.py", "image": "sheet.png", "format": "RGBA8888", "scale": scale,
-        "size": {"w": cols * cell_w * scale, "h": len(compiled) * cell_h * scale}, "fps": {}}}
-    for r, (key, frames, info) in enumerate(compiled):
+        "size": {"w": sheet_w, "h": sheet_h}, "fps": {}}}
+    y = 0
+    for (key, frames, info), (fw, fh) in zip(compiled, sizes):
         for c, (fname, grid) in enumerate(frames.items()):
-            w, h = len(grid[0]) * scale, len(grid) * scale
-            x, y = c * cell_w * scale, r * cell_h * scale
+            w, h = fw * scale, fh * scale
+            x = c * w
             paste(sheet, scaled(grid, scale), x, y)
             atlas["frames"][f"{key}/{fname}"] = {
                 "frame": {"x": x, "y": y, "w": w, "h": h}, "rotated": False, "trimmed": False,
@@ -316,6 +318,7 @@ def render(spec, out_dir, scale=1, preview_scale=None, frames_too=False, gif=Fal
             if frames_too:
                 write(os.path.join(out_dir, "frames", key.replace("@", "_"), f"{fname}.png"),
                       png_bytes(scaled(grid, scale)))
+        y += fh * scale
         for aname, anim in info["animations"].items():
             names = anim.get("frames") if isinstance(anim, dict) else anim
             missing = [f for f in names if f not in frames]
@@ -326,29 +329,34 @@ def render(spec, out_dir, scale=1, preview_scale=None, frames_too=False, gif=Fal
     write(os.path.join(out_dir, "sheet.png"), png_bytes(sheet))
     with open(os.path.join(out_dir, "sheet.json"), "w", encoding="utf-8") as fh:
         json.dump(atlas, fh, indent=1)
+    if not preview:
+        return ["sheet.png", "sheet.json"], compiled
 
     # The preview: big, on a checkerboard, frames apart; a tile shown 3x3 so its seams show.
-    ps = preview_scale or max(2, min(12, 96 // max(cell_w, cell_h)))
+    biggest = max(max(w, h) for w, h in sizes)
+    ps = preview_scale or max(1, min(12, 96 // biggest))
     gap = 2
     wide = [3 if info["tile"] else 1 for _, _, info in compiled]
-    pcols = max(len(f) * k for (_, f, _), k in zip(compiled, wide))
-    pw = gap + pcols * (cell_w + gap) * ps
-    ph = gap + sum((cell_h * k + gap) * ps for k in wide)
+    pw = gap + max((fw * k + gap) * ps * len(f) for (fw, _), (_, f, _), k in zip(sizes, compiled, wide))
+    ph = gap + sum((fh * k + gap) * ps for (_, fh), k in zip(sizes, wide))
     preview = blank(pw, ph, (40, 40, 46, 255))
+    checker = {}
     y = gap
-    for (key, frames, info), k in zip(compiled, wide):
+    for (key, frames, info), (fw, fh), k in zip(compiled, sizes, wide):
         for c, grid in enumerate(frames.values()):
             gh, gw = len(grid), len(grid[0])
-            x0 = gap + c * k * (cell_w + gap) * ps
-            for yy in range(gh * k * ps):
-                for xx in range(gw * k * ps):
-                    light = ((xx // (ps * 2)) + (yy // (ps * 2))) % 2
-                    preview[y + yy][x0 + xx] = (200, 200, 208, 255) if light else (168, 168, 178, 255)
+            x0 = gap + c * (fw * k + gap) * ps
+            cw, ch = gw * k * ps, gh * k * ps
+            if (cw, ch, ps) not in checker:
+                checker[(cw, ch, ps)] = [[(200, 200, 208, 255) if ((xx // (ps * 2)) + (yy // (ps * 2))) % 2 else
+                                          (168, 168, 178, 255) for xx in range(cw)] for yy in range(ch)]
+            for yy, row in enumerate(checker[(cw, ch, ps)]):
+                preview[y + yy][x0:x0 + cw] = row
             big = scaled(grid, ps)
             for ty in range(k):
                 for tx in range(k):
                     paste(preview, big, x0 + tx * gw * ps, y + ty * gh * ps, over=True)
-        y += (cell_h * k + gap) * ps
+        y += (fh * k + gap) * ps
     write(os.path.join(out_dir, "preview.png"), png_bytes(preview))
 
     made = ["sheet.png", "sheet.json", "preview.png"]
@@ -405,6 +413,7 @@ def main(argv=None):
     r.add_argument("--preview-scale", type=int, default=None)
     r.add_argument("--frames", action="store_true", help="also one PNG per frame")
     r.add_argument("--gif", action="store_true", help="also a GIF per animation (Pillow)")
+    r.add_argument("--no-preview", action="store_true", help="skip preview.png (faster for big sheets)")
     a = sub.add_parser("ascii", help="print one frame's letters, e.g. cat/blink")
     a.add_argument("spec")
     a.add_argument("frame")
@@ -419,7 +428,8 @@ def main(argv=None):
                       + (", tile" if info["tile"] else ""))
             print("ok")
         elif args.cmd == "render":
-            made, _ = render(spec, args.out, args.scale, args.preview_scale, args.frames, args.gif)
+            made, _ = render(spec, args.out, args.scale, args.preview_scale, args.frames, args.gif,
+                             preview=not args.no_preview)
             for m in made:
                 print(os.path.join(args.out, m))
         else:

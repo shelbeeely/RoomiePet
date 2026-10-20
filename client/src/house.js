@@ -1,101 +1,106 @@
-// The house's floor plan, seen front-on like a doll's house: two bedrooms
-// upstairs, the kitchen-living room and the bathroom-laundry downstairs.
-// Rooms, the doors between them, where the furniture stands and where pets go
-// for what -- and the way from any room to any other through the doors.
-// Pure data and geometry (room pixels, 16 to a tile), so it is testable.
+// The apartment's floor plan: about 750 sq ft (30 x 25 ft), seen front-on
+// from a little above like a doll's house, 16 pixels to the foot. Left to
+// right: the two bedrooms, one behind the other, each opening onto the main
+// area -- kitchen along its back wall, living room in front -- and the
+// bathroom with the laundry in the back right corner. Each room shows the
+// wall at its back and its floor. Rooms, the doors between them, where the
+// furniture stands, where pets go for what, and the way from room to room.
+// Pure data and geometry, so it is testable.
 
-export const T = 16;
-export const W = 16 * T; // 256
-export const H = 15 * T; // 240
+export const FT = 16;
+export const W = 30 * FT; // 480
+export const H = 25 * FT; // 400
+export const WALL_H = 48;  // a back wall strip, 3 ft as seen
 
-// Each room: its back wall strip and its floor. `free` is where a pet may
-// wander to (clear of the furniture); feet y is the bottom of the sprite.
+// A room's area is one or more rectangles; each rectangle's top edge has a back wall.
+// `free` is where a pet may stand (its feet), clear of the furniture.
 export const ROOMS = {
-  bedA: { label: "Bedroom", wall: { x0: 0, x1: 128, y0: 0, y1: 32 }, floor: { x0: 0, x1: 128, y0: 32, y1: 112 },
-    free: [{ x0: 42, x1: 118, y0: 66, y1: 108 }], paper: "wall@rose" },
-  bedB: { label: "Bedroom", wall: { x0: 128, x1: 256, y0: 0, y1: 32 }, floor: { x0: 128, x1: 256, y0: 32, y1: 112 },
-    free: [{ x0: 138, x1: 214, y0: 66, y1: 108 }], paper: "wall@lilac" },
-  living: { label: "Kitchen & living room", wall: { x0: 0, x1: 176, y0: 112, y1: 144 }, floor: { x0: 0, x1: 176, y0: 144, y1: 240 },
-    free: [{ x0: 10, x1: 66, y0: 168, y1: 204 }, { x0: 80, x1: 168, y0: 176, y1: 236 }], paper: "wall" },
-  bath: { label: "Bathroom & laundry", wall: { x0: 176, x1: 256, y0: 112, y1: 144 }, floor: { x0: 176, x1: 256, y0: 144, y1: 240 },
-    free: [{ x0: 184, x1: 250, y0: 176, y1: 236 }], paper: "tile@aqua/wall" },
+  bedA: { label: "Bedroom", areas: [{ x0: 0, x1: 176, y0: 0, y1: 196 }], paper: "wall@rose", floor: "floor/wood",
+    free: [{ x0: 92, x1: 166, y0: 112, y1: 190 }] },
+  bedB: { label: "Bedroom", areas: [{ x0: 0, x1: 176, y0: 196, y1: 400 }], paper: "wall@lilac", floor: "floor/wood",
+    free: [{ x0: 92, x1: 166, y0: 310, y1: 392 }] },
+  main: { label: "Kitchen & living room", areas: [{ x0: 176, x1: 336, y0: 0, y1: 400 }, { x0: 336, x1: 480, y0: 152, y1: 400 }],
+    paper: "wall@butter", floor: "floor/wood",
+    free: [{ x0: 196, x1: 326, y0: 118, y1: 176 }, { x0: 196, x1: 326, y0: 226, y1: 392 }, { x0: 346, x1: 470, y0: 252, y1: 312 }] },
+  bath: { label: "Bathroom & laundry", areas: [{ x0: 336, x1: 480, y0: 0, y1: 152 }], paper: "tile@aqua/wall", floor: "tile@aqua/check",
+    free: [{ x0: 352, x1: 428, y0: 120, y1: 148 }] },
 };
 
-// The kitchen is the left end of the living room, with a tiled floor.
-export const KITCHEN = { x0: 0, x1: 72 };
+// The kitchen floor is tiled: the back of the main area.
+export const KITCHEN_FLOOR = { x0: 176, x1: 336, y0: WALL_H, y1: 184 };
 
-// Doors: which rooms they join, and a point either side to walk through.
+// Doors: the rooms they join, a point on either side, and how they are drawn --
+// a gap in a side wall, or a doorway in a back wall.
 export const DOORS = [
-  { rooms: ["bedA", "bedB"], at: { bedA: { x: 118, y: 90 }, bedB: { x: 138, y: 90 } }, wall: { x: 128, y0: 72, y1: 104 } },
-  { rooms: ["bedA", "living"], at: { bedA: { x: 72, y: 108 }, living: { x: 72, y: 154 } }, door: { x: 72, y: 144 } },
-  { rooms: ["bedB", "living"], at: { bedB: { x: 141, y: 108 }, living: { x: 141, y: 154 } }, door: { x: 141, y: 144 } },
-  { rooms: ["living", "bath"], at: { living: { x: 168, y: 206 }, bath: { x: 186, y: 206 } }, wall: { x: 176, y0: 188, y1: 222 } },
+  { rooms: ["bedA", "main"], at: { bedA: { x: 158, y: 166 }, main: { x: 196, y: 166 } }, gap: { x: 176, y0: 112, y1: 180 } },
+  { rooms: ["bedB", "main"], at: { bedB: { x: 158, y: 362 }, main: { x: 196, y: 362 } }, gap: { x: 176, y0: 308, y1: 376 } },
+  { rooms: ["bath", "main"], at: { bath: { x: 356, y: 146 }, main: { x: 356, y: 218 } }, doorway: { x: 356, y: 200 } },
 ];
 
-// What stands where: frame in the atlas, bottom-centre position. Drawn in
-// this order, before the pets (everything is against a wall or low).
+// Furniture: frame, bottom-centre position. `wall` pieces hang on a back wall
+// and `flat` ones lie on the floor -- both drawn before the pets; the rest
+// stand on the floor and are drawn with the pets, back to front.
 export const FURNITURE = [
-  // Bedroom A
-  { frame: "window/day", night: "window/night", x: 76, y: 31 },
-  { frame: "picture/hills", x: 112, y: 22 },
-  { frame: "rug@pink/oval", x: 80, y: 98 },
-  { frame: "bed/bed", x: 20, y: 62 },
-  { frame: "nightstand/lamp", night: "nightstand/lamp", day: "nightstand/lamp_off", x: 44, y: 56 },
-  // Bedroom B
-  { frame: "window/day", night: "window/night", x: 180, y: 31 },
-  { frame: "picture/sea", x: 144, y: 22 },
-  { frame: "rug/oval", x: 176, y: 98 },
-  { frame: "bed/bed", x: 236, y: 62, flip: true },
-  { frame: "nightstand/lamp", night: "nightstand/lamp", day: "nightstand/lamp_off", x: 212, y: 56 },
-  // Kitchen
-  { frame: "fridge/fridge", x: 12, y: 150 },
-  { frame: "counter/counter", x: 40, y: 152 },
-  { frame: "table/table", x: 34, y: 232 },
-  // Living room
-  { frame: "window/day", night: "window/night", x: 106, y: 141 },
-  { frame: "sofa/sofa", x: 106, y: 168 },
-  { frame: "shelf/shelf", x: 164, y: 154 },
-  { frame: "rug/oval", x: 120, y: 206 },
-  { frame: "plant/plant", x: 82, y: 236 },
+  // Bedroom 1
+  { frame: "window/main", night: "window/night", x: 138, y: 42, wall: true },
+  { frame: "picture/main", x: 40, y: 30, wall: true },
+  { frame: "rug@pink/main", x: 120, y: 160, flat: true },
+  { frame: "bed/main", x: 40, y: 140 },
+  { frame: "nightstand/off", night: "nightstand/main", x: 88, y: 80 },
+  // Bedroom 2
+  { frame: "window/main", night: "window/night", x: 138, y: 238, wall: true },
+  { frame: "picture@sea/main", x: 40, y: 226, wall: true },
+  { frame: "rug@sage/main", x: 120, y: 356, flat: true },
+  { frame: "bed@blue/main", x: 40, y: 336 },
+  { frame: "nightstand/off", night: "nightstand/main", x: 88, y: 276 },
+  // Kitchen, along the back of the main area
+  { frame: "fridge/main", x: 198, y: 86 },
+  { frame: "counter/main", x: 274, y: 80 },
+  { frame: "table/main", x: 266, y: 214 },
+  // Living room, the front of the main area
+  { frame: "bookshelf/main", x: 204, y: 300 },
+  { frame: "tv/main", x: 426, y: 214 },
+  { frame: "rug/main", x: 404, y: 304, flat: true },
+  { frame: "sofa/main", x: 404, y: 384 },
+  { frame: "plant/main", x: 300, y: 398 },
   // Bathroom & laundry
-  { frame: "bathtub/tub", x: 198, y: 164 },
-  { frame: "toilet/toilet", x: 226, y: 160 },
-  { frame: "washer/washer", x: 246, y: 166 },
-  { frame: "mat/mat", x: 200, y: 196 },
-  { frame: "basket/basket", x: 242, y: 232 },
+  { frame: "bathtub/main", x: 390, y: 104 },
+  { frame: "toilet/main", x: 456, y: 96 },
+  { frame: "mat/main", x: 392, y: 132, flat: true },
+  { frame: "washer/main", x: 458, y: 150 },
 ];
 
-// Where a pet goes for something, by its bedroom (0 or 1) and its place in the queue.
-const BEDS = [
-  [{ x: 12, y: 58 }, { x: 28, y: 58 }, { x: 52, y: 76 }, { x: 66, y: 84 }],
-  [{ x: 244, y: 58 }, { x: 228, y: 58 }, { x: 204, y: 76 }, { x: 190, y: 84 }],
-];
-export const BOWL = { x: 16, y: 186 };
+export const BOWL = { x: 214, y: 134 };
+
+// Where pets sleep: on their bed, then beside it. Bedrooms alternate by roommate.
+const BEDS = {
+  bedA: [{ x: 30, y: 118 }, { x: 54, y: 118 }, { x: 110, y: 150 }, { x: 142, y: 178 }],
+  bedB: [{ x: 30, y: 314 }, { x: 54, y: 314 }, { x: 110, y: 346 }, { x: 142, y: 374 }],
+};
 
 export function bedroomOf(index) {
   return index % 2 === 0 ? "bedA" : "bedB";
 }
 
 export function bedSpot(index) {
-  const room = index % 2;
+  const room = bedroomOf(index);
   const slots = BEDS[room];
-  return { room: bedroomOf(index), ...slots[Math.floor(index / 2) % slots.length] };
+  return { room, ...slots[Math.floor(index / 2) % slots.length] };
 }
 
 export function bowlSpot(index) {
-  return { room: "living", x: BOWL.x + 16 + (index % 3) * 10, y: BOWL.y + 2 + Math.floor(index / 3) * 6 };
+  return { room: "main", x: BOWL.x + 30 + (index % 3) * 22, y: BOWL.y + 8 + Math.floor(index / 3) * 10 };
 }
 
 export function bathSpot(index) {
-  return { room: "bath", x: 194 + (index % 3) * 12, y: 196 + Math.floor(index / 3) * 8 };
+  return { room: "bath", x: 362 + (index % 3) * 22, y: 140 + Math.floor(index / 3) * 4 };
 }
 
 export function roomAt(x, y) {
   for (const [id, r] of Object.entries(ROOMS)) {
-    const f = r.floor;
-    if (x >= f.x0 && x <= f.x1 && y >= f.y0 - 4 && y <= f.y1) return id;
+    if (r.areas.some((a) => x >= a.x0 && x <= a.x1 && y >= a.y0 && y <= a.y1)) return id;
   }
-  return "living";
+  return "main";
 }
 
 /** A random spot a pet can wander to in a room. */
@@ -128,7 +133,7 @@ export function roomPath(from, to) {
   return [from];
 }
 
-/** The points to walk through to get from a room to a spot in another: through each door's two sides. */
+/** The points to walk through to get from a room to a spot in another: each door's two sides. */
 export function route(fromRoom, to) {
   const rooms = roomPath(fromRoom, to.room);
   const points = [];
@@ -143,7 +148,7 @@ export function route(fromRoom, to) {
 /**
  * Where a pet heads, from how it is and what just happened:
  *   asleep -> its bed; a chore that fed it -> the bowl; one that cleaned it ->
- *   the bathroom; hungry -> hangs about the kitchen; grubby -> the bathroom;
+ *   the bathroom; hungry -> about the kitchen; grubby -> the bathroom;
  *   sad or poorly -> its own room; otherwise mostly the living room.
  */
 export function destination(cond, effect, index, rand = Math.random) {
@@ -151,11 +156,9 @@ export function destination(cond, effect, index, rand = Math.random) {
   if (cond.state === "asleep") return bedSpot(index);
   if (effect === "eat") return bowlSpot(index);
   if (effect === "clean") return bathSpot(index);
-  if (cond.flags?.hungry && rand() < 0.7) {
-    return { room: "living", x: 12 + rand() * 54, y: 168 + rand() * 34 };
-  }
+  if (cond.flags?.hungry && rand() < 0.7) return { room: "main", x: 200 + rand() * 120, y: 122 + rand() * 50 };
   if (cond.flags?.grubby && rand() < 0.6) return wanderSpot("bath", rand);
   if (cond.state === "sad" || cond.state === "poorly") return wanderSpot(bedroomOf(index), rand);
   const r = rand();
-  return wanderSpot(r < 0.55 ? "living" : r < 0.8 ? bedroomOf(index) : r < 0.9 ? bedroomOf(index + 1) : "bath", rand);
+  return wanderSpot(r < 0.6 ? "main" : r < 0.85 ? bedroomOf(index) : r < 0.93 ? bedroomOf(index + 1) : "bath", rand);
 }

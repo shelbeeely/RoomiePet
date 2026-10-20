@@ -10,23 +10,28 @@ export const NEED_LABEL = { food: "🍖 Food", clean: "🫧 Clean", fun: "🎈 F
 /** One pet, animated, on its own little canvas. */
 export function PetSprite({ atlas, species, color, stage = "grown", cond = { state: "ok", flags: {} }, size = 64 }) {
   const ref = useRef(null);
+  // Drawn at the screen's real resolution, in whole pixels per art pixel, so it stays crisp.
+  const dpr = typeof window !== "undefined" ? Math.min(3, Math.round(window.devicePixelRatio || 1)) : 1;
+  const px = size * dpr;
   useEffect(() => {
     if (!atlas) return;
     const ctx = ref.current.getContext("2d");
     let raf;
     const loop = (ms) => {
-      ctx.clearRect(0, 0, size, size);
+      ctx.clearRect(0, 0, px, px);
       const key = stage === "egg" ? "egg" : petKey(species, color);
-      const full = Math.floor(size / 16);
-      const scale = stage === "baby" ? Math.max(1, Math.round(full * 0.66)) : full; // whole pixels only
-      draw(ctx, atlas, frameAt(atlas, key, animFor(cond), ms / 1000), size / 2, size - (size - 16 * scale) / 2, scale);
-      if (stage === "star") draw(ctx, atlas, "crown/crown", size / 2, size - (size - 16 * scale) / 2 - 15 * scale, scale);
+      const art = atlas.frames[`${key}/idle_0`]?.frame.w || atlas.frames["egg/egg_0"]?.frame.w || 64;
+      const full = Math.max(1, Math.floor(px / art));
+      const scale = stage === "baby" || stage === "egg" ? Math.max(1, Math.floor(full * 0.75)) : full;
+      const bottom = px - (px - art * scale) / 2;
+      draw(ctx, atlas, frameAt(atlas, key, animFor(cond), ms / 1000), px / 2, bottom, scale);
+      if (stage === "star") draw(ctx, atlas, "crown/crown", px / 2, bottom - (art - 14) * scale, scale);
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [atlas, species, color, stage, cond.state, size]);
-  return <canvas ref={ref} width={size} height={size} className="pet-sprite" />;
+  }, [atlas, species, color, stage, cond.state, px]);
+  return <canvas ref={ref} width={px} height={px} style={{ width: size, height: size }} className="pet-sprite" />;
 }
 
 function Bar({ label, value }) {
@@ -48,7 +53,7 @@ export function PetCard({ atlas, member, mine, onPat, now }) {
   const into = pet.next ? Math.round(((pet.xp - stage.xp) / (pet.next.xp - stage.xp)) * 100) : 100;
   return (
     <section className="card pet-card">
-      <PetSprite atlas={atlas} species={pet.species} color={pet.color} stage={pet.stage} cond={cond} size={96} />
+      <PetSprite atlas={atlas} species={pet.species} color={pet.color} stage={pet.stage} cond={cond} size={112} />
       <div className="pet-info">
         <h2>
           {pet.name} <small>{mine ? "your pet" : `${member.name}'s pet`}</small>
@@ -299,7 +304,7 @@ export function PetPicker({ atlas, value, onChange }) {
             className={value.species === s ? "on" : ""}
             onClick={() => onChange({ species: s, color: SPECIES[s].colors[0] })}
           >
-            <PetSprite atlas={atlas} species={s} color={value.species === s ? value.color : info.colors[0]} size={48} />
+            <PetSprite atlas={atlas} species={s} color={value.species === s ? value.color : info.colors[0]} size={64} />
             {info.label}
           </button>
         ))}
@@ -307,7 +312,7 @@ export function PetPicker({ atlas, value, onChange }) {
       <div className="colors">
         {SPECIES[value.species].colors.map((c) => (
           <button type="button" key={c} className={value.color === c ? "on" : ""} onClick={() => onChange({ ...value, color: c })}>
-            <PetSprite atlas={atlas} species={value.species} color={c} cond={{ state: "happy", flags: {} }} size={32} />
+            <PetSprite atlas={atlas} species={value.species} color={c} cond={{ state: "happy", flags: {} }} size={44} />
             {c}
           </button>
         ))}
