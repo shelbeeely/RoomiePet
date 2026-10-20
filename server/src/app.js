@@ -11,6 +11,7 @@ import {
 import { ASSIGNMENTS, RECURRENCES, afterDone, dueStatus, sortChores, todayIn } from "../../shared/chores.js";
 import { NOTIFY_KINDS, digest, doneLine, hourIn, openFor, petAlerts, prefsOf } from "../../shared/notify.js";
 import { matchChore } from "../../shared/match.js";
+import { ROOMS, cleanLayout, layoutProblem } from "../../shared/home.js";
 import { Pusher, makeSender, vapidKeys } from "./push.js";
 
 const INVITE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // nothing that reads as another letter
@@ -223,6 +224,8 @@ export function createApp(db, { now = () => Date.now(), codeLimit = { max: 30, w
       members: people.map((m) => ({ id: m.id, name: m.name, pet: petView(m) })),
       chores,
       tags: tagsView(h),
+      rooms: Object.fromEntries(q("SELECT room, layout FROM room_layouts WHERE household_id = ?").all(h.id)
+        .filter((r) => ROOMS[r.room]).map((r) => [r.room, JSON.parse(r.layout)])),
       feed: events.map((e) => ({
         id: e.id, kind: e.kind, memberId: e.member_id, who: names[e.member_id] || "Someone",
         at: e.at, data: JSON.parse(e.data),
@@ -377,6 +380,26 @@ export function createApp(db, { now = () => Date.now(), codeLimit = { max: 30, w
       event(hid, "left", req.me.id, { petName: req.me.pet_name });
     });
     hub.notify(hid);
+    res.json({ ok: true });
+  });
+
+  // A room arranged in the room builder: checked as the app checks it, kept whole.
+  app.put("/api/rooms/:room", (req, res) => {
+    const room = req.params.room;
+    const layout = req.body?.layout;
+    const problem = layoutProblem(room, layout);
+    if (problem) throw new HttpError(Object.hasOwn(ROOMS, room) ? 400 : 404, problem);
+    const clean = cleanLayout(layout);
+    q(`INSERT INTO room_layouts (household_id, room, layout, updated_by, updated_at) VALUES (?, ?, ?, ?, ?)
+       ON CONFLICT (household_id, room) DO UPDATE SET layout = excluded.layout, updated_by = excluded.updated_by, updated_at = excluded.updated_at`)
+      .run(req.household.id, room, JSON.stringify(clean), req.me.id, now());
+    hub.notify(req.household.id);
+    res.json({ ok: true, layout: clean });
+  });
+
+  app.delete("/api/rooms/:room", (req, res) => {
+    q("DELETE FROM room_layouts WHERE household_id = ? AND room = ?").run(req.household.id, req.params.room);
+    hub.notify(req.household.id);
     res.json({ ok: true });
   });
 

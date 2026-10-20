@@ -1,81 +1,92 @@
 import { describe, expect, test } from "vitest";
 import { readFileSync } from "node:fs";
-import {
-  DOORS, FURNITURE, H, ROOMS, W, bathSpot, bedSpot, bowlSpot, destination, roomAt, roomPath, route, wanderSpot,
-} from "./house.js";
+import { CATALOG, DEFAULT_LAYOUTS, footprint, roomAt } from "@shared/home.js";
+import { SPECIES } from "@shared/pet.js";
+import { allLayouts, bedSpot, bedroomOf, bowlSpot, destination, findPath, free, gridOf, sleepSpots, wanderSpot } from "./house.js";
+import { petKey } from "./sprites.js";
 
 const atlas = JSON.parse(readFileSync(new URL("../public/sprites/sheet.json", import.meta.url)));
-const inside = (p, f) => p.x >= f.x0 && p.x <= f.x1 && p.y >= f.y0 && p.y <= f.y1;
+const layouts = allLayouts({});
+const grid = gridOf(layouts);
+const solid = (room) => layouts[room].items.filter((i) => CATALOG[i.kind].layer === "solid").map(footprint);
+const inside = (p, f) => p.x > f.x0 && p.x < f.x1 && p.y > f.y0 && p.y < f.y1;
 
-describe("the house", () => {
-  test("rooms fit the apartment and every free spot is on its room's floor", () => {
-    for (const [id, r] of Object.entries(ROOMS)) {
-      for (const a of r.areas) expect(a.x1 <= W && a.y1 <= H, id).toBe(true);
-      for (const a of r.free) {
-        for (const corner of [{ x: a.x0, y: a.y0 }, { x: a.x1, y: a.y1 }, { x: a.x0, y: a.y1 }, { x: a.x1, y: a.y0 }]) {
-          expect(roomAt(corner.x, corner.y), `${id} ${JSON.stringify(corner)}`).toBe(id);
-        }
-      }
+/** Every bit of the way, in steps small enough to catch going through a wall. */
+function walk(path, from) {
+  const out = [];
+  let a = from;
+  for (const b of path) {
+    const n = Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / 0.1);
+    for (let k = 1; k <= n; k++) out.push({ x: a.x + ((b.x - a.x) * k) / n, y: a.y + ((b.y - a.y) * k) / n });
+    a = b;
+  }
+  return out;
+}
+
+describe("getting about", () => {
+  test("from the bottom bedroom to the bathroom: through the doors, round the furniture", () => {
+    const from = { x: 6, y: 20 };
+    const to = { x: 25, y: 5 };
+    const path = findPath(grid, from, to);
+    const steps = walk(path, from);
+    const rooms = [...new Set(steps.map((p) => roomAt(p.x, p.y)))];
+    expect(rooms).toEqual(["bedB", "main", "bath"]);
+    const furniture = Object.keys(layouts).flatMap(solid);
+    for (const p of steps.slice(0, -4)) expect(furniture.some((f) => inside(p, f)), JSON.stringify(p)).toBe(false);
+    // Crossing from room to room only where there's a door.
+    for (let k = 1; k < steps.length; k++) {
+      const [a, b] = [steps[k - 1], steps[k]];
+      if (roomAt(a.x, a.y) === roomAt(b.x, b.y)) continue;
+      const atDoor = (b.y > 20 && b.y < 23 && Math.abs(b.x - 11) < 0.3) || (b.x > 22 && b.x < 25 && Math.abs(b.y - 9) < 0.3);
+      expect(atDoor, JSON.stringify([a, b])).toBe(true);
     }
   });
 
-  test("the layout: bedrooms on the left open onto the main area; the bathroom is the back right corner", () => {
-    const right = (id) => Math.max(...ROOMS[id].areas.map((a) => a.x1));
-    const left = (id) => Math.min(...ROOMS[id].areas.map((a) => a.x0));
-    expect(right("bedA")).toBeLessThanOrEqual(left("main"));
-    expect(right("bedB")).toBeLessThanOrEqual(left("main"));
-    expect(right("bath")).toBe(W);
-    expect(Math.min(...ROOMS.bath.areas.map((a) => a.y0))).toBe(0);
-    expect(roomPath("bedA", "main")).toEqual(["bedA", "main"]);
-    expect(roomPath("bedB", "main")).toEqual(["bedB", "main"]);
-    // About 750 sq ft at 16 px to the foot.
-    expect((W / 16) * (H / 16)).toBe(750);
+  test("wandering only picks free floor", () => {
+    for (let k = 0; k < 50; k++) {
+      const s = wanderSpot(grid, "bedB", Math.random);
+      expect(roomAt(s.x, s.y)).toBe("bedB");
+      expect(free(grid, Math.floor(s.x / 0.5), Math.floor(s.y / 0.5))).toBe(true);
+    }
+  });
+});
+
+describe("where pets go", () => {
+  const cond = (state, flags = {}) => ({ state, flags });
+
+  test("asleep: their own bedroom, the pet bed first, then the bed", () => {
+    expect(bedroomOf(0)).toBe("bedA");
+    expect(bedroomOf(1)).toBe("bedB");
+    const spots = sleepSpots(layouts, "bedB");
+    expect(spots[0].z).toBeLessThan(1);         // in the pet bed, on the floor
+    expect(spots[1].z).toBeGreaterThan(1);      // then up on the bed
+    expect(bedSpot(layouts, grid, 1)).toEqual(spots[0]);
+    expect(bedSpot(layouts, grid, 3)).toEqual(spots[1]);
+    expect(destination(layouts, grid, cond("asleep"), null, 2).room).toBe("bedA");
   });
 
-  test("every room reaches every other, through doors whose sides are in their rooms", () => {
-    for (const d of DOORS) for (const r of d.rooms) expect(roomAt(d.at[r].x, d.at[r].y), JSON.stringify(d.at[r])).toBe(r);
-    const ids = Object.keys(ROOMS);
-    for (const a of ids) for (const b of ids) expect(roomPath(a, b).at(-1)).toBe(b);
-    expect(roomPath("bedA", "bath")).toEqual(["bedA", "main", "bath"]);
+  test("fed: to the bowl, wherever someone put it", () => {
+    const at = bowlSpot(layouts, grid, 0);
+    expect(at.room).toBe("main");
+    const moved = allLayouts({
+      bedA: { ...DEFAULT_LAYOUTS.bedA, items: [...DEFAULT_LAYOUTS.bedA.items, { kind: "bowl", color: "sun", x: 6, y: 9, rot: 0 }] },
+      main: { ...DEFAULT_LAYOUTS.main, items: DEFAULT_LAYOUTS.main.items.filter((i) => i.kind !== "bowl") },
+    });
+    const there = destination(moved, gridOf(moved), cond("ok"), "eat", 0);
+    expect(there.room).toBe("bedA");
+    expect(Math.hypot(there.x - 6.5, there.y - 9.5)).toBeLessThan(3);
   });
 
-  test("a route goes door by door and ends at the spot", () => {
-    const r = route("bedB", { room: "bath", x: 380, y: 130 });
-    expect(r.map((p) => p.room)).toEqual(["bedB", "main", "main", "bath", "bath"]);
-    expect(r.at(-1)).toEqual({ room: "bath", x: 380, y: 130 });
-    expect(route("main", { room: "main", x: 250, y: 300 })).toHaveLength(1);
+  test("cleaned: to the bathroom; eggs stay put", () => {
+    expect(destination(layouts, grid, cond("ok"), "clean", 0).room).toBe("bath");
+    expect(destination(layouts, grid, cond("egg"), null, 0)).toBe(null);
   });
+});
 
-  test("every piece of furniture is in the art", () => {
-    for (const f of FURNITURE) {
-      for (const frame of [f.frame, f.night, f.day].filter(Boolean)) expect(atlas.frames[frame], frame).toBeTruthy();
+test("every pet has its back view, for walking away", () => {
+  for (const [species, s] of Object.entries(SPECIES)) {
+    for (const color of s.colors) {
+      for (const anim of ["idle_back", "walk_back"]) expect(atlas.animations[`${petKey(species, color)}/${anim}`], `${species} ${color} ${anim}`).toBeTruthy();
     }
-    for (const r of Object.values(ROOMS)) {
-      const [sprite, frame = "paper"] = r.paper.split("/");
-      expect(atlas.frames[`${sprite}/${frame}`], r.paper).toBeTruthy();
-      expect(atlas.frames[r.floor], r.floor).toBeTruthy();
-    }
-    for (const name of ["bowl/empty", "bowl/full", "door/main", "crown/crown", "tile/check", "wall@butter/base"]) {
-      expect(atlas.frames[name], name).toBeTruthy();
-    }
-    for (const [key, f] of Object.entries(atlas.frames)) {
-      if (/^(cat|bunny|chick|lop|raccoon|ferret|possum|stitched)(@|\/)/.test(key)) expect([f.frame.w, f.frame.h], key).toEqual([64, 64]);
-    }
-  });
-
-  test("where pets go: bed when asleep, bowl after a kitchen chore, bath after cleaning, their room when sad", () => {
-    const ok = { state: "ok", flags: {} };
-    expect(destination({ ...ok, state: "asleep" }, null, 0)).toEqual(bedSpot(0));
-    expect(bedSpot(0).room).toBe("bedA");
-    expect(bedSpot(1).room).toBe("bedB");
-    expect(roomAt(bedSpot(3).x, bedSpot(3).y)).toBe("bedB");
-    expect(destination(ok, "eat", 2)).toEqual(bowlSpot(2));
-    expect(destination(ok, "clean", 1)).toEqual(bathSpot(1));
-    expect(destination({ ...ok, state: "egg" }, "eat", 0)).toBeNull();
-    for (let i = 0; i < 20; i++) expect(destination({ state: "sad", flags: {} }, null, 1).room).toBe("bedB");
-    for (const room of Object.keys(ROOMS)) {
-      const s = wanderSpot(room);
-      expect(roomAt(s.x, s.y)).toBe(room);
-    }
-  });
+  }
 });

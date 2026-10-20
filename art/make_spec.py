@@ -1,9 +1,9 @@
 """
 Writes art/sprites.json: RoomiePet's pixel art for the pixel-art skill to
-render (npm run art). Pets are 64 x 64 animals drawn from shapes in pets.py; the
-apartment's furniture is drawn the same way in house64.py, at 16 pixels to
-the foot. This file gives them their colours: each species' colour variants
-recolour the whole pet, shading included.
+render (npm run art). Pets are 64 x 64 animals drawn from shapes in pets.py;
+this file gives them their colours: each species' colour variants recolour
+the whole pet, shading included. The flat and its furniture aren't sprites:
+the app draws them from the room model (shared/home.js, client/src/iso.js).
 """
 import json
 import os
@@ -12,8 +12,8 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(HERE, "..", ".claude", "skills", "pixel-art", "scripts"))
-import house64  # noqa: E402
 import pets  # noqa: E402
+from painter import Painter  # noqa: E402
 
 # Letters every pet shares: outline, eyes and their shine, mouth and its
 # inside, cheeks, inner ears, chest, nose, a crumb, beaks and chick feet, tears, a fluffy tail.
@@ -86,12 +86,20 @@ def pet_sprite(name):
     }
 
 
-def piece(fn, *args, frames=None, variants=None):
-    rows, palette = fn(*args)
-    return {"palette": palette, "frames": {**{"main": rows}, **(frames or {})}, **({"variants": variants} if variants else {})}
+def bowl():
+    """A full food bowl, for the Chores shortcut's icon."""
+    p = Painter(32, 22)
+    p.ellipse(16, 9, 10, 5, "F")
+    p.ellipse(12, 7, 3, 2, "f")
+    p.ellipse(20, 8, 2.5, 1.6, "f")
+    p.ellipse(16, 15, 13, 5, "q")
+    p.rect(3, 11, 27, 4, "q")
+    p.ellipse(16, 11, 13, 2.2, "Q")
+    p.ellipse(16, 10.5, 10, 1.4, "F")
+    p.outline("o")
+    return p.rows()
 
 
-paper, base, wood, check, tilewall = house64.surfaces()
 spec = {
     "palette": PALETTE,
     "sprites": {
@@ -102,44 +110,7 @@ spec = {
             "animations": {"wobble": {"frames": ["egg_0", "egg_1", "egg_0", "egg_2", "egg_0", "egg_0"], "fps": 4}},
         },
         "crown": {"palette": {"y": "#ffd166", "Y": "#e9a93a", "r": "#e05d5d"}, "frames": {"crown": pets.crown()}},
-
-        # Walls and floors, tiled.
-        "wall": {
-            "tile": True,
-            "palette": {"a": "#8fa8c8", "A": {"from": "a", "shade": 0.92}, "t": {"from": "a", "shade": 0.62},
-                        "T": {"from": "a", "shade": 0.48}},
-            "frames": {"paper": paper, "base": base},
-            "variants": {"rose": {"a": "#e7b8c6"}, "lilac": {"a": "#c3b3e0"}, "butter": {"a": "#f0dc9c"}},
-        },
-        "floor": {"tile": True, "palette": {"k": "#c08a5c", "K": "#ad7a4e", "s": "#8a5d3a"}, "frames": {"wood": wood}},
-        "tile": {
-            "tile": True,
-            "palette": {"a": "#f4efe6", "g": {"from": "a", "shade": 0.8}, "A": "#e0d2bd"},
-            "frames": {"check": check, "wall": tilewall},
-            "variants": {"aqua": {"a": "#d8f0ee", "A": "#9fd3cf"}},
-        },
-
-        # The furniture.
-        "bed": piece(house64.bed, variants={"blue": {"q": "#7fa8d8"}}),
-        "nightstand": piece(house64.nightstand, frames={"off": {"base": "main", "replace": {"L": "s", "l": "s"}}}),
-        "window": piece(house64.window, frames={"night": {"base": "main", "replace": {"g": "n", "G": "N"}}}),
-        "picture": piece(house64.picture, variants={"sea": {"g": "#5a8ad8", "G": "#3d6fbf"}}),
-        "rug": piece(house64.rug, variants={"pink": {"r": "#e7a1b6"}, "sage": {"r": "#a8c99a"}}),
-        "fridge": piece(house64.fridge),
-        "counter": piece(house64.counter),
-        "table": piece(house64.table),
-        "sofa": piece(house64.sofa_back),
-        "tv": piece(house64.tv),
-        "bookshelf": piece(house64.bookshelf),
-        "plant": piece(house64.plant),
-        "bathtub": piece(house64.bathtub),
-        "toilet": piece(house64.toilet),
-        "washer": piece(house64.washer),
-        "basket": piece(house64.basket),
-        "bowl": {"palette": house64.bowl(False)[1],
-                 "frames": {"empty": house64.bowl(False)[0], "full": house64.bowl(True)[0]}},
-        "door": piece(house64.door),
-        "mat": piece(house64.mat),
+        "bowl": {"palette": {"q": "#7fa8d8", "Q": "#a9c6ea", "F": "#c08a50", "f": "#dba872"}, "frames": {"full": bowl()}},
     },
 }
 

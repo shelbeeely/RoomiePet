@@ -49,8 +49,19 @@ export function draw(ctx, atlas, frame, x, y, scale, flip = false) {
   ctx.restore();
 }
 
-/** Which animation shows how a pet is. */
-export function animFor(cond, { walking = false, effect = null } = {}) {
+/**
+ * Which animation shows how a pet is. Pets are drawn facing us (and to the
+ * left) or walking away (to the right), mirrored for the other two ways;
+ * away only shows while it idles or walks.
+ */
+export function animFor(cond, { walking = false, effect = null, away = false } = {}) {
+  const anim = moodAnim(cond, walking, effect);
+  if (away && anim === "walk") return "walk_back";
+  if (away && anim === "idle") return "idle_back";
+  return anim;
+}
+
+function moodAnim(cond, walking, effect) {
   if (cond.state === "egg") return "wobble";
   if (effect === "eat") return "eat";
   if (effect === "happy" || effect === "clean") return "happy";

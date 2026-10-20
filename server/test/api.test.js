@@ -241,3 +241,46 @@ test("the live stream says when something changed", async () => {
   ctrl.abort();
   assert.match(seen, /event: hello[\s\S]*event: changed/);
 });
+
+test("a room arranged in the builder is kept for the household, checked as the app checks it", async () => {
+  const { ana, ben } = await household();
+  assert.deepEqual((await st(ana)).rooms, {});
+  const layout = {
+    wall: "night", floor: "carpet",
+    items: [
+      { kind: "bed", color: "pink", x: 0.5, y: 12, rot: 0, extra: "dropped" },
+      { kind: "pet_bed", color: "sun", x: 6, y: 13, rot: 1 },
+      { kind: "window", color: "oak", side: "s", line: 25, at: 2 },
+    ],
+  };
+  const r = await call("PUT", "/api/rooms/bedB", { layout }, ana);
+  assert.equal(r.status, 200);
+  const seen = (await st(ben)).rooms.bedB;
+  assert.equal(seen.wall, "night");
+  assert.deepEqual(seen.items[0], { kind: "bed", color: "pink", x: 0.5, y: 12, rot: 0 });
+  assert.equal(seen.items.length, 3);
+
+  const bad = [
+    [{ ...layout, items: [{ kind: "bed", color: "pink", x: 9, y: 12, rot: 0 }] }, /doesn't fit/],                // through the wall
+    [{ ...layout, items: [{ kind: "sofa", color: "teal", x: 7, y: 18, rot: 1 }] }, /blocks a doorway/],
+    [{ ...layout, items: [{ kind: "window", color: "oak", side: "n", line: 12, at: 2 }] }, /outside wall/],  // onto bedroom 1
+    [{ ...layout, items: [layout.items[0], { ...layout.items[0], x: 1 }] }, /overlaps/],
+    [{ ...layout, items: [{ kind: "__proto__", color: "pink", x: 1, y: 13, rot: 0 }] }, /catalog/],
+    [{ ...layout, wall: "plaid" }, /wallpaper/],
+  ];
+  for (const [l, why] of bad) {
+    const res = await call("PUT", "/api/rooms/bedB", { layout: l }, ben);
+    assert.equal(res.status, 400, JSON.stringify(l));
+    assert.match(res.data.error, why);
+  }
+  assert.equal((await call("PUT", "/api/rooms/attic", { layout }, ana)).status, 404);
+  assert.equal((await st(ana)).rooms.bedB.wall, "night");
+
+  // Another household's flat is its own.
+  const other = await call("POST", "/api/households", { householdName: "Next door", name: "Zed", petName: "Z", species: "cat", timezone: "UTC" });
+  assert.deepEqual((await st(other.data.token)).rooms, {});
+
+  // Back as it came.
+  assert.equal((await call("DELETE", "/api/rooms/bedB", undefined, ana)).status, 200);
+  assert.deepEqual((await st(ben)).rooms, {});
+});

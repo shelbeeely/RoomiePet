@@ -1,0 +1,559 @@
+// The apartment as a model the server and every phone share: about 750 sq ft
+// (30 x 25 ft), measured in feet. Left to right: the two bedrooms, one behind
+// the other, each opening onto the main area -- kitchen along its back wall,
+// living room in front -- and the bathroom with the laundry in the back right
+// corner. Rooms are unions of rectangles; walls run along their edges, with
+// gaps for the doors. What stands in a room is its layout: a wallpaper, a
+// floor and pieces from the catalog, which roommates rearrange in the room
+// builder. The server keeps each household's layouts and checks them here,
+// so a phone can't save a bed through a wall or across a doorway.
+
+export const FLAT = { w: 30, d: 25 };
+
+export const ROOMS = {
+  bedA: { label: "Bedroom 1", areas: [{ x0: 0, x1: 11, y0: 0, y1: 12 }] },
+  bedB: { label: "Bedroom 2", areas: [{ x0: 0, x1: 11, y0: 12, y1: 25 }] },
+  main: { label: "Kitchen & living room", areas: [{ x0: 11, x1: 21, y0: 0, y1: 25 }, { x0: 21, x1: 30, y0: 9, y1: 25 }] },
+  bath: { label: "Bathroom & laundry", areas: [{ x0: 21, x1: 30, y0: 0, y1: 9 }] },
+};
+
+// A door is a gap in the wall on a line: x = at (axis "x") or y = at (axis "y"), from..to along it.
+export const DOORS = [
+  { rooms: ["bedA", "main"], axis: "x", at: 11, from: 8, to: 11 },
+  { rooms: ["bedB", "main"], axis: "x", at: 11, from: 20, to: 23 },
+  { rooms: ["bath", "main"], axis: "y", at: 9, from: 22, to: 25 },
+];
+
+const EPS = 1e-9;
+
+export function roomAt(x, y) {
+  for (const [id, r] of Object.entries(ROOMS)) {
+    if (r.areas.some((a) => x >= a.x0 && x < a.x1 && y >= a.y0 && y < a.y1)) return id;
+  }
+  return null;
+}
+
+export function bounds(room) {
+  const as = ROOMS[room].areas;
+  return {
+    x0: Math.min(...as.map((a) => a.x0)), x1: Math.max(...as.map((a) => a.x1)),
+    y0: Math.min(...as.map((a) => a.y0)), y1: Math.max(...as.map((a) => a.y1)),
+  };
+}
+
+export function doorAt(axis, line, along) {
+  return DOORS.find((d) => d.axis === axis && d.at === line && along >= d.from - EPS && along <= d.to + EPS) || null;
+}
+
+/**
+ * A room's walls: straight runs along its edges, split by doors. side is which
+ * edge of the room the wall is (n is its back, as the flat is drawn); line is
+ * the x or y it runs along, from..to the span; outer when nothing is on the
+ * other side.
+ */
+export function wallsOf(room) {
+  const b = bounds(room);
+  const runs = [];
+  const add = (side, line, along, outer) => {
+    const last = runs[runs.length - 1];
+    if (last && last.side === side && last.line === line && last.to === along && last.outer === outer) last.to = along + 1;
+    else runs.push({ side, line, from: along, to: along + 1, outer });
+  };
+  const sides = [
+    ["n", 0, -1, "y"], ["s", 0, 1, "y"], ["w", -1, 0, "x"], ["e", 1, 0, "x"],
+  ];
+  for (const [side, dx, dy, axis] of sides) {
+    // Walk the lines in order so each run is contiguous.
+    if (axis === "y") {
+      for (let y = b.y0; y < b.y1; y++) {
+        for (let x = b.x0; x < b.x1; x++) {
+          if (roomAt(x + 0.5, y + 0.5) !== room) continue;
+          const other = roomAt(x + 0.5 + dx, y + 0.5 + dy);
+          const line = dy < 0 ? y : y + 1;
+          if (other === room || doorAt("y", line, x + 0.5)) continue;
+          add(side, line, x, other === null);
+        }
+      }
+    } else {
+      for (let x = b.x0; x < b.x1; x++) {
+        for (let y = b.y0; y < b.y1; y++) {
+          if (roomAt(x + 0.5, y + 0.5) !== room) continue;
+          const other = roomAt(x + 0.5 + dx, y + 0.5 + dy);
+          const line = dx < 0 ? x : x + 1;
+          if (other === room || doorAt("x", line, y + 0.5)) continue;
+          add(side, line, y, other === null);
+        }
+      }
+    }
+  }
+  return runs;
+}
+
+// -- the catalog -------------------------------------------------------------------------
+
+// Colours a piece can come in, and the fixed materials models are made of.
+export const COLORWAYS = {
+  blue: "#7fa8d8", pink: "#e7a1b6", sage: "#a8c99a", sun: "#f0c75e", lilac: "#c3b3e0", coral: "#ee8f6f",
+  teal: "#5fb3b3", grey: "#a7a7b8", oak: "#c08a5c", walnut: "#7a553c", white: "#efeae2", black: "#55506a",
+};
+
+export const MATERIALS = {
+  wood: "#b07a4a", woodDark: "#7a4f2e", white: "#f4efe6", cream: "#efe2c8", metal: "#b8c0cc", dark: "#3b3049",
+  glass: "#9fd3ef", leaf: "#5fae5a", leafDark: "#3f8a4a", pot: "#c8643c", screen: "#33406a", pillow: "#fffaf0",
+  porcelain: "#f7f7fa", water: "#8fd0ef", shade: "#ffe6a8", gold: "#e9b64a", red: "#e05d5d", food: "#c08a50",
+  book1: "#d8645a", book2: "#5a8ad8", book3: "#f0c75e", book4: "#6fbf8a", frame: "#7a4f2e", sky: "#bfe3f5", pink: "#f4a6b8",
+};
+
+// Boxes: [x, y, z, w, d, h, material], in feet, x across the piece and y from its back (y = 0)
+// to its front, at rotation 0 -- the front facing the room's front, as the flat is drawn.
+// "main" is the colour chosen; "main^" a little lighter, "main_" a little darker.
+// layer: solid pieces block the way and can't overlap; rugs lie under everything; small things
+// (the bowl) don't block the way but can't sit on furniture. bed and pets mark where pets sleep. Wall pieces hang on a wall: w along
+// it, z up it, d out from it. spots are where pets curl up on a piece: [x, y, z].
+const legs = (w, d, h, inset = 0.1, s = 0.25, mat = "wood") => [
+  [inset, inset, 0, s, s, h, mat], [w - inset - s, inset, 0, s, s, h, mat],
+  [inset, d - inset - s, 0, s, s, h, mat], [w - inset - s, d - inset - s, 0, s, s, h, mat],
+];
+
+export const CATALOG = {
+  bed: {
+    label: "Bed", group: "bedroom", w: 3.5, d: 6.5, layer: "solid", colors: ["blue", "pink", "sage", "lilac", "sun"],
+    boxes: [
+      [0, 0, 0, 3.5, 0.3, 2.8, "wood"], [0, 0.3, 0, 3.5, 6.2, 1.1, "wood"],
+      [0.1, 0.3, 1.1, 3.3, 1.9, 0.6, "white"], [0.5, 0.45, 1.7, 2.5, 1.0, 0.35, "pillow"],
+      [0.05, 2.2, 1.1, 3.4, 4.25, 0.7, "main"], [0.05, 2.2, 1.8, 3.4, 0.45, 0.08, "main^"],
+    ],
+    spots: [[1.2, 4.2, 1.8], [2.4, 4.8, 1.8], [1.75, 3.2, 1.8]],
+    bed: true,
+  },
+  double_bed: {
+    label: "Double bed", group: "bedroom", w: 5, d: 6.5, layer: "solid", colors: ["sage", "blue", "pink", "lilac", "sun"],
+    boxes: [
+      [0, 0, 0, 5, 0.3, 3, "wood"], [0, 0.3, 0, 5, 6.2, 1.1, "wood"],
+      [0.1, 0.3, 1.1, 4.8, 1.9, 0.6, "white"], [0.35, 0.45, 1.7, 2, 1.0, 0.35, "pillow"], [2.65, 0.45, 1.7, 2, 1.0, 0.35, "pillow"],
+      [0.05, 2.2, 1.1, 4.9, 4.25, 0.7, "main"], [0.05, 2.2, 1.8, 4.9, 0.45, 0.08, "main^"],
+    ],
+    spots: [[1.5, 4.2, 1.8], [3.5, 4.4, 1.8], [2.5, 5.4, 1.8], [1.5, 5.6, 1.8]],
+    bed: true,
+  },
+  nightstand: {
+    label: "Nightstand", group: "bedroom", w: 1.5, d: 1.5, layer: "solid", colors: ["oak", "white", "walnut", "pink"],
+    boxes: [
+      [0, 0, 0, 1.5, 1.5, 1.8, "main"], [0, 0, 1.8, 1.5, 1.5, 0.15, "main_"], [0.25, 1.5, 0.9, 1, 0.04, 0.5, "main_"],
+      [0.55, 0.5, 1.95, 0.4, 0.4, 0.5, "dark"], [0.3, 0.25, 2.45, 0.9, 0.9, 0.6, "shade"],
+    ],
+    glow: [0.75, 0.75, 2.7],
+  },
+  dresser: {
+    label: "Dresser", group: "bedroom", w: 3, d: 1.5, layer: "solid", colors: ["white", "oak", "walnut", "lilac"],
+    boxes: [
+      [0, 0, 0, 3, 1.5, 2.8, "main"], [0, 0, 2.8, 3, 1.5, 0.15, "main_"],
+      [0.2, 1.5, 0.3, 2.6, 0.04, 0.6, "main_"], [0.2, 1.5, 1.1, 2.6, 0.04, 0.6, "main_"], [0.2, 1.5, 1.9, 2.6, 0.04, 0.6, "main_"],
+      [2.2, 0.4, 2.95, 0.5, 0.5, 0.7, "leaf"],
+    ],
+  },
+  wardrobe: {
+    label: "Wardrobe", group: "bedroom", w: 3.5, d: 2, layer: "solid", colors: ["white", "oak", "walnut", "blue"],
+    boxes: [
+      [0, 0, 0, 3.5, 2, 6.2, "main"], [0, 0, 6.2, 3.5, 2, 0.2, "main_"],
+      [0.15, 2, 0.4, 1.55, 0.04, 5.6, "main^"], [1.8, 2, 0.4, 1.55, 0.04, 5.6, "main^"],
+      [1.5, 2.04, 2.8, 0.15, 0.06, 0.8, "gold"], [1.85, 2.04, 2.8, 0.15, 0.06, 0.8, "gold"],
+    ],
+  },
+  desk: {
+    label: "Desk", group: "bedroom", w: 4, d: 2, layer: "solid", colors: ["oak", "white", "walnut", "black"],
+    boxes: [
+      ...legs(4, 2, 2.3, 0.1, 0.25, "main_"), [2.8, 0.1, 0, 1.1, 1.8, 2.3, "main"], [2.9, 1.9, 1.4, 0.9, 0.04, 0.6, "main_"],
+      [0, 0, 2.3, 4, 2, 0.2, "main"], [0.8, 0.5, 2.5, 1.4, 0.9, 0.06, "metal"], [0.8, 0.45, 2.5, 1.4, 0.08, 0.9, "dark"],
+      [3.1, 0.4, 2.5, 0.4, 0.4, 0.5, "red"],
+    ],
+  },
+  chair: {
+    label: "Chair", group: "bedroom", w: 1.5, d: 1.5, layer: "solid", colors: ["oak", "coral", "teal", "white", "black"],
+    boxes: [...legs(1.5, 1.5, 1.4, 0.1, 0.2, "main_"), [0.05, 0.05, 1.4, 1.4, 1.4, 0.2, "main"], [0.05, 0.05, 1.6, 1.4, 0.2, 1.5, "main"]],
+  },
+  bookshelf: {
+    label: "Bookshelf", group: "living", w: 3, d: 1, layer: "solid", colors: ["oak", "white", "walnut", "teal"],
+    boxes: [
+      [0, 0, 0, 3, 1, 5, "main"],
+      ...[0.4, 1.6, 2.8, 4.0].flatMap((z, i) => [
+        [0.2, 1, z, 0.6, 0.04, 0.9, `book${(i % 4) + 1}`], [0.85, 1, z, 0.4, 0.04, 0.8, `book${((i + 1) % 4) + 1}`],
+        [1.3, 1, z, 0.7, 0.04, 0.9, `book${((i + 2) % 4) + 1}`], [2.1, 1, z, 0.6, 0.04, 0.7, `book${((i + 3) % 4) + 1}`],
+      ]),
+    ],
+  },
+  plant: {
+    label: "Plant", group: "living", w: 1.5, d: 1.5, layer: "solid", colors: ["coral", "white", "teal", "sun"],
+    boxes: [[0.3, 0.3, 0, 0.9, 0.9, 1, "main"], [0.05, 0.05, 1, 1.4, 1.4, 0.9, "leaf"], [0.3, 0.3, 1.9, 0.9, 0.9, 0.7, "leafDark"], [0.5, 0.5, 2.6, 0.5, 0.5, 0.4, "leaf"]],
+  },
+  lamp: {
+    label: "Floor lamp", group: "living", w: 1, d: 1, layer: "solid", colors: ["sun", "white", "pink", "teal"],
+    boxes: [[0.2, 0.2, 0, 0.6, 0.6, 0.15, "dark"], [0.42, 0.42, 0.15, 0.16, 0.16, 3.6, "dark"], [0.05, 0.05, 3.7, 0.9, 0.9, 1, "main"]],
+    glow: [0.5, 0.5, 4],
+  },
+  beanbag: {
+    label: "Beanbag", group: "living", w: 2.5, d: 2.5, layer: "solid", colors: ["coral", "teal", "lilac", "sun", "grey"],
+    boxes: [[0, 0, 0, 2.5, 2.5, 0.8, "main"], [0.25, 0.25, 0.8, 2, 2, 0.5, "main"], [0.3, 0.1, 1.3, 1.9, 0.8, 0.6, "main_"]],
+    spots: [[1.25, 1.5, 1.3]],
+  },
+  pet_bed: {
+    label: "Pet bed", group: "pets", w: 2, d: 2, layer: "solid", colors: ["pink", "blue", "sage", "lilac", "sun"],
+    boxes: [[0, 0, 0, 2, 2, 0.25, "main_"], [0, 0, 0.25, 2, 0.35, 0.4, "main"], [0, 0.35, 0.25, 0.35, 1.65, 0.4, "main"],
+      [1.65, 0.35, 0.25, 0.35, 1.65, 0.4, "main"], [0.35, 1.7, 0.25, 1.3, 0.3, 0.2, "main"], [0.35, 0.35, 0.25, 1.3, 1.35, 0.1, "pillow"]],
+    spots: [[1, 1.05, 0.35]],
+    pets: true,
+  },
+  toybox: {
+    label: "Toy box", group: "pets", w: 2, d: 1.5, layer: "solid", colors: ["sun", "teal", "coral", "lilac"],
+    boxes: [[0, 0, 0, 2, 1.5, 1.4, "main"], [0, 0, 1.4, 2, 1.5, 0.15, "main_"], [0.3, 0.4, 1.55, 0.6, 0.6, 0.6, "red"], [1.2, 0.5, 1.55, 0.5, 0.5, 0.35, "book2"]],
+  },
+  bowl: {
+    label: "Food bowl", group: "pets", w: 1, d: 1, layer: "small", colors: ["blue", "pink", "sage", "sun"],
+    boxes: [[0.1, 0.1, 0, 0.8, 0.8, 0.35, "main"], [0.25, 0.25, 0.35, 0.5, 0.5, 0.06, "food"]],
+    bowl: true,
+  },
+  sofa: {
+    label: "Sofa", group: "living", w: 6.5, d: 3, layer: "solid", colors: ["teal", "coral", "grey", "blue", "sun"],
+    boxes: [
+      [0, 0, 0, 6.5, 0.8, 2.7, "main"], [0, 0.8, 0, 6.5, 2.2, 1.2, "main_"],
+      [0, 0.8, 1.2, 0.7, 2.2, 0.8, "main"], [5.8, 0.8, 1.2, 0.7, 2.2, 0.8, "main"],
+      [0.7, 0.8, 1.2, 2.55, 2.1, 0.3, "main^"], [3.25, 0.8, 1.2, 2.55, 2.1, 0.3, "main^"],
+    ],
+    spots: [[2, 2, 1.5], [4.5, 2, 1.5], [3.2, 1.6, 1.5]],
+  },
+  armchair: {
+    label: "Armchair", group: "living", w: 3, d: 3, layer: "solid", colors: ["coral", "teal", "sun", "grey", "lilac"],
+    boxes: [[0, 0, 0, 3, 0.8, 2.7, "main"], [0, 0.8, 0, 3, 2.2, 1.2, "main_"], [0, 0.8, 1.2, 0.6, 2.2, 0.8, "main"],
+      [2.4, 0.8, 1.2, 0.6, 2.2, 0.8, "main"], [0.6, 0.8, 1.2, 1.8, 2.1, 0.3, "main^"]],
+    spots: [[1.5, 1.9, 1.5]],
+  },
+  tv: {
+    label: "TV", group: "living", w: 4, d: 1.5, layer: "solid", colors: ["walnut", "oak", "white", "black"],
+    boxes: [[0, 0.1, 0, 4, 1.4, 1.4, "main"], [0.2, 1.5, 0.3, 1.7, 0.04, 0.8, "main_"], [2.1, 1.5, 0.3, 1.7, 0.04, 0.8, "main_"],
+      [1.6, 0.6, 1.4, 0.8, 0.4, 0.2, "dark"], [0.3, 0.7, 1.6, 3.4, 0.2, 2, "dark"], [0.45, 0.9, 1.75, 3.1, 0.03, 1.7, "screen"]],
+  },
+  table: {
+    label: "Table", group: "kitchen", w: 4, d: 3, layer: "solid", colors: ["oak", "white", "walnut", "teal"],
+    boxes: [...legs(4, 3, 2.3, 0.2, 0.25, "main_"), [0, 0, 2.3, 4, 3, 0.2, "main"], [1.5, 1, 2.5, 1, 1, 0.3, "white"], [1.7, 1.2, 2.8, 0.6, 0.6, 0.3, "red"]],
+  },
+  counter: {
+    label: "Kitchen counter", group: "kitchen", w: 6, d: 2, layer: "solid", colors: ["white", "sage", "blue", "oak"],
+    boxes: [
+      [0, 0, 0, 6, 2, 2.8, "main"], [0, 0, 2.8, 6, 2, 0.2, "cream"], [0.15, 2, 0.3, 1.8, 0.04, 2.2, "main_"],
+      [2.1, 2, 0.3, 1.8, 0.04, 2.2, "main_"], [4.05, 2, 0.3, 1.8, 0.04, 2.2, "main_"],
+      [0.5, 0.4, 3, 1.8, 1.2, 0.04, "dark"], [3.7, 0.3, 2.96, 1.6, 1.3, 0.06, "metal"], [4.3, 0.1, 3, 0.3, 0.3, 0.7, "metal"],
+    ],
+  },
+  fridge: {
+    label: "Fridge", group: "kitchen", w: 2.5, d: 2.5, layer: "solid", colors: ["white", "teal", "pink", "grey"],
+    boxes: [[0, 0, 0, 2.5, 2.5, 6, "main"], [0.1, 2.5, 3.6, 2.3, 0.04, 2.3, "main^"], [0.1, 2.5, 0.2, 2.3, 0.04, 3.2, "main^"],
+      [0.2, 2.54, 2.8, 0.15, 0.06, 0.6, "metal"], [0.2, 2.54, 3.8, 0.15, 0.06, 0.6, "metal"]],
+  },
+  bathtub: {
+    label: "Bathtub", group: "bath", w: 5, d: 2.5, layer: "solid", colors: ["white", "pink", "sage", "blue"],
+    boxes: [[0, 0, 0, 5, 2.5, 1.8, "main"], [0.3, 0.3, 1.8, 4.4, 1.9, 0.02, "water"], [4.4, 0.05, 1.8, 0.3, 0.25, 0.7, "metal"]],
+  },
+  toilet: {
+    label: "Toilet", group: "bath", w: 1.5, d: 2.5, layer: "solid", colors: ["white", "pink", "blue", "black"],
+    boxes: [[0.2, 0, 0, 1.1, 0.7, 2.6, "porcelain"], [0.15, 0.7, 0, 1.2, 1.6, 1.4, "porcelain"], [0.15, 0.7, 1.4, 1.2, 1.6, 0.1, "main"]],
+  },
+  sink: {
+    label: "Sink", group: "bath", w: 2, d: 1.5, layer: "solid", colors: ["white", "oak", "teal", "pink"],
+    boxes: [[0, 0, 0, 2, 1.5, 2.6, "main"], [0, 0, 2.6, 2, 1.5, 0.2, "porcelain"], [0.4, 0.35, 2.8, 1.2, 0.9, 0.03, "water"], [0.9, 0.05, 2.8, 0.2, 0.3, 0.6, "metal"]],
+  },
+  washer: {
+    label: "Washer", group: "bath", w: 2.5, d: 2.5, layer: "solid", colors: ["white", "grey", "blue", "pink"],
+    boxes: [[0, 0, 0, 2.5, 2.5, 3, "main"], [0, 0, 3, 2.5, 0.6, 0.3, "main_"], [0.55, 2.5, 0.6, 1.4, 0.04, 1.4, "glass"], [0.2, 0.1, 3.3, 0.3, 0.3, 0.05, "red"]],
+  },
+  basket: {
+    label: "Laundry basket", group: "bath", w: 1.5, d: 1.5, layer: "solid", colors: ["oak", "white", "teal", "pink"],
+    boxes: [[0.1, 0.1, 0, 1.3, 1.3, 1.4, "main"], [0.25, 0.25, 1.4, 1, 1, 0.3, "sky"], [0.6, 0.3, 1.7, 0.5, 0.5, 0.15, "pink"]],
+  },
+  rug: {
+    label: "Rug", group: "floor", w: 6, d: 4, layer: "rug", colors: ["pink", "sage", "blue", "sun", "lilac", "coral"],
+    boxes: [[0, 0, 0, 6, 4, 0.05, "main"], [0.4, 0.4, 0.05, 5.2, 3.2, 0.01, "main^"]],
+  },
+  small_rug: {
+    label: "Small rug", group: "floor", w: 4, d: 3, layer: "rug", colors: ["sage", "pink", "blue", "sun", "lilac", "coral"],
+    boxes: [[0, 0, 0, 4, 3, 0.05, "main"], [0.3, 0.3, 0.05, 3.4, 2.4, 0.01, "main^"]],
+  },
+  mat: {
+    label: "Bath mat", group: "floor", w: 3, d: 2, layer: "rug", colors: ["blue", "pink", "sage", "white"],
+    boxes: [[0, 0, 0, 3, 2, 0.06, "main"]],
+  },
+  window: {
+    label: "Window", group: "wall", w: 3, d: 0.15, layer: "wall", outer: true, colors: ["white", "oak", "teal"],
+    boxes: [[0, 0, 1.2, 3, 0.12, 2.6, "main"], [0.2, 0.12, 1.4, 1.2, 0.03, 2.2, "sky"], [1.6, 0.12, 1.4, 1.2, 0.03, 2.2, "sky"], [-0.1, 0, 1.1, 3.2, 0.3, 0.12, "main"]],
+  },
+  picture: {
+    label: "Picture", group: "wall", w: 2, d: 0.1, layer: "wall", colors: ["blue", "pink", "sage", "sun"],
+    boxes: [[0, 0, 2.2, 2, 0.08, 1.4, "frame"], [0.15, 0.08, 2.35, 1.7, 0.02, 1.1, "main"], [0.4, 0.1, 2.5, 0.6, 0.01, 0.5, "white"]],
+  },
+  mirror: {
+    label: "Mirror", group: "wall", w: 1.5, d: 0.1, layer: "wall", colors: ["sun", "white", "black"],
+    boxes: [[0, 0, 1.5, 1.5, 0.08, 2.4, "main"], [0.15, 0.08, 1.65, 1.2, 0.02, 2.1, "glass"]],
+  },
+  shelf: {
+    label: "Wall shelf", group: "wall", w: 3, d: 0.8, layer: "wall", colors: ["oak", "white", "walnut"],
+    boxes: [[0, 0, 2.8, 3, 0.8, 0.12, "main"], [0.3, 0.2, 2.92, 0.5, 0.4, 0.6, "pot"], [0.3, 0.15, 3.5, 0.6, 0.5, 0.4, "leaf"], [1.4, 0.15, 2.92, 1.2, 0.5, 0.7, "book2"]],
+  },
+  clock: {
+    label: "Clock", group: "wall", w: 1, d: 0.1, layer: "wall", colors: ["white", "sun", "pink", "teal"],
+    boxes: [[0, 0, 3, 1, 0.08, 1, "main"], [0.2, 0.08, 3.2, 0.6, 0.02, 0.6, "white"], [0.45, 0.1, 3.5, 0.1, 0.01, 0.3, "dark"]],
+  },
+};
+
+export const WALLPAPERS = {
+  rose: { label: "Rose", base: "#e7b8c6", pattern: "stripe" },
+  lilac: { label: "Lilac", base: "#c3b3e0", pattern: "dots" },
+  butter: { label: "Butter", base: "#f0dc9c", pattern: "plain" },
+  sky: { label: "Sky", base: "#a9cdeb", pattern: "stripe" },
+  mint: { label: "Mint", base: "#b8e2cc", pattern: "dots" },
+  peach: { label: "Peach", base: "#f5c4a1", pattern: "plain" },
+  night: { label: "Night", base: "#5a5a8a", pattern: "stars" },
+  tiles: { label: "Tiles", base: "#d8f0ee", pattern: "tile" },
+};
+
+export const FLOORS = {
+  oak: { label: "Oak", base: "#c08a5c", pattern: "planks" },
+  walnut: { label: "Walnut", base: "#8a5d3a", pattern: "planks" },
+  birch: { label: "Birch", base: "#e2c39a", pattern: "planks" },
+  carpet: { label: "Blue carpet", base: "#8ea6c8", pattern: "carpet" },
+  rosecarpet: { label: "Pink carpet", base: "#e2a9b9", pattern: "carpet" },
+  check: { label: "Check tiles", base: "#f4efe6", pattern: "check" },
+  aqua: { label: "Aqua tiles", base: "#bfe6e2", pattern: "check" },
+};
+
+// -- layouts -----------------------------------------------------------------------------
+
+export const MAX_ITEMS = 40;
+
+/** A piece's footprint on the floor: x0..x1, y0..y1 in feet. Rotation turns it a quarter at a time. */
+export function footprint(item) {
+  const c = CATALOG[item.kind];
+  if (c.layer === "wall") return wallBox(item);
+  const turned = item.rot % 2 === 1;
+  const w = turned ? c.d : c.w;
+  const d = turned ? c.w : c.d;
+  return { x0: item.x, y0: item.y, x1: item.x + w, y1: item.y + d };
+}
+
+/** Where a point of a piece (its own feet, rotation 0) lands in the flat. */
+export function place(item, u, v) {
+  const c = CATALOG[item.kind];
+  switch (item.rot) {
+    case 1: return [item.x + c.d - v, item.y + u];
+    case 2: return [item.x + c.w - u, item.y + c.d - v];
+    case 3: return [item.x + v, item.y + c.w - u];
+    default: return [item.x + u, item.y + v];
+  }
+}
+
+/** A wall piece's place along its wall: along `at`, out from the wall by d. */
+export function wallPlace(item, u, v) {
+  const { side, line, at } = item;
+  if (side === "n") return [at + u, line + v];
+  if (side === "s") return [at + u, line - v];
+  if (side === "w") return [line + v, at + u];
+  return [line - v, at + u];
+}
+
+function wallBox(item) {
+  const c = CATALOG[item.kind];
+  const [ax, ay] = wallPlace(item, 0, 0);
+  const [bx, by] = wallPlace(item, c.w, c.d);
+  return { x0: Math.min(ax, bx), x1: Math.max(ax, bx), y0: Math.min(ay, by), y1: Math.max(ay, by) };
+}
+
+/** The piece's boxes in the flat, as {x0, y0, z0, x1, y1, z1, mat}. */
+export function boxesOf(item) {
+  const c = CATALOG[item.kind];
+  const at = c.layer === "wall" ? wallPlace : place;
+  return c.boxes.map(([x, y, z, w, d, h, mat]) => {
+    const [ax, ay] = at(item, x, y);
+    const [bx, by] = at(item, x + w, y + d);
+    return { x0: Math.min(ax, bx), x1: Math.max(ax, bx), y0: Math.min(ay, by), y1: Math.max(ay, by), z0: z, z1: z + h, mat };
+  });
+}
+
+/** Where pets curl up on a piece, in the flat. */
+export function spotsOf(item) {
+  return (CATALOG[item.kind].spots || []).map(([u, v, z]) => {
+    const [x, y] = place(item, u, v);
+    return { x, y, z };
+  });
+}
+
+const overlaps = (a, b) => a.x0 < b.x1 - EPS && b.x0 < a.x1 - EPS && a.y0 < b.y1 - EPS && b.y0 < a.y1 - EPS;
+const onHalf = (n) => Number.isFinite(n) && Math.abs(n * 2 - Math.round(n * 2)) < EPS;
+
+/** Room in front of each door a piece of furniture mustn't stand in, so pets (and people) get through. */
+export function doorways(room) {
+  return DOORS.filter((d) => d.rooms.includes(room)).map((d) => {
+    const deep = 1.5;
+    // Which side of the line this room is on.
+    const probe = d.axis === "x" ? roomAt(d.at - 0.5, (d.from + d.to) / 2) : roomAt((d.from + d.to) / 2, d.at - 0.5);
+    const before = probe === room;
+    return d.axis === "x"
+      ? { x0: before ? d.at - deep : d.at, x1: before ? d.at : d.at + deep, y0: d.from, y1: d.to }
+      : { x0: d.from, x1: d.to, y0: before ? d.at - deep : d.at, y1: before ? d.at : d.at + deep };
+  });
+}
+
+function insideRoom(room, f) {
+  for (let x = f.x0 + 0.25; x < f.x1; x += 0.5) {
+    for (let y = f.y0 + 0.25; y < f.y1; y += 0.5) if (roomAt(x, y) !== room) return false;
+  }
+  return true;
+}
+
+/** Whether a wall piece's span along its wall is all wall of this room (no door, no corner). */
+function onWall(room, item) {
+  const c = CATALOG[item.kind];
+  const walls = wallsOf(room).filter((w) => w.side === item.side && w.line === item.line && (!c.outer || w.outer));
+  for (let a = item.at + 0.25; a < item.at + c.w; a += 0.5) {
+    if (!walls.some((w) => a >= w.from && a <= w.to)) return false;
+  }
+  return true;
+}
+
+/**
+ * Whether a layout can be saved for a room. Returns null when it can, or what is wrong
+ * in words a roommate understands.
+ */
+export function layoutProblem(room, layout) {
+  if (!ROOMS[room]) return "There is no such room";
+  if (!layout || typeof layout !== "object") return "A layout is needed";
+  if (!Object.hasOwn(WALLPAPERS, layout.wall)) return "Pick a wallpaper";
+  if (!Object.hasOwn(FLOORS, layout.floor)) return "Pick a floor";
+  if (!Array.isArray(layout.items)) return "A layout needs its furniture";
+  if (layout.items.length > MAX_ITEMS) return `A room can hold ${MAX_ITEMS} pieces`;
+  const placed = [];
+  for (const item of layout.items) {
+    const c = item && CATALOG[item.kind];
+    if (!c || !Object.hasOwn(CATALOG, item.kind)) return "Something in the room isn't in the catalog";
+    if (!c.colors.includes(item.color)) return `${c.label} doesn't come in that colour`;
+    if (c.layer === "wall") {
+      if (!["n", "e", "s", "w"].includes(item.side) || !onHalf(item.at) || !Number.isInteger(item.line)) return `${c.label} must hang on a wall`;
+      if (!onWall(room, item)) return c.outer ? `${c.label} must go on an outside wall` : `${c.label} must hang on one of the room's walls`;
+      const span = { side: item.side, line: item.line, from: item.at, to: item.at + c.w };
+      if (placed.some((p) => p.span && p.span.side === span.side && p.span.line === span.line && p.span.from < span.to - EPS && span.from < p.span.to - EPS)) {
+        return `${c.label} overlaps something on the wall`;
+      }
+      placed.push({ span, c });
+      continue;
+    }
+    if (![0, 1, 2, 3].includes(item.rot) || !onHalf(item.x) || !onHalf(item.y)) return `${c.label} is out of place`;
+    const f = footprint(item);
+    if (!insideRoom(room, f)) return `${c.label} doesn't fit there`;
+    for (const p of placed) {
+      if (!p.f || !overlaps(f, p.f)) continue;
+      const a = c.layer;
+      const b = p.c.layer;
+      if (a === b || (a === "small" && b === "solid") || (a === "solid" && b === "small")) return `${c.label} overlaps the ${p.c.label.toLowerCase()}`;
+    }
+    if (c.layer === "solid" && doorways(room).some((d) => overlaps(f, d))) return `${c.label} blocks a doorway`;
+    placed.push({ f, c });
+  }
+  return null;
+}
+
+/** A layout with only what the catalog knows, in the shape the server keeps. */
+export function cleanLayout(layout) {
+  return {
+    wall: layout.wall,
+    floor: layout.floor,
+    items: layout.items.map((i) => (CATALOG[i.kind].layer === "wall"
+      ? { kind: i.kind, color: i.color, side: i.side, line: i.line, at: i.at }
+      : { kind: i.kind, color: i.color, x: i.x, y: i.y, rot: i.rot })),
+  };
+}
+
+const W = (kind, color, side, line, at) => ({ kind, color, side, line, at });
+const F = (kind, color, x, y, rot = 0) => ({ kind, color, x, y, rot });
+
+// How the flat comes furnished, until someone rearranges a room.
+export const DEFAULT_LAYOUTS = {
+  bedA: {
+    wall: "rose", floor: "oak",
+    items: [
+      W("window", "white", "n", 0, 5), W("picture", "pink", "n", 0, 8.5),
+      F("small_rug", "pink", 4.5, 6.5), F("bed", "pink", 0.5, 0), F("nightstand", "oak", 4, 0), F("dresser", "white", 8, 0),
+      F("plant", "coral", 0.5, 10),
+    ],
+  },
+  bedB: {
+    wall: "lilac", floor: "oak",
+    items: [
+      W("window", "white", "w", 0, 15.5), W("picture", "blue", "n", 12, 1),
+      F("rug", "sage", 3.5, 17), F("bed", "blue", 0.5, 12), F("nightstand", "oak", 4, 12), F("pet_bed", "pink", 8.5, 12.5),
+      F("desk", "oak", 6.5, 23), F("chair", "teal", 7.5, 21.5, 2), F("plant", "teal", 0.5, 23.5),
+    ],
+  },
+  main: {
+    wall: "butter", floor: "oak",
+    items: [
+      W("clock", "white", "n", 0, 19.5), W("window", "white", "n", 0, 15.5), W("picture", "sun", "n", 9, 26.5),
+      F("fridge", "white", 11.5, 0), F("counter", "white", 14, 0), F("bowl", "blue", 12, 4.5), F("table", "oak", 14.5, 6),
+      F("chair", "oak", 16, 4.5), F("chair", "oak", 16, 9, 2),
+      F("bookshelf", "oak", 11, 14, 3), F("rug", "pink", 22.5, 14.5), F("tv", "walnut", 25.5, 9), F("sofa", "teal", 23, 20, 2),
+      F("plant", "coral", 19.5, 23.5), F("lamp", "sun", 29, 24), F("armchair", "coral", 18, 13.5, 1),
+    ],
+  },
+  bath: {
+    wall: "tiles", floor: "aqua",
+    items: [
+      W("mirror", "white", "e", 30, 3.5), F("mat", "blue", 23, 3), F("bathtub", "white", 21.5, 0), F("toilet", "white", 27.5, 0),
+      F("sink", "white", 28.5, 3.5, 3), F("washer", "white", 27.5, 6.5), F("basket", "oak", 25.5, 7),
+    ],
+  },
+};
+
+/** The layout a room has: the household's own, or how it came. */
+export function layoutOf(layouts, room) {
+  return layouts?.[room] || DEFAULT_LAYOUTS[room];
+}
+
+// -- the builder's moves, kept here so they are tested ----------------------------------
+
+const snap = (n) => Math.round(n * 2) / 2;
+
+/** A piece turned a quarter, about its middle, kept on the half foot. */
+export function turned(item) {
+  const f = footprint(item);
+  const cx = (f.x0 + f.x1) / 2;
+  const cy = (f.y0 + f.y1) / 2;
+  const next = { ...item, rot: (item.rot + 1) % 4 };
+  const g = footprint({ ...next, x: 0, y: 0 });
+  return { ...next, x: snap(cx - g.x1 / 2), y: snap(cy - g.y1 / 2) };
+}
+
+/** Somewhere a new piece fits in a room, nearest its middle (and on a wall for wall pieces), or null. */
+export function freeSpot(room, layout, kind, color) {
+  const c = CATALOG[kind];
+  const col = color || c.colors[0];
+  const tries = [];
+  if (c.layer === "wall") {
+    for (const w of wallsOf(room)) {
+      for (let at = w.from; at + c.w <= w.to + EPS; at += 0.5) tries.push({ kind, color: col, side: w.side, line: w.line, at, score: (w.side === "n" ? 0 : 1) * 100 + Math.abs(at + c.w / 2 - (w.from + w.to) / 2) });
+    }
+  } else {
+    const b = bounds(room);
+    const cx = (b.x0 + b.x1) / 2;
+    const cy = (b.y0 + b.y1) / 2;
+    for (let rot = 0; rot < 4; rot += 1) {
+      for (let x = b.x0; x <= b.x1; x += 0.5) {
+        for (let y = b.y0; y <= b.y1; y += 0.5) {
+          const it = { kind, color: col, x, y, rot };
+          const f = footprint(it);
+          tries.push({ ...it, score: Math.hypot((f.x0 + f.x1) / 2 - cx, (f.y0 + f.y1) / 2 - cy) + rot * 0.01 });
+        }
+      }
+    }
+  }
+  tries.sort((a, b) => a.score - b.score);
+  for (const { score: _score, ...item } of tries) {
+    if (!layoutProblem(room, { ...layout, items: [...layout.items, item] })) return item;
+  }
+  return null;
+}

@@ -126,13 +126,29 @@ outlines):
 npm run art        # -> client/public/sprites/sheet.png + sheet.json, art/preview.png, client/public/icons/
 ```
 
-The apartment (`client/src/house.js`) is about 750 sq ft, seen front-on like a
-doll's house: the two bedrooms on the left, each opening onto the main area
--- kitchen along its back wall, living room in front -- and the bathroom with
-the laundry in the back right corner. Pets sleep in their bedroom (roommates
-alternate between the two), go to the bowl after a kitchen chore and to the
-bathroom after a cleaning one, hang about the kitchen when hungry, and are
-mostly in the living room otherwise.
+The apartment is a model, not a picture: `shared/home.js` has its rooms in
+feet (about 750 sq ft -- the two bedrooms on the left, each opening onto the
+main area, kitchen along its back wall and living room in front, and the
+bathroom with the laundry in the back right corner), its walls and doors, a
+catalog of furniture made of boxes, and how each room comes furnished.
+`client/src/iso.js` draws it as pixel art: the whole flat front-on like a
+doll's house, with the walls inside cut down so nothing hides behind them,
+or one room isometric, turned a quarter at a time -- tap a room or its chip.
+
+The room builder (✏️ under a room, `client/src/RoomBuilder.jsx`) is a small
+Sims-style editor: drag pieces about on a half-foot grid, turn, recolour or
+remove them, add from the catalog (beds, pet beds, sofas, lamps, rugs,
+windows, pictures...), and pick the wallpaper and floor. Layouts are saved
+per household (`PUT /api/rooms/:room`, the `room_layouts` table) and checked
+on the server by the same code the builder uses: in the room, off the
+doorways, nothing solid overlapping, windows on outside walls only.
+
+Pets find their way round the furniture and through the doors
+(`client/src/house.js`, A* on a half-foot grid). They sleep in their bedroom
+(roommates alternate between the two) -- in a pet bed if there is one, else
+up on the bed -- go to the bowl (wherever it was put) after a kitchen chore
+and to the bathroom after a cleaning one, hang about the bowl when hungry, and
+are mostly in the living room otherwise, now and then up on the sofa.
 
 ## Layout
 

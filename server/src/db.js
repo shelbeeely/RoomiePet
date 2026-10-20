@@ -92,6 +92,15 @@ CREATE TABLE IF NOT EXISTS nfc_tags (
   last_tap_at INTEGER NOT NULL DEFAULT 0
 );
 CREATE INDEX IF NOT EXISTS nfc_household ON nfc_tags(household_id);
+-- How a household has arranged a room in the room builder; rooms without a row are as the flat came.
+CREATE TABLE IF NOT EXISTS room_layouts (
+  household_id TEXT NOT NULL REFERENCES households(id),
+  room TEXT NOT NULL,
+  layout TEXT NOT NULL,
+  updated_by TEXT,
+  updated_at INTEGER NOT NULL,
+  PRIMARY KEY (household_id, room)
+);
 CREATE TABLE IF NOT EXISTS settings (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL

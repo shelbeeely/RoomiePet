@@ -176,7 +176,9 @@ export default function App() {
       <main>
         {tab === "home" && (
           <>
-            <HouseScene atlas={atlas} pets={members} effects={effects} selectedId={shown.id} onSelect={setSelected} hour={hour} />
+            <HouseScene atlas={atlas} pets={members} effects={effects} selectedId={shown.id} onSelect={setSelected} hour={hour}
+              layouts={state.rooms}
+              onSaveRoom={(room, layout) => run(() => api("PUT", `/api/rooms/${room}`, { layout }), "Room saved 🛋️")} />
             <PetCard
               atlas={atlas}
               member={shown}
