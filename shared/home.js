@@ -22,7 +22,7 @@ export const ROOMS = {
 // A door is a gap in the wall on a line: x = at (axis "x") or y = at (axis "y"), from..to along it.
 export const DOORS = [
   { rooms: ["bedA", "main"], axis: "x", at: 13, from: 8, to: 11 },
-  // At the back of Bedroom 2's right wall: the front of it is the second bed's.
+  // Bedroom 2's: on its right wall, 2 ft from the top (back) corner, as the real one is.
   { rooms: ["bedB", "main"], axis: "x", at: 13, from: 15, to: 18 },
   { rooms: ["bath", "main"], axis: "y", at: 9, from: 22, to: 25 },
 ];

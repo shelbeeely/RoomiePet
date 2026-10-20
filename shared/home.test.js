@@ -151,6 +151,8 @@ describe("room to live in", () => {
     const door = DOORS.find((d) => d.rooms.includes("bedB"));
     expect(door.rooms).toContain("main");
     expect([door.axis, door.at]).toEqual(["x", room.x1]);
+    expect(door.from - room.y0).toBe(2);                               // 2 ft from the back (top) corner
+    expect(door.to - door.from).toBe(3);
     for (const kind of ["desk", "dresser", "pet_bed"]) expect(l.items.some((i) => i.kind === kind), kind).toBe(true);
     // And there is still room to add things.
     for (const kind of ["beanbag", "bookshelf", "lamp"]) expect(freeSpot("bedB", l, kind), kind).not.toBe(null);
