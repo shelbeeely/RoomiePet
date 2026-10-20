@@ -43,6 +43,7 @@ export const SPECIES = {
   bunny: { label: "Bunny", colors: ["snow", "cocoa", "pebble", "blush"] },
   chick: { label: "Chick", colors: ["sunny", "sky", "rose", "sprout"] },
   lop: { label: "Lop bunny", colors: ["honey", "snow", "smoke", "choc"] },
+  stitched: { label: "Stitched bunny", colors: ["lilac", "mint", "bubblegum", "bone"] },
   raccoon: { label: "Raccoon", colors: ["grey", "cinnamon", "silver", "midnight"] },
   ferret: { label: "Ferret", colors: ["sable", "albino", "cinnamon", "silver"] },
   possum: { label: "Possum", colors: ["grey", "smoky", "cream", "blossom"] },

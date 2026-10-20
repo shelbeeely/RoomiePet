@@ -3520,10 +3520,890 @@
     "h": 16
    }
   },
-  "raccoon/idle_0": {
+  "stitched/idle_0": {
    "frame": {
     "x": 0,
     "y": 448,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched/idle_1": {
+   "frame": {
+    "x": 32,
+    "y": 448,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched/blink": {
+   "frame": {
+    "x": 64,
+    "y": 448,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched/walk_0": {
+   "frame": {
+    "x": 96,
+    "y": 448,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched/happy": {
+   "frame": {
+    "x": 128,
+    "y": 448,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched/happy_1": {
+   "frame": {
+    "x": 160,
+    "y": 448,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched/sad": {
+   "frame": {
+    "x": 192,
+    "y": 448,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched/sleep_0": {
+   "frame": {
+    "x": 224,
+    "y": 448,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched/sleep_1": {
+   "frame": {
+    "x": 256,
+    "y": 448,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched/eat": {
+   "frame": {
+    "x": 288,
+    "y": 448,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched/poorly": {
+   "frame": {
+    "x": 320,
+    "y": 448,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@mint/idle_0": {
+   "frame": {
+    "x": 0,
+    "y": 476,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@mint/idle_1": {
+   "frame": {
+    "x": 32,
+    "y": 476,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@mint/blink": {
+   "frame": {
+    "x": 64,
+    "y": 476,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@mint/walk_0": {
+   "frame": {
+    "x": 96,
+    "y": 476,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@mint/happy": {
+   "frame": {
+    "x": 128,
+    "y": 476,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@mint/happy_1": {
+   "frame": {
+    "x": 160,
+    "y": 476,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@mint/sad": {
+   "frame": {
+    "x": 192,
+    "y": 476,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@mint/sleep_0": {
+   "frame": {
+    "x": 224,
+    "y": 476,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@mint/sleep_1": {
+   "frame": {
+    "x": 256,
+    "y": 476,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@mint/eat": {
+   "frame": {
+    "x": 288,
+    "y": 476,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@mint/poorly": {
+   "frame": {
+    "x": 320,
+    "y": 476,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bubblegum/idle_0": {
+   "frame": {
+    "x": 0,
+    "y": 504,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bubblegum/idle_1": {
+   "frame": {
+    "x": 32,
+    "y": 504,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bubblegum/blink": {
+   "frame": {
+    "x": 64,
+    "y": 504,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bubblegum/walk_0": {
+   "frame": {
+    "x": 96,
+    "y": 504,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bubblegum/happy": {
+   "frame": {
+    "x": 128,
+    "y": 504,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bubblegum/happy_1": {
+   "frame": {
+    "x": 160,
+    "y": 504,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bubblegum/sad": {
+   "frame": {
+    "x": 192,
+    "y": 504,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bubblegum/sleep_0": {
+   "frame": {
+    "x": 224,
+    "y": 504,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bubblegum/sleep_1": {
+   "frame": {
+    "x": 256,
+    "y": 504,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bubblegum/eat": {
+   "frame": {
+    "x": 288,
+    "y": 504,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bubblegum/poorly": {
+   "frame": {
+    "x": 320,
+    "y": 504,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bone/idle_0": {
+   "frame": {
+    "x": 0,
+    "y": 532,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bone/idle_1": {
+   "frame": {
+    "x": 32,
+    "y": 532,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bone/blink": {
+   "frame": {
+    "x": 64,
+    "y": 532,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bone/walk_0": {
+   "frame": {
+    "x": 96,
+    "y": 532,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bone/happy": {
+   "frame": {
+    "x": 128,
+    "y": 532,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bone/happy_1": {
+   "frame": {
+    "x": 160,
+    "y": 532,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bone/sad": {
+   "frame": {
+    "x": 192,
+    "y": 532,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bone/sleep_0": {
+   "frame": {
+    "x": 224,
+    "y": 532,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bone/sleep_1": {
+   "frame": {
+    "x": 256,
+    "y": 532,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bone/eat": {
+   "frame": {
+    "x": 288,
+    "y": 532,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "stitched@bone/poorly": {
+   "frame": {
+    "x": 320,
+    "y": 532,
+    "w": 16,
+    "h": 16
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 16,
+    "h": 16
+   },
+   "sourceSize": {
+    "w": 16,
+    "h": 16
+   }
+  },
+  "raccoon/idle_0": {
+   "frame": {
+    "x": 0,
+    "y": 560,
     "w": 16,
     "h": 16
    },
@@ -3543,7 +4423,7 @@
   "raccoon/idle_1": {
    "frame": {
     "x": 32,
-    "y": 448,
+    "y": 560,
     "w": 16,
     "h": 16
    },
@@ -3563,7 +4443,7 @@
   "raccoon/blink": {
    "frame": {
     "x": 64,
-    "y": 448,
+    "y": 560,
     "w": 16,
     "h": 16
    },
@@ -3583,7 +4463,7 @@
   "raccoon/walk_0": {
    "frame": {
     "x": 96,
-    "y": 448,
+    "y": 560,
     "w": 16,
     "h": 16
    },
@@ -3603,7 +4483,7 @@
   "raccoon/happy": {
    "frame": {
     "x": 128,
-    "y": 448,
+    "y": 560,
     "w": 16,
     "h": 16
    },
@@ -3623,7 +4503,7 @@
   "raccoon/happy_1": {
    "frame": {
     "x": 160,
-    "y": 448,
+    "y": 560,
     "w": 16,
     "h": 16
    },
@@ -3643,7 +4523,7 @@
   "raccoon/sad": {
    "frame": {
     "x": 192,
-    "y": 448,
+    "y": 560,
     "w": 16,
     "h": 16
    },
@@ -3663,7 +4543,7 @@
   "raccoon/sleep_0": {
    "frame": {
     "x": 224,
-    "y": 448,
+    "y": 560,
     "w": 16,
     "h": 16
    },
@@ -3683,7 +4563,7 @@
   "raccoon/sleep_1": {
    "frame": {
     "x": 256,
-    "y": 448,
+    "y": 560,
     "w": 16,
     "h": 16
    },
@@ -3703,7 +4583,7 @@
   "raccoon/eat": {
    "frame": {
     "x": 288,
-    "y": 448,
+    "y": 560,
     "w": 16,
     "h": 16
    },
@@ -3723,7 +4603,7 @@
   "raccoon/poorly": {
    "frame": {
     "x": 320,
-    "y": 448,
+    "y": 560,
     "w": 16,
     "h": 16
    },
@@ -3743,7 +4623,7 @@
   "raccoon@cinnamon/idle_0": {
    "frame": {
     "x": 0,
-    "y": 476,
+    "y": 588,
     "w": 16,
     "h": 16
    },
@@ -3763,7 +4643,7 @@
   "raccoon@cinnamon/idle_1": {
    "frame": {
     "x": 32,
-    "y": 476,
+    "y": 588,
     "w": 16,
     "h": 16
    },
@@ -3783,7 +4663,7 @@
   "raccoon@cinnamon/blink": {
    "frame": {
     "x": 64,
-    "y": 476,
+    "y": 588,
     "w": 16,
     "h": 16
    },
@@ -3803,7 +4683,7 @@
   "raccoon@cinnamon/walk_0": {
    "frame": {
     "x": 96,
-    "y": 476,
+    "y": 588,
     "w": 16,
     "h": 16
    },
@@ -3823,7 +4703,7 @@
   "raccoon@cinnamon/happy": {
    "frame": {
     "x": 128,
-    "y": 476,
+    "y": 588,
     "w": 16,
     "h": 16
    },
@@ -3843,7 +4723,7 @@
   "raccoon@cinnamon/happy_1": {
    "frame": {
     "x": 160,
-    "y": 476,
+    "y": 588,
     "w": 16,
     "h": 16
    },
@@ -3863,7 +4743,7 @@
   "raccoon@cinnamon/sad": {
    "frame": {
     "x": 192,
-    "y": 476,
+    "y": 588,
     "w": 16,
     "h": 16
    },
@@ -3883,7 +4763,7 @@
   "raccoon@cinnamon/sleep_0": {
    "frame": {
     "x": 224,
-    "y": 476,
+    "y": 588,
     "w": 16,
     "h": 16
    },
@@ -3903,7 +4783,7 @@
   "raccoon@cinnamon/sleep_1": {
    "frame": {
     "x": 256,
-    "y": 476,
+    "y": 588,
     "w": 16,
     "h": 16
    },
@@ -3923,7 +4803,7 @@
   "raccoon@cinnamon/eat": {
    "frame": {
     "x": 288,
-    "y": 476,
+    "y": 588,
     "w": 16,
     "h": 16
    },
@@ -3943,7 +4823,7 @@
   "raccoon@cinnamon/poorly": {
    "frame": {
     "x": 320,
-    "y": 476,
+    "y": 588,
     "w": 16,
     "h": 16
    },
@@ -3963,7 +4843,7 @@
   "raccoon@silver/idle_0": {
    "frame": {
     "x": 0,
-    "y": 504,
+    "y": 616,
     "w": 16,
     "h": 16
    },
@@ -3983,7 +4863,7 @@
   "raccoon@silver/idle_1": {
    "frame": {
     "x": 32,
-    "y": 504,
+    "y": 616,
     "w": 16,
     "h": 16
    },
@@ -4003,7 +4883,7 @@
   "raccoon@silver/blink": {
    "frame": {
     "x": 64,
-    "y": 504,
+    "y": 616,
     "w": 16,
     "h": 16
    },
@@ -4023,7 +4903,7 @@
   "raccoon@silver/walk_0": {
    "frame": {
     "x": 96,
-    "y": 504,
+    "y": 616,
     "w": 16,
     "h": 16
    },
@@ -4043,7 +4923,7 @@
   "raccoon@silver/happy": {
    "frame": {
     "x": 128,
-    "y": 504,
+    "y": 616,
     "w": 16,
     "h": 16
    },
@@ -4063,7 +4943,7 @@
   "raccoon@silver/happy_1": {
    "frame": {
     "x": 160,
-    "y": 504,
+    "y": 616,
     "w": 16,
     "h": 16
    },
@@ -4083,7 +4963,7 @@
   "raccoon@silver/sad": {
    "frame": {
     "x": 192,
-    "y": 504,
+    "y": 616,
     "w": 16,
     "h": 16
    },
@@ -4103,7 +4983,7 @@
   "raccoon@silver/sleep_0": {
    "frame": {
     "x": 224,
-    "y": 504,
+    "y": 616,
     "w": 16,
     "h": 16
    },
@@ -4123,7 +5003,7 @@
   "raccoon@silver/sleep_1": {
    "frame": {
     "x": 256,
-    "y": 504,
+    "y": 616,
     "w": 16,
     "h": 16
    },
@@ -4143,7 +5023,7 @@
   "raccoon@silver/eat": {
    "frame": {
     "x": 288,
-    "y": 504,
+    "y": 616,
     "w": 16,
     "h": 16
    },
@@ -4163,7 +5043,7 @@
   "raccoon@silver/poorly": {
    "frame": {
     "x": 320,
-    "y": 504,
+    "y": 616,
     "w": 16,
     "h": 16
    },
@@ -4183,7 +5063,7 @@
   "raccoon@midnight/idle_0": {
    "frame": {
     "x": 0,
-    "y": 532,
+    "y": 644,
     "w": 16,
     "h": 16
    },
@@ -4203,7 +5083,7 @@
   "raccoon@midnight/idle_1": {
    "frame": {
     "x": 32,
-    "y": 532,
+    "y": 644,
     "w": 16,
     "h": 16
    },
@@ -4223,7 +5103,7 @@
   "raccoon@midnight/blink": {
    "frame": {
     "x": 64,
-    "y": 532,
+    "y": 644,
     "w": 16,
     "h": 16
    },
@@ -4243,7 +5123,7 @@
   "raccoon@midnight/walk_0": {
    "frame": {
     "x": 96,
-    "y": 532,
+    "y": 644,
     "w": 16,
     "h": 16
    },
@@ -4263,7 +5143,7 @@
   "raccoon@midnight/happy": {
    "frame": {
     "x": 128,
-    "y": 532,
+    "y": 644,
     "w": 16,
     "h": 16
    },
@@ -4283,7 +5163,7 @@
   "raccoon@midnight/happy_1": {
    "frame": {
     "x": 160,
-    "y": 532,
+    "y": 644,
     "w": 16,
     "h": 16
    },
@@ -4303,7 +5183,7 @@
   "raccoon@midnight/sad": {
    "frame": {
     "x": 192,
-    "y": 532,
+    "y": 644,
     "w": 16,
     "h": 16
    },
@@ -4323,7 +5203,7 @@
   "raccoon@midnight/sleep_0": {
    "frame": {
     "x": 224,
-    "y": 532,
+    "y": 644,
     "w": 16,
     "h": 16
    },
@@ -4343,7 +5223,7 @@
   "raccoon@midnight/sleep_1": {
    "frame": {
     "x": 256,
-    "y": 532,
+    "y": 644,
     "w": 16,
     "h": 16
    },
@@ -4363,7 +5243,7 @@
   "raccoon@midnight/eat": {
    "frame": {
     "x": 288,
-    "y": 532,
+    "y": 644,
     "w": 16,
     "h": 16
    },
@@ -4383,7 +5263,7 @@
   "raccoon@midnight/poorly": {
    "frame": {
     "x": 320,
-    "y": 532,
+    "y": 644,
     "w": 16,
     "h": 16
    },
@@ -4403,7 +5283,7 @@
   "ferret/idle_0": {
    "frame": {
     "x": 0,
-    "y": 560,
+    "y": 672,
     "w": 16,
     "h": 16
    },
@@ -4423,7 +5303,7 @@
   "ferret/idle_1": {
    "frame": {
     "x": 32,
-    "y": 560,
+    "y": 672,
     "w": 16,
     "h": 16
    },
@@ -4443,7 +5323,7 @@
   "ferret/blink": {
    "frame": {
     "x": 64,
-    "y": 560,
+    "y": 672,
     "w": 16,
     "h": 16
    },
@@ -4463,7 +5343,7 @@
   "ferret/walk_0": {
    "frame": {
     "x": 96,
-    "y": 560,
+    "y": 672,
     "w": 16,
     "h": 16
    },
@@ -4483,7 +5363,7 @@
   "ferret/happy": {
    "frame": {
     "x": 128,
-    "y": 560,
+    "y": 672,
     "w": 16,
     "h": 16
    },
@@ -4503,7 +5383,7 @@
   "ferret/happy_1": {
    "frame": {
     "x": 160,
-    "y": 560,
+    "y": 672,
     "w": 16,
     "h": 16
    },
@@ -4523,7 +5403,7 @@
   "ferret/sad": {
    "frame": {
     "x": 192,
-    "y": 560,
+    "y": 672,
     "w": 16,
     "h": 16
    },
@@ -4543,7 +5423,7 @@
   "ferret/sleep_0": {
    "frame": {
     "x": 224,
-    "y": 560,
+    "y": 672,
     "w": 16,
     "h": 16
    },
@@ -4563,7 +5443,7 @@
   "ferret/sleep_1": {
    "frame": {
     "x": 256,
-    "y": 560,
+    "y": 672,
     "w": 16,
     "h": 16
    },
@@ -4583,7 +5463,7 @@
   "ferret/eat": {
    "frame": {
     "x": 288,
-    "y": 560,
+    "y": 672,
     "w": 16,
     "h": 16
    },
@@ -4603,7 +5483,7 @@
   "ferret/poorly": {
    "frame": {
     "x": 320,
-    "y": 560,
+    "y": 672,
     "w": 16,
     "h": 16
    },
@@ -4623,7 +5503,7 @@
   "ferret@albino/idle_0": {
    "frame": {
     "x": 0,
-    "y": 588,
+    "y": 700,
     "w": 16,
     "h": 16
    },
@@ -4643,7 +5523,7 @@
   "ferret@albino/idle_1": {
    "frame": {
     "x": 32,
-    "y": 588,
+    "y": 700,
     "w": 16,
     "h": 16
    },
@@ -4663,7 +5543,7 @@
   "ferret@albino/blink": {
    "frame": {
     "x": 64,
-    "y": 588,
+    "y": 700,
     "w": 16,
     "h": 16
    },
@@ -4683,7 +5563,7 @@
   "ferret@albino/walk_0": {
    "frame": {
     "x": 96,
-    "y": 588,
+    "y": 700,
     "w": 16,
     "h": 16
    },
@@ -4703,7 +5583,7 @@
   "ferret@albino/happy": {
    "frame": {
     "x": 128,
-    "y": 588,
+    "y": 700,
     "w": 16,
     "h": 16
    },
@@ -4723,7 +5603,7 @@
   "ferret@albino/happy_1": {
    "frame": {
     "x": 160,
-    "y": 588,
+    "y": 700,
     "w": 16,
     "h": 16
    },
@@ -4743,7 +5623,7 @@
   "ferret@albino/sad": {
    "frame": {
     "x": 192,
-    "y": 588,
+    "y": 700,
     "w": 16,
     "h": 16
    },
@@ -4763,7 +5643,7 @@
   "ferret@albino/sleep_0": {
    "frame": {
     "x": 224,
-    "y": 588,
+    "y": 700,
     "w": 16,
     "h": 16
    },
@@ -4783,7 +5663,7 @@
   "ferret@albino/sleep_1": {
    "frame": {
     "x": 256,
-    "y": 588,
+    "y": 700,
     "w": 16,
     "h": 16
    },
@@ -4803,7 +5683,7 @@
   "ferret@albino/eat": {
    "frame": {
     "x": 288,
-    "y": 588,
+    "y": 700,
     "w": 16,
     "h": 16
    },
@@ -4823,7 +5703,7 @@
   "ferret@albino/poorly": {
    "frame": {
     "x": 320,
-    "y": 588,
+    "y": 700,
     "w": 16,
     "h": 16
    },
@@ -4843,7 +5723,7 @@
   "ferret@cinnamon/idle_0": {
    "frame": {
     "x": 0,
-    "y": 616,
+    "y": 728,
     "w": 16,
     "h": 16
    },
@@ -4863,7 +5743,7 @@
   "ferret@cinnamon/idle_1": {
    "frame": {
     "x": 32,
-    "y": 616,
+    "y": 728,
     "w": 16,
     "h": 16
    },
@@ -4883,7 +5763,7 @@
   "ferret@cinnamon/blink": {
    "frame": {
     "x": 64,
-    "y": 616,
+    "y": 728,
     "w": 16,
     "h": 16
    },
@@ -4903,7 +5783,7 @@
   "ferret@cinnamon/walk_0": {
    "frame": {
     "x": 96,
-    "y": 616,
+    "y": 728,
     "w": 16,
     "h": 16
    },
@@ -4923,7 +5803,7 @@
   "ferret@cinnamon/happy": {
    "frame": {
     "x": 128,
-    "y": 616,
+    "y": 728,
     "w": 16,
     "h": 16
    },
@@ -4943,7 +5823,7 @@
   "ferret@cinnamon/happy_1": {
    "frame": {
     "x": 160,
-    "y": 616,
+    "y": 728,
     "w": 16,
     "h": 16
    },
@@ -4963,7 +5843,7 @@
   "ferret@cinnamon/sad": {
    "frame": {
     "x": 192,
-    "y": 616,
+    "y": 728,
     "w": 16,
     "h": 16
    },
@@ -4983,7 +5863,7 @@
   "ferret@cinnamon/sleep_0": {
    "frame": {
     "x": 224,
-    "y": 616,
+    "y": 728,
     "w": 16,
     "h": 16
    },
@@ -5003,7 +5883,7 @@
   "ferret@cinnamon/sleep_1": {
    "frame": {
     "x": 256,
-    "y": 616,
+    "y": 728,
     "w": 16,
     "h": 16
    },
@@ -5023,7 +5903,7 @@
   "ferret@cinnamon/eat": {
    "frame": {
     "x": 288,
-    "y": 616,
+    "y": 728,
     "w": 16,
     "h": 16
    },
@@ -5043,7 +5923,7 @@
   "ferret@cinnamon/poorly": {
    "frame": {
     "x": 320,
-    "y": 616,
+    "y": 728,
     "w": 16,
     "h": 16
    },
@@ -5063,7 +5943,7 @@
   "ferret@silver/idle_0": {
    "frame": {
     "x": 0,
-    "y": 644,
+    "y": 756,
     "w": 16,
     "h": 16
    },
@@ -5083,7 +5963,7 @@
   "ferret@silver/idle_1": {
    "frame": {
     "x": 32,
-    "y": 644,
+    "y": 756,
     "w": 16,
     "h": 16
    },
@@ -5103,7 +5983,7 @@
   "ferret@silver/blink": {
    "frame": {
     "x": 64,
-    "y": 644,
+    "y": 756,
     "w": 16,
     "h": 16
    },
@@ -5123,7 +6003,7 @@
   "ferret@silver/walk_0": {
    "frame": {
     "x": 96,
-    "y": 644,
+    "y": 756,
     "w": 16,
     "h": 16
    },
@@ -5143,7 +6023,7 @@
   "ferret@silver/happy": {
    "frame": {
     "x": 128,
-    "y": 644,
+    "y": 756,
     "w": 16,
     "h": 16
    },
@@ -5163,7 +6043,7 @@
   "ferret@silver/happy_1": {
    "frame": {
     "x": 160,
-    "y": 644,
+    "y": 756,
     "w": 16,
     "h": 16
    },
@@ -5183,7 +6063,7 @@
   "ferret@silver/sad": {
    "frame": {
     "x": 192,
-    "y": 644,
+    "y": 756,
     "w": 16,
     "h": 16
    },
@@ -5203,7 +6083,7 @@
   "ferret@silver/sleep_0": {
    "frame": {
     "x": 224,
-    "y": 644,
+    "y": 756,
     "w": 16,
     "h": 16
    },
@@ -5223,7 +6103,7 @@
   "ferret@silver/sleep_1": {
    "frame": {
     "x": 256,
-    "y": 644,
+    "y": 756,
     "w": 16,
     "h": 16
    },
@@ -5243,7 +6123,7 @@
   "ferret@silver/eat": {
    "frame": {
     "x": 288,
-    "y": 644,
+    "y": 756,
     "w": 16,
     "h": 16
    },
@@ -5263,7 +6143,7 @@
   "ferret@silver/poorly": {
    "frame": {
     "x": 320,
-    "y": 644,
+    "y": 756,
     "w": 16,
     "h": 16
    },
@@ -5283,7 +6163,7 @@
   "possum/idle_0": {
    "frame": {
     "x": 0,
-    "y": 672,
+    "y": 784,
     "w": 16,
     "h": 16
    },
@@ -5303,7 +6183,7 @@
   "possum/idle_1": {
    "frame": {
     "x": 32,
-    "y": 672,
+    "y": 784,
     "w": 16,
     "h": 16
    },
@@ -5323,7 +6203,7 @@
   "possum/blink": {
    "frame": {
     "x": 64,
-    "y": 672,
+    "y": 784,
     "w": 16,
     "h": 16
    },
@@ -5343,7 +6223,7 @@
   "possum/walk_0": {
    "frame": {
     "x": 96,
-    "y": 672,
+    "y": 784,
     "w": 16,
     "h": 16
    },
@@ -5363,7 +6243,7 @@
   "possum/happy": {
    "frame": {
     "x": 128,
-    "y": 672,
+    "y": 784,
     "w": 16,
     "h": 16
    },
@@ -5383,7 +6263,7 @@
   "possum/happy_1": {
    "frame": {
     "x": 160,
-    "y": 672,
+    "y": 784,
     "w": 16,
     "h": 16
    },
@@ -5403,7 +6283,7 @@
   "possum/sad": {
    "frame": {
     "x": 192,
-    "y": 672,
+    "y": 784,
     "w": 16,
     "h": 16
    },
@@ -5423,7 +6303,7 @@
   "possum/sleep_0": {
    "frame": {
     "x": 224,
-    "y": 672,
+    "y": 784,
     "w": 16,
     "h": 16
    },
@@ -5443,7 +6323,7 @@
   "possum/sleep_1": {
    "frame": {
     "x": 256,
-    "y": 672,
+    "y": 784,
     "w": 16,
     "h": 16
    },
@@ -5463,7 +6343,7 @@
   "possum/eat": {
    "frame": {
     "x": 288,
-    "y": 672,
+    "y": 784,
     "w": 16,
     "h": 16
    },
@@ -5483,7 +6363,7 @@
   "possum/poorly": {
    "frame": {
     "x": 320,
-    "y": 672,
+    "y": 784,
     "w": 16,
     "h": 16
    },
@@ -5503,7 +6383,7 @@
   "possum@smoky/idle_0": {
    "frame": {
     "x": 0,
-    "y": 700,
+    "y": 812,
     "w": 16,
     "h": 16
    },
@@ -5523,7 +6403,7 @@
   "possum@smoky/idle_1": {
    "frame": {
     "x": 32,
-    "y": 700,
+    "y": 812,
     "w": 16,
     "h": 16
    },
@@ -5543,7 +6423,7 @@
   "possum@smoky/blink": {
    "frame": {
     "x": 64,
-    "y": 700,
+    "y": 812,
     "w": 16,
     "h": 16
    },
@@ -5563,7 +6443,7 @@
   "possum@smoky/walk_0": {
    "frame": {
     "x": 96,
-    "y": 700,
+    "y": 812,
     "w": 16,
     "h": 16
    },
@@ -5583,7 +6463,7 @@
   "possum@smoky/happy": {
    "frame": {
     "x": 128,
-    "y": 700,
+    "y": 812,
     "w": 16,
     "h": 16
    },
@@ -5603,7 +6483,7 @@
   "possum@smoky/happy_1": {
    "frame": {
     "x": 160,
-    "y": 700,
+    "y": 812,
     "w": 16,
     "h": 16
    },
@@ -5623,7 +6503,7 @@
   "possum@smoky/sad": {
    "frame": {
     "x": 192,
-    "y": 700,
+    "y": 812,
     "w": 16,
     "h": 16
    },
@@ -5643,7 +6523,7 @@
   "possum@smoky/sleep_0": {
    "frame": {
     "x": 224,
-    "y": 700,
+    "y": 812,
     "w": 16,
     "h": 16
    },
@@ -5663,7 +6543,7 @@
   "possum@smoky/sleep_1": {
    "frame": {
     "x": 256,
-    "y": 700,
+    "y": 812,
     "w": 16,
     "h": 16
    },
@@ -5683,7 +6563,7 @@
   "possum@smoky/eat": {
    "frame": {
     "x": 288,
-    "y": 700,
+    "y": 812,
     "w": 16,
     "h": 16
    },
@@ -5703,7 +6583,7 @@
   "possum@smoky/poorly": {
    "frame": {
     "x": 320,
-    "y": 700,
+    "y": 812,
     "w": 16,
     "h": 16
    },
@@ -5723,7 +6603,7 @@
   "possum@cream/idle_0": {
    "frame": {
     "x": 0,
-    "y": 728,
+    "y": 840,
     "w": 16,
     "h": 16
    },
@@ -5743,7 +6623,7 @@
   "possum@cream/idle_1": {
    "frame": {
     "x": 32,
-    "y": 728,
+    "y": 840,
     "w": 16,
     "h": 16
    },
@@ -5763,7 +6643,7 @@
   "possum@cream/blink": {
    "frame": {
     "x": 64,
-    "y": 728,
+    "y": 840,
     "w": 16,
     "h": 16
    },
@@ -5783,7 +6663,7 @@
   "possum@cream/walk_0": {
    "frame": {
     "x": 96,
-    "y": 728,
+    "y": 840,
     "w": 16,
     "h": 16
    },
@@ -5803,7 +6683,7 @@
   "possum@cream/happy": {
    "frame": {
     "x": 128,
-    "y": 728,
+    "y": 840,
     "w": 16,
     "h": 16
    },
@@ -5823,7 +6703,7 @@
   "possum@cream/happy_1": {
    "frame": {
     "x": 160,
-    "y": 728,
+    "y": 840,
     "w": 16,
     "h": 16
    },
@@ -5843,7 +6723,7 @@
   "possum@cream/sad": {
    "frame": {
     "x": 192,
-    "y": 728,
+    "y": 840,
     "w": 16,
     "h": 16
    },
@@ -5863,7 +6743,7 @@
   "possum@cream/sleep_0": {
    "frame": {
     "x": 224,
-    "y": 728,
+    "y": 840,
     "w": 16,
     "h": 16
    },
@@ -5883,7 +6763,7 @@
   "possum@cream/sleep_1": {
    "frame": {
     "x": 256,
-    "y": 728,
+    "y": 840,
     "w": 16,
     "h": 16
    },
@@ -5903,7 +6783,7 @@
   "possum@cream/eat": {
    "frame": {
     "x": 288,
-    "y": 728,
+    "y": 840,
     "w": 16,
     "h": 16
    },
@@ -5923,7 +6803,7 @@
   "possum@cream/poorly": {
    "frame": {
     "x": 320,
-    "y": 728,
+    "y": 840,
     "w": 16,
     "h": 16
    },
@@ -5943,7 +6823,7 @@
   "possum@blossom/idle_0": {
    "frame": {
     "x": 0,
-    "y": 756,
+    "y": 868,
     "w": 16,
     "h": 16
    },
@@ -5963,7 +6843,7 @@
   "possum@blossom/idle_1": {
    "frame": {
     "x": 32,
-    "y": 756,
+    "y": 868,
     "w": 16,
     "h": 16
    },
@@ -5983,7 +6863,7 @@
   "possum@blossom/blink": {
    "frame": {
     "x": 64,
-    "y": 756,
+    "y": 868,
     "w": 16,
     "h": 16
    },
@@ -6003,7 +6883,7 @@
   "possum@blossom/walk_0": {
    "frame": {
     "x": 96,
-    "y": 756,
+    "y": 868,
     "w": 16,
     "h": 16
    },
@@ -6023,7 +6903,7 @@
   "possum@blossom/happy": {
    "frame": {
     "x": 128,
-    "y": 756,
+    "y": 868,
     "w": 16,
     "h": 16
    },
@@ -6043,7 +6923,7 @@
   "possum@blossom/happy_1": {
    "frame": {
     "x": 160,
-    "y": 756,
+    "y": 868,
     "w": 16,
     "h": 16
    },
@@ -6063,7 +6943,7 @@
   "possum@blossom/sad": {
    "frame": {
     "x": 192,
-    "y": 756,
+    "y": 868,
     "w": 16,
     "h": 16
    },
@@ -6083,7 +6963,7 @@
   "possum@blossom/sleep_0": {
    "frame": {
     "x": 224,
-    "y": 756,
+    "y": 868,
     "w": 16,
     "h": 16
    },
@@ -6103,7 +6983,7 @@
   "possum@blossom/sleep_1": {
    "frame": {
     "x": 256,
-    "y": 756,
+    "y": 868,
     "w": 16,
     "h": 16
    },
@@ -6123,7 +7003,7 @@
   "possum@blossom/eat": {
    "frame": {
     "x": 288,
-    "y": 756,
+    "y": 868,
     "w": 16,
     "h": 16
    },
@@ -6143,7 +7023,7 @@
   "possum@blossom/poorly": {
    "frame": {
     "x": 320,
-    "y": 756,
+    "y": 868,
     "w": 16,
     "h": 16
    },
@@ -6163,7 +7043,7 @@
   "egg/egg_0": {
    "frame": {
     "x": 0,
-    "y": 784,
+    "y": 896,
     "w": 16,
     "h": 16
    },
@@ -6183,7 +7063,7 @@
   "egg/egg_1": {
    "frame": {
     "x": 32,
-    "y": 784,
+    "y": 896,
     "w": 16,
     "h": 16
    },
@@ -6203,7 +7083,7 @@
   "egg/egg_2": {
    "frame": {
     "x": 64,
-    "y": 784,
+    "y": 896,
     "w": 16,
     "h": 16
    },
@@ -6223,7 +7103,7 @@
   "floor/wood": {
    "frame": {
     "x": 0,
-    "y": 812,
+    "y": 924,
     "w": 16,
     "h": 16
    },
@@ -6243,7 +7123,7 @@
   "wall/paper": {
    "frame": {
     "x": 0,
-    "y": 840,
+    "y": 952,
     "w": 16,
     "h": 16
    },
@@ -6263,7 +7143,7 @@
   "wall/base": {
    "frame": {
     "x": 32,
-    "y": 840,
+    "y": 952,
     "w": 16,
     "h": 16
    },
@@ -6283,7 +7163,7 @@
   "window/day": {
    "frame": {
     "x": 0,
-    "y": 868,
+    "y": 980,
     "w": 32,
     "h": 28
    },
@@ -6303,7 +7183,7 @@
   "window/night": {
    "frame": {
     "x": 32,
-    "y": 868,
+    "y": 980,
     "w": 32,
     "h": 28
    },
@@ -6323,7 +7203,7 @@
   "bed/bed": {
    "frame": {
     "x": 0,
-    "y": 896,
+    "y": 1008,
     "w": 32,
     "h": 16
    },
@@ -6343,7 +7223,7 @@
   "plant/plant": {
    "frame": {
     "x": 0,
-    "y": 924,
+    "y": 1036,
     "w": 16,
     "h": 24
    },
@@ -6363,7 +7243,7 @@
   "bowl/empty": {
    "frame": {
     "x": 0,
-    "y": 952,
+    "y": 1064,
     "w": 16,
     "h": 16
    },
@@ -6383,7 +7263,7 @@
   "bowl/full": {
    "frame": {
     "x": 32,
-    "y": 952,
+    "y": 1064,
     "w": 16,
     "h": 16
    },
@@ -6403,7 +7283,7 @@
   "crown/crown": {
    "frame": {
     "x": 0,
-    "y": 980,
+    "y": 1092,
     "w": 8,
     "h": 5
    },
@@ -6902,6 +7782,126 @@
    "lop@choc/poorly",
    "lop@choc/sad"
   ],
+  "stitched/idle": [
+   "stitched/idle_0",
+   "stitched/idle_1",
+   "stitched/idle_0",
+   "stitched/idle_1",
+   "stitched/blink"
+  ],
+  "stitched/walk": [
+   "stitched/walk_0",
+   "stitched/idle_1"
+  ],
+  "stitched/happy": [
+   "stitched/happy",
+   "stitched/happy_1"
+  ],
+  "stitched/sad": [
+   "stitched/sad"
+  ],
+  "stitched/sleep": [
+   "stitched/sleep_0",
+   "stitched/sleep_1"
+  ],
+  "stitched/eat": [
+   "stitched/eat",
+   "stitched/idle_0"
+  ],
+  "stitched/poorly": [
+   "stitched/poorly",
+   "stitched/sad"
+  ],
+  "stitched@mint/idle": [
+   "stitched@mint/idle_0",
+   "stitched@mint/idle_1",
+   "stitched@mint/idle_0",
+   "stitched@mint/idle_1",
+   "stitched@mint/blink"
+  ],
+  "stitched@mint/walk": [
+   "stitched@mint/walk_0",
+   "stitched@mint/idle_1"
+  ],
+  "stitched@mint/happy": [
+   "stitched@mint/happy",
+   "stitched@mint/happy_1"
+  ],
+  "stitched@mint/sad": [
+   "stitched@mint/sad"
+  ],
+  "stitched@mint/sleep": [
+   "stitched@mint/sleep_0",
+   "stitched@mint/sleep_1"
+  ],
+  "stitched@mint/eat": [
+   "stitched@mint/eat",
+   "stitched@mint/idle_0"
+  ],
+  "stitched@mint/poorly": [
+   "stitched@mint/poorly",
+   "stitched@mint/sad"
+  ],
+  "stitched@bubblegum/idle": [
+   "stitched@bubblegum/idle_0",
+   "stitched@bubblegum/idle_1",
+   "stitched@bubblegum/idle_0",
+   "stitched@bubblegum/idle_1",
+   "stitched@bubblegum/blink"
+  ],
+  "stitched@bubblegum/walk": [
+   "stitched@bubblegum/walk_0",
+   "stitched@bubblegum/idle_1"
+  ],
+  "stitched@bubblegum/happy": [
+   "stitched@bubblegum/happy",
+   "stitched@bubblegum/happy_1"
+  ],
+  "stitched@bubblegum/sad": [
+   "stitched@bubblegum/sad"
+  ],
+  "stitched@bubblegum/sleep": [
+   "stitched@bubblegum/sleep_0",
+   "stitched@bubblegum/sleep_1"
+  ],
+  "stitched@bubblegum/eat": [
+   "stitched@bubblegum/eat",
+   "stitched@bubblegum/idle_0"
+  ],
+  "stitched@bubblegum/poorly": [
+   "stitched@bubblegum/poorly",
+   "stitched@bubblegum/sad"
+  ],
+  "stitched@bone/idle": [
+   "stitched@bone/idle_0",
+   "stitched@bone/idle_1",
+   "stitched@bone/idle_0",
+   "stitched@bone/idle_1",
+   "stitched@bone/blink"
+  ],
+  "stitched@bone/walk": [
+   "stitched@bone/walk_0",
+   "stitched@bone/idle_1"
+  ],
+  "stitched@bone/happy": [
+   "stitched@bone/happy",
+   "stitched@bone/happy_1"
+  ],
+  "stitched@bone/sad": [
+   "stitched@bone/sad"
+  ],
+  "stitched@bone/sleep": [
+   "stitched@bone/sleep_0",
+   "stitched@bone/sleep_1"
+  ],
+  "stitched@bone/eat": [
+   "stitched@bone/eat",
+   "stitched@bone/idle_0"
+  ],
+  "stitched@bone/poorly": [
+   "stitched@bone/poorly",
+   "stitched@bone/sad"
+  ],
   "raccoon/idle": [
    "raccoon/idle_0",
    "raccoon/idle_1",
@@ -7278,7 +8278,7 @@
   "scale": 1,
   "size": {
    "w": 352,
-   "h": 1008
+   "h": 1120
   },
   "fps": {
    "cat/idle": 3,
@@ -7393,6 +8393,34 @@
    "lop@choc/sleep": 1.5,
    "lop@choc/eat": 4,
    "lop@choc/poorly": 1,
+   "stitched/idle": 3,
+   "stitched/walk": 6,
+   "stitched/happy": 4,
+   "stitched/sad": 1,
+   "stitched/sleep": 1.5,
+   "stitched/eat": 4,
+   "stitched/poorly": 1,
+   "stitched@mint/idle": 3,
+   "stitched@mint/walk": 6,
+   "stitched@mint/happy": 4,
+   "stitched@mint/sad": 1,
+   "stitched@mint/sleep": 1.5,
+   "stitched@mint/eat": 4,
+   "stitched@mint/poorly": 1,
+   "stitched@bubblegum/idle": 3,
+   "stitched@bubblegum/walk": 6,
+   "stitched@bubblegum/happy": 4,
+   "stitched@bubblegum/sad": 1,
+   "stitched@bubblegum/sleep": 1.5,
+   "stitched@bubblegum/eat": 4,
+   "stitched@bubblegum/poorly": 1,
+   "stitched@bone/idle": 3,
+   "stitched@bone/walk": 6,
+   "stitched@bone/happy": 4,
+   "stitched@bone/sad": 1,
+   "stitched@bone/sleep": 1.5,
+   "stitched@bone/eat": 4,
+   "stitched@bone/poorly": 1,
    "raccoon/idle": 3,
    "raccoon/walk": 6,
    "raccoon/happy": 4,

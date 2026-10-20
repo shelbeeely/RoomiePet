@@ -166,6 +166,29 @@ LOP = [
     "................",
 ]
 
+# The stitched bunny: a creepy-cute plush. Its left eye is sewn shut with an X
+# (x stitches; n is body-coloured filling the X's gaps, so no face is drawn
+# there), its right ear is bandaged (B), a patch (q) is sewn on its head and a
+# little heart (r) on its tummy. Faces show through the right eye and mouth.
+STITCHED = [
+    "....oo....oo....",
+    "...obpo..opbo...",
+    "...obpo..BBBB...",
+    "...obpo..opbo...",
+    "...obbo..obbo...",
+    "..obbbbbbbbqqo..",
+    ".obblbbbbbbqqbo.",
+    ".oblxnxbbbbbbbo.",
+    ".obbnxnbbbbbbbo.",
+    ".obbxnxbbbbbbbo.",
+    ".obbbbbbbbbbbbo.",
+    ".obbbbrwrwbbbbo.",
+    "..obbwrrrwwbbo..",
+    "..odddxrxddddo..",
+    "...oo......oo...",
+    "................",
+]
+
 SHADES = {"d": {"from": "b", "shade": 0.78, "hue": -8}, "l": {"from": "b", "shade": 1.4}}
 
 
@@ -267,6 +290,14 @@ spec = {
             "smoke": ("#8e8a98", {}),
             "choc": ("#7a553c", {"w": "#f1e2cf"}),
         }, {"p": "#f4a6b8"}, onto="blw"),
+        "stitched": pet(STITCHED, (4, 6), 14, "..oo_......_oo..", "#c9b6e8", {
+            "mint": ("#a8e6cf", {}),
+            "bubblegum": ("#f7b2cf", {"r": "#b8264a"}),
+            "bone": ("#e8e4dc", {"x": "#2b2238", "q": "#9fb4c8"}),
+        }, {
+            "x": "#4a2c4a", "n": {"from": "b"}, "r": "#d64560", "B": "#f4ecd8",
+            "q": {"from": "b", "hue": 70, "shade": 0.85, "sat": 1.2}, "p": "#f2a6b8",
+        }),
         "raccoon": pet(RACCOON, (4, 6), 14, "..oo_......_oo..", "#a9a6b2", {
             "cinnamon": ("#b88a64", {}),
             "silver": ("#cfccd6", {}),
