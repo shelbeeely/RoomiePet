@@ -10,7 +10,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CATALOG, ROOMS, footprint, layoutProblem, wallsOf } from "@shared/home.js";
 import { animFor, draw, frameAt, petKey } from "./sprites.js";
-import { PX, dollCamera, floorSprite, order, pieceBox, pieceSprite, wallBox, wallSprite } from "./dollhouse.js";
+import { PX, dollCamera, floorSprite, order, pieceBox, pieceSprite, wallBox, wallPieceBox, wallSprite } from "./dollhouse.js";
 import { allLayouts, bedroomOf, destination, findPath, gridOf, roomAt } from "./house.js";
 import RoomBuilder from "./RoomBuilder.jsx";
 
@@ -100,7 +100,12 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
   useEffect(() => {
     if (!atlas) return;
     const el = canvas.current;
-    const ctx = el.getContext("2d");
+    const screen = el.getContext("2d");
+    // The scene is put together at its own pixel-art size, then scaled up to the screen
+    // in one copy. Drawn piece by piece at the screen's size (1440 x 1400 on a phone)
+    // every frame went to filling pixels: a slowed-down CPU managed 13 frames a second.
+    const buf = document.createElement("canvas");
+    const ctx = buf.getContext("2d");
     let S = 0;
     let size = "";
     const fit = () => {
@@ -111,6 +116,8 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
         size = c.key;
         el.width = c.width * S;
         el.height = c.height * S;
+        buf.width = c.width;
+        buf.height = c.height;
       }
     };
     window.addEventListener("resize", fit);
@@ -124,11 +131,10 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
       const { pets, effects, selectedId, hour, layouts, grid, cam, edit } = latest.current;
       fit();
       const night = hour >= 20 || hour < 7;
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.fillStyle = BG;
-      ctx.fillRect(0, 0, el.width, el.height);
+      ctx.fillRect(0, 0, buf.width, buf.height);
       ctx.imageSmoothingEnabled = false;
-      ctx.setTransform(S, 0, 0, S, 0, 0);
+      const texts = [];   // emoji and zzz, drawn sharp at the screen's size after the scale-up
       const blit = (sp) => ctx.drawImage(sp.canvas, sp.ox, sp.oy);
 
       // Where each pet goes now (all of them, seen or not, so they are where they should be).
@@ -199,7 +205,7 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
             if (back) {
               blit(sp);
               wallHits.unshift({ room, item: it, sprite: sp });
-            } else units.push({ kind: "piece", room, item: it, box: pieceBox(it), sprite: sp });
+            } else units.push({ kind: "piece", room, item: it, box: wallPieceBox(it), sprite: sp });
           }
         }
       }
@@ -250,16 +256,12 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
         const top = sy - SPRITE * size;
         const need = p.cond.state === "asleep" ? "z" : p.cond.flags.hungry ? "🍖" : p.cond.flags.grubby ? "🫧" : null;
         if (need === "z") {
-          ctx.fillStyle = "#fff";
-          ctx.font = "bold 14px system-ui";
-          ctx.fillText("z", sx + 14, top + 12 - ((t * 8 + p.phase * 6) % 16));
+          texts.push(["bold 14px system-ui", "#fff", "z", sx + 14, top + 12 - ((t * 8 + p.phase * 6) % 16)]);
         } else if (need && p.cond.state !== "egg") {
-          ctx.font = "16px system-ui";
-          ctx.fillText(need, sx + 12, top + 8 - Math.abs(Math.sin(t * 2)) * 4);
+          texts.push(["16px system-ui", "#fff", need, sx + 12, top + 8 - Math.abs(Math.sin(t * 2)) * 4]);
         }
         if (effect) {
-          ctx.font = "14px system-ui";
-          ctx.fillText(effect === "eat" ? "🍖" : effect === "clean" ? "🫧" : "💖", sx - 8, top + 4 - ((t * 24) % 20));
+          texts.push(["14px system-ui", "#fff", effect === "eat" ? "🍖" : effect === "clean" ? "🫧" : "💖", sx - 8, top + 4 - ((t * 24) % 20)]);
         }
         const label = labels.current.get(p.id);
         if (label) {
@@ -312,6 +314,15 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
           ctx.fillRect(gx - 56, gy - 56, 112, 112);
         }
         ctx.globalCompositeOperation = "source-over";
+      }
+      screen.imageSmoothingEnabled = false;
+      screen.setTransform(1, 0, 0, 1, 0, 0);
+      screen.drawImage(buf, 0, 0, el.width, el.height);
+      screen.setTransform(S, 0, 0, S, 0, 0);
+      for (const [font, fill, str, x, y] of texts) {
+        screen.font = font;
+        screen.fillStyle = fill;
+        screen.fillText(str, x, y);
       }
       raf = requestAnimationFrame(frame);
     };

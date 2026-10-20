@@ -111,8 +111,8 @@ npm test           # server API tests (node:test) and the shared rules (vitest)
 
 ## Art
 
-The pets are 64 x 64 pixel art drawn from shapes in `art/pets.py` -- animals
-on all fours facing us, seen from a little above: the head and face first,
+The pets are 64 x 64 chibi pixel art drawn from shapes in `art/pets.py` -- a
+big head with big low-set eyes, a little body: animals on all fours facing us, seen from a little above: the head and face first,
 the back stretching away behind it with the tail up off the rump, front legs
 under the chest and the hind feet further back. Every species shares the build and each adds its
 ears, snout, markings and tail, so all of them have every mood and

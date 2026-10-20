@@ -1,7 +1,7 @@
 """
-RoomiePet's pets, on all fours and facing us, seen from a little above like
-the dollhouse. The head and face are the biggest thing in the frame, in
-front; behind the head the back and rump rise away from us, the tail comes
+RoomiePet's pets, chibi and kawaii: on all fours and facing us, seen from a
+little above like the dollhouse. The head and face are most of the pet --
+big low-set eyes, a little muzzle, blushing cheeks -- in front; behind the head the back and rump rise away from us, the tail comes
 up off the rump, the front legs stand straight down under the chest and the
 hind legs stand further back. No side views: walking the other way mirrors
 them. Earlier tries taught what this has to avoid: round blobs with a face
@@ -100,9 +100,9 @@ class Where:
         self.legs = P["legs"]
         self.droop = bool(P.get("droop"))
         if self.lying:
-            self.hx, self.hy = 32, 43 + P["hdy"]
-            self.rx, self.ry = 32, 38 + P["dy"]
-            self.cx, self.cy = 32, 55 + P["dy"]
+            self.hx, self.hy = 32, 42 + P["hdy"]
+            self.rx, self.ry = 32, 40 + P["dy"]
+            self.cx, self.cy = 32, 57 + P["dy"]
         else:
             self.hx, self.hy = animal.head_at[0], animal.head_at[1] + P["hdy"]
             self.rx, self.ry = animal.rump_at[0], animal.rump_at[1] + P["dy"]
@@ -112,18 +112,19 @@ class Where:
 class Animal:
     """A four-legged pet standing facing us. Species override sizes and the hooks."""
 
-    head = (14, 11.5)         # radii: wider than tall, a little animal's head
-    head_at = (32, 42)
-    rump = (12, 14)           # the back, seen from above stretching away behind the head
-    rump_at = (32, 23)
-    chest = (9, 5)
-    chest_at = (32, 52)
-    leg_w = 6
-    legs_apart = 6            # front legs either side of the middle
-    hind_apart = 11
-    eye_apart = 7
-    eye_y = 0                 # eyes relative to the head's middle
-    muzzle = (6.5, 4.6)       # the pale muzzle round nose and mouth, or None
+    # Chibi proportions: the head is most of the pet, the body a little loaf behind it on stubby legs.
+    head = (18, 15)           # radii: wider than tall
+    head_at = (32, 38)
+    rump = (10, 9)            # the back, seen from above behind the head
+    rump_at = (32, 21)
+    chest = (8, 4)
+    chest_at = (32, 53)
+    leg_w = 7
+    legs_apart = 6.5          # front legs either side of the middle
+    hind_apart = 12
+    eye_apart = 8
+    eye_y = 2                 # eyes a little below the head's middle: big, low and wide reads as cute
+    muzzle = (5.5, 3.8)       # the pale muzzle round nose and mouth, or None
     bib = True                # a pale chest
     whiskers = False
 
@@ -149,16 +150,16 @@ class Animal:
     # -- faces ---------------------------------------------------------------
     def eye(self, p, x, y, kind, left):
         if kind == "open":
-            p.ellipse(x, y, 2.6, 3.4, "e")
-            p.rect(x - 1.5, y - 2, 1.5, 2, "h")
+            p.ellipse(x, y, 3.3, 4.2, "e")
+            p.rect(x - 2, y - 3, 2, 2, "h")
             p.rect(x + 1, y + 1, 1, 1, "h")
         elif kind == "closed":
-            p.ring(x, y - 1, 3, 2.4, 1.2, "e", half="bottom")
+            p.ring(x, y - 1, 3.6, 2.6, 1.3, "e", half="bottom")
         elif kind == "happy":
-            p.ring(x, y + 1, 3, 2.6, 1.3, "e", half="top")
+            p.ring(x, y + 1, 3.6, 3, 1.4, "e", half="top")
         elif kind == "sad":
-            p.ellipse(x, y + 1, 2.2, 2.8, "e")
-            p.rect(x - 1, y, 1, 1, "h")
+            p.ellipse(x, y + 1, 2.8, 3.4, "e")
+            p.rect(x - 1.5, y - 1, 1.5, 1.5, "h")
             if left:
                 p.rect(x - 1, y + 4, 1, 3, "s")
         elif kind == "x":
@@ -168,16 +169,17 @@ class Animal:
     def face(self, p, hx, hy, eyes, mouth, brows):
         ey = hy + self.eye_y
         ex1, ex2 = hx - self.eye_apart, hx + self.eye_apart
+        my = ey + 5
         if self.muzzle:
-            p.ellipse(hx, hy + 6, *self.muzzle, "w", only="bld")
+            p.ellipse(hx, my + 1, *self.muzzle, "w", only="bld")
         self.eye(p, ex1, ey, eyes, True)
         self.eye(p, ex2, ey, eyes, False)
         if brows == "sad":
             p.line(ex1 - 2, ey - 6, ex1 + 2, ey - 4, "e", 1)
             p.line(ex2 - 2, ey - 4, ex2 + 2, ey - 6, "e", 1)
-        p.ellipse(ex1 - 4, ey + 5, 2.2, 1.4, "c", only="bwl")
-        p.ellipse(ex2 + 4, ey + 5, 2.2, 1.4, "c", only="bwl")
-        self.mouth_shape(p, hx, hy + 5, mouth)
+        p.ellipse(ex1 - 4, ey + 5, 3, 1.7, "c", only="bwl")
+        p.ellipse(ex2 + 4, ey + 5, 3, 1.7, "c", only="bwl")
+        self.mouth_shape(p, hx, my, mouth)
 
     def mouth_shape(self, p, mx, my, kind):
         p.poly([(mx - 2, my - 1), (mx + 2, my - 1), (mx, my + 1)], "n")      # a little nose on the muzzle
@@ -199,7 +201,7 @@ class Animal:
 
     def whisker_lines(self, p, hx, hy):
         rx = self.head[0]
-        for dy, tilt in ((4, -1), (6, 1)):
+        for dy, tilt in ((self.eye_y + 6, -1), (self.eye_y + 8, 1)):
             p.line(hx - rx + 3, hy + dy, hx - rx - 4, hy + dy + tilt, "e", 1)
             p.line(hx + rx - 3, hy + dy, hx + rx + 4, hy + dy + tilt, "e", 1)
 
@@ -215,7 +217,7 @@ class Animal:
         p = Painter(N, N)
         self.tail(p, at)
         if at.lying:
-            p.ellipse(at.rx, at.ry, self.rump[0] + 4, self.rump[1] - 1, "b")
+            p.ellipse(at.rx, at.ry, self.rump[0] + 8, self.rump[1] + 1, "b")
         else:
             lift = LIFT[at.legs]
             for side, up in ((-1, lift[1]), (1, lift[0])):        # hind legs, opposite the front ones
@@ -297,53 +299,53 @@ class Cat(Animal):
     def ears(self, p, at):
         droop = 3 if at.droop else 0
         for side in (-1, 1):
-            ex = at.hx + side * 8
-            tip = (ex + side * (3 + droop), at.hy - 19 + droop * 2)
-            p.poly([(ex - 6, at.hy - 6), tip, (ex + 6, at.hy - 6)], "b")
-            p.poly([(ex - 3, at.hy - 7), (tip[0] - side * 0.5, tip[1] + 4), (ex + 3, at.hy - 7)], "p")
+            ex = at.hx + side * 10
+            tip = (ex + side * (3 + droop), at.hy - 23 + droop * 2)
+            p.poly([(ex - 6.5, at.hy - 8), tip, (ex + 6.5, at.hy - 8)], "b")
+            p.poly([(ex - 3.5, at.hy - 9), (tip[0] - side * 0.5, tip[1] + 4), (ex + 3.5, at.hy - 9)], "p")
 
     def tail(self, p, at):
         rump_tail(p, at, self, [(2, -4), (5, -8), (9, -10), (12, -8)], 2.4)
 
     def back_marks(self, p, at):
         if not at.lying:
-            for dy in (-9, -5, -1):                         # tabby stripes across the back
-                p.rect(at.rx - 7, at.ry + dy, 14, 1.5, "d", only="bl")
+            for dy in (-6, -3):                             # tabby stripes across the back
+                p.rect(at.rx - 6, at.ry + dy, 12, 1.5, "d", only="bl")
 
     def markings(self, p, at):
         for dx in (-3, 0, 3):                               # and on the forehead
-            p.rect(at.hx + dx, at.hy - 10, 1, 3 + (dx == 0), "d", only="bl")
+            p.rect(at.hx + dx, at.hy - 13, 1, 3 + (dx == 0), "d", only="bl")
 
 
 class Bunny(Animal):
-    head = (13, 11)
-    head_at = (32, 43)
-    rump = (12, 12)
-    rump_at = (32, 27)
-    chest = (8, 4.5)
-    chest_at = (32, 53)
-    legs_apart = 5
-    leg_w = 5
-    hind_apart = 11
-    muzzle = (5, 3.6)
+    head = (17, 14)
+    head_at = (32, 40)
+    rump = (10, 8)
+    rump_at = (32, 25)
+    chest = (7, 4)
+    chest_at = (32, 54)
+    legs_apart = 6
+    leg_w = 6
+    hind_apart = 12
+    muzzle = (4.6, 3.4)
 
     def ears(self, p, at):
         lean = 3 if at.droop else 0
         if at.lying:
             for side in (-1, 1):                            # laid flat out to the sides
-                p.ellipse(at.hx + side * 14, at.hy - 6, 8, 3.2, "b")
-                p.ellipse(at.hx + side * 14.5, at.hy - 6, 5.5, 1.4, "p")
+                p.ellipse(at.hx + side * 17, at.hy - 7, 8, 3.2, "b")
+                p.ellipse(at.hx + side * 17.5, at.hy - 7, 5.5, 1.4, "p")
             return
         for side in (-1, 1):
-            x = at.hx + side * (5 + lean)
-            p.ellipse(x, at.hy - 18 + lean, 3.8, 11, "b")
-            p.ellipse(x, at.hy - 17 + lean, 1.7, 8, "p")
+            x = at.hx + side * (6 + lean)
+            p.ellipse(x, at.hy - 21 + lean, 4.2, 11, "b")
+            p.ellipse(x, at.hy - 20 + lean, 1.9, 8, "p")
 
     def tail(self, p, at):
         if at.lying:
             p.ellipse(at.rx + self.rump[0] + 4, at.ry - 2, 4, 4, "W")
         else:
-            p.ellipse(at.rx + 9, at.ry - self.rump[1] + 6, 4.4, 4.4, "W")   # a puff at the far end of its back
+            p.ellipse(at.rx + 11, at.ry - self.rump[1] + 7, 4.2, 4.2, "W")   # a puff at the far end of its back
 
 
 class Lop(Bunny):
@@ -354,20 +356,21 @@ class Lop(Bunny):
         # Ears hang down either side of the face, over the cheeks.
         down = 2 if at.droop else 0
         for side in (-1, 1):
-            rimmed(p, at.hx + side * 12, at.hy + 3 + down, 4.2, 10.5, "b")
-            p.ellipse(at.hx + side * 12.5, at.hy + 5 + down, 1.6, 7, "p")
-        p.ellipse(at.hx, at.hy - 10, 7, 3, "b")           # the crown between them
+            rimmed(p, at.hx + side * 16, at.hy + 3 + down, 4.6, 11, "b")
+            p.ellipse(at.hx + side * 16.5, at.hy + 5 + down, 1.8, 7.5, "p")
+        p.ellipse(at.hx, at.hy - 13, 8, 3, "b")           # the crown between them
 
 
 class Chick(Animal):
     """A bird stands on two legs: a round body with its head on top, wings at its sides."""
-    head = (11, 10)
-    head_at = (32, 25)
-    chest = (15, 13)
-    chest_at = (32, 45)
+    head = (14, 13)
+    head_at = (32, 28)
+    chest = (13, 11)
+    chest_at = (32, 48)
     muzzle = None
     bib = False
-    eye_apart = 5
+    eye_apart = 6
+    eye_y = 1
 
     def back_layer(self, at):
         p = Painter(N, N)
@@ -415,15 +418,15 @@ class Chick(Animal):
 
 
 class Raccoon(Animal):
-    head = (15, 12)
-    rump = (13, 14)
-    muzzle = (6, 4.4)
+    head = (18.5, 15)
+    rump = (11, 9)
+    muzzle = (5.5, 3.8)
 
     def ears(self, p, at):
         drop = 2 if at.droop else 0
         for side in (-1, 1):
-            p.ellipse(at.hx + side * 10, at.hy - 10 + drop, 4.6, 5, "b")
-            p.ellipse(at.hx + side * 10, at.hy - 9.5 + drop, 2.2, 2.6, "j")
+            p.ellipse(at.hx + side * 12, at.hy - 12 + drop, 5.2, 5.6, "b")
+            p.ellipse(at.hx + side * 12, at.hy - 11.5 + drop, 2.6, 3, "j")
 
     def tail(self, p, at):
         path = rump_tail(p, at, self, [(3, -3), (7, -6), (11, -7)], 4)
@@ -431,13 +434,13 @@ class Raccoon(Animal):
             p.ellipse(x, y, 4.4, 1.5, "j", only="b")
 
     def markings(self, p, at):
-        hx, hy = at.hx, at.hy
-        p.ellipse(hx, hy - 6, 3, 4, "w", only="bld")       # pale stripe up the forehead
+        hx, ey = at.hx, at.hy + self.eye_y
+        p.ellipse(hx, ey - 9, 3, 4, "w", only="bld")       # pale stripe up the forehead
         for side in (-1, 1):
             x = hx + side * self.eye_apart
-            p.ellipse(x, hy - 5.5, 4, 1.4, "w", only="bld")   # pale brows
+            p.ellipse(x, ey - 7, 4.6, 1.5, "w", only="bld")   # pale brows
             # The mask: a patch round each eye running down and out to the cheek, apart over the nose.
-            p.poly([(x - side * 3, hy - 3), (x + side * 4, hy - 3), (x + side * 6, hy + 3), (x + side * 3, hy + 5), (x - side * 3, hy + 2)], "j", only="bldw")
+            p.poly([(x - side * 3.5, ey - 4.5), (x + side * 5, ey - 4.5), (x + side * 7, ey + 3), (x + side * 3, ey + 6), (x - side * 3.5, ey + 3)], "j", only="bldw")
 
     def eye(self, p, x, y, kind, left):
         super().eye(p, x, y, kind, left)
@@ -446,54 +449,54 @@ class Raccoon(Animal):
 
 
 class Ferret(Animal):
-    head = (13, 11)
-    head_at = (32, 43)
-    rump = (10, 17)           # a long body, stretching well away behind the head
-    rump_at = (32, 22)
-    chest = (8, 5)
-    leg_w = 5
-    legs_apart = 5
-    hind_apart = 8
-    muzzle = (6.5, 4.6)
+    head = (17, 14)
+    head_at = (32, 39)
+    rump = (11, 10)           # a longer body, stretching further away behind the head
+    rump_at = (32, 20)
+    chest = (7, 4)
+    leg_w = 6
+    legs_apart = 6
+    hind_apart = 11
+    muzzle = (5.5, 3.8)
     bib = False
 
     def ears(self, p, at):
         for side in (-1, 1):
-            p.ellipse(at.hx + side * 10, at.hy - 8, 3.4, 3.4, "b")
-            p.ellipse(at.hx + side * 10, at.hy - 8, 1.6, 1.6, "p")
+            p.ellipse(at.hx + side * 12.5, at.hy - 10, 4, 4, "b")
+            p.ellipse(at.hx + side * 12.5, at.hy - 10, 2, 2, "p")
 
     def tail(self, p, at):
         rump_tail(p, at, self, [(3, -2), (7, -4), (11, -4), (14, -2)], 2.4)
 
     def markings(self, p, at):
-        hx, hy = at.hx, at.hy
-        p.ellipse(hx, hy + 4, 10, 6.5, "w", only="bld")    # pale face
-        p.ellipse(hx, hy - 7, 6, 2.4, "w", only="bld")     # and a pale blaze above the eyes
+        hx, ey = at.hx, at.hy + self.eye_y
+        p.ellipse(hx, ey + 4, 12, 7.5, "w", only="bld")    # pale face
+        p.ellipse(hx, ey - 9, 7, 2.6, "w", only="bld")     # and a pale blaze above the eyes
         for side in (-1, 1):                                # a soft patch at each eye
-            p.ellipse(hx + side * self.eye_apart, hy + 0.5, 3.8, 3, "j", only="bldw")
+            p.ellipse(hx + side * self.eye_apart, ey + 0.5, 4.6, 3.8, "j", only="bldw")
         if not at.lying:
             p.ellipse(at.cx, at.cy, 5, 4, "w", only="bld")
 
 
 class Possum(Animal):
-    muzzle = (7, 5)
+    muzzle = (6, 4.2)
     bib = False
 
     def ears(self, p, at):
         drop = 2 if at.droop else 0
         for side in (-1, 1):
-            p.ellipse(at.hx + side * 11, at.hy - 9 + drop, 5.4, 5.8, "K")
-            p.ellipse(at.hx + side * 11, at.hy - 8.5 + drop, 3, 3.4, "p")
+            p.ellipse(at.hx + side * 13.5, at.hy - 11 + drop, 6, 6.4, "K")
+            p.ellipse(at.hx + side * 13.5, at.hy - 10.5 + drop, 3.4, 3.8, "p")
 
     def tail(self, p, at):
         rump_tail(p, at, self, [(3, -5), (8, -8), (12, -7), (13, -4), (10, -2)], 1.5, letter="t")
 
     def markings(self, p, at):
-        hx, hy = at.hx, at.hy
-        p.ellipse(hx, hy + 1, 12, 10.5, "w", only="bld")   # white face
-        p.poly([(hx - 3, hy - 12), (hx + 3, hy - 12), (hx, hy - 3)], "d", only="w")   # the grey line down the forehead
+        hx, hy, ey = at.hx, at.hy, at.hy + self.eye_y
+        p.ellipse(hx, hy + 2, 15.5, 13, "w", only="bld")   # white face
+        p.poly([(hx - 3.5, hy - 15), (hx + 3.5, hy - 15), (hx, hy - 4)], "d", only="w")   # the grey line down the forehead
         for side in (-1, 1):                                # grey round the eyes
-            p.ellipse(hx + side * self.eye_apart, hy, 3.6, 3.8, "r", only="bldw")
+            p.ellipse(hx + side * self.eye_apart, ey, 4.4, 4.8, "r", only="bldw")
 
     def mouth_shape(self, p, mx, my, kind):
         super().mouth_shape(p, mx, my, kind)
@@ -502,18 +505,18 @@ class Possum(Animal):
 
 class Stitched(Bunny):
     """A creepy-cute plush bunny: a button eye and an X-stitched one, a stitched mouth, a bandaged ear,
-    a patch on its back, a heart on its chest and stuffing out of a seam."""
+    a patch and a heart sewn on its back and stuffing out of a seam."""
 
     def eye(self, p, x, y, kind, left):
         if left:   # a button: doesn't blink
-            p.ellipse(x, y, 3.6, 3.6, "u")
-            p.ellipse(x, y, 2.6, 2.6, "U")
+            p.ellipse(x, y, 4.3, 4.3, "u")
+            p.ellipse(x, y, 3.2, 3.2, "U")
             for dx, dy in ((-1, -1), (1, -1), (-1, 1), (1, 1)):
                 p.rect(x + dx - 0.5, y + dy - 0.5, 1, 1, "v")
-            p.rect(x - 3, y - 3, 1, 1, "h")
+            p.rect(x - 3, y - 3, 1.5, 1.5, "h")
         else:      # sewn shut
-            p.line(x - 2.5, y - 2.5, x + 2.5, y + 2.5, "x", 1.4)
-            p.line(x + 2.5, y - 2.5, x - 2.5, y + 2.5, "x", 1.4)
+            p.line(x - 3, y - 3, x + 3, y + 3, "x", 1.5)
+            p.line(x + 3, y - 3, x - 3, y + 3, "x", 1.5)
 
     def mouth_shape(self, p, mx, my, kind):
         if kind in ("open", "eat", "eat2"):
@@ -530,12 +533,12 @@ class Stitched(Bunny):
         for i in range(0, 6, 2):
             p._set(px + i, py, "x")
             p._set(px + i, py + 4, "x")
+        if not at.lying:
+            p.blit(at.rx + 2, at.ry - 5, ["rr.rr", "rHrrR", ".rrR.", "..R.."])   # and a heart sewn on beside it
 
     def markings(self, p, at):
-        if not at.lying:
-            p.blit(at.cx - 2, at.cy - 4, ["rr.rr", "rHrrR", ".rrR.", "..R.."])   # a heart on its chest
         # Stuffing out of a seam on top of its head.
-        sx, sy = at.hx + 8, at.hy - 9
+        sx, sy = at.hx + 10, at.hy - 12
         p.ellipse(sx, sy, 2.6, 2.2, "W")
         p.ellipse(sx + 1.5, sy - 1.5, 1.8, 1.8, "W")
 
@@ -544,8 +547,8 @@ class Stitched(Bunny):
             return
         # The left ear bandaged, a loose end hanging.
         lean = 3 if at.droop else 0
-        x = at.hx - 5 - lean
-        y = at.hy - 22 + lean
+        x = at.hx - 6 - lean
+        y = at.hy - 25 + lean
         p.rect(x - 4, y, 9, 4, "B")
         p.rect(x - 4, y + 2, 9, 1, "C")
         p.rect(x - 6, y + 2, 2, 5, "B")

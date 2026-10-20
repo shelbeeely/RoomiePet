@@ -52,6 +52,12 @@ export function doorAt(axis, line, along) {
  * other side.
  */
 export function wallsOf(room) {
+  if (!wallCache.has(room)) wallCache.set(room, Object.freeze(findWalls(room).map(Object.freeze)));
+  return wallCache.get(room);
+}
+const wallCache = new Map();
+
+function findWalls(room) {
   const b = bounds(room);
   const runs = [];
   const add = (side, line, along, outer) => {

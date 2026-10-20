@@ -344,6 +344,21 @@ export function pieceBox(item) {
   };
 }
 
+/**
+ * Where a wall piece goes in the drawing order: in the wall itself, not
+ * sticking out of it. A window's sill reaches into the room, so ordered by
+ * its own box it tied with a dresser against the same wall and was drawn
+ * over it; in the wall, everything standing in the room is in front of it.
+ */
+export function wallPieceBox(item) {
+  const b = pieceBox(item);
+  const { side, line } = item;
+  if (side === "n") return { ...b, y0: line - 0.2, y1: line };
+  if (side === "s") return { ...b, y0: line, y1: line + 0.2 };
+  if (side === "w") return { ...b, x0: line - 0.2, x1: line };
+  return { ...b, x0: line, x1: line + 0.2 };
+}
+
 /** A wall as a box beside its line, outside the room it bounds, a little longer to close the corners. */
 export function wallBox(wall, height) {
   const { side, line, from, to } = wall;
