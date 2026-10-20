@@ -260,86 +260,6 @@
     "h": 64
    }
   },
-  "cat/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "cat/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "cat/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "cat/backwalk_1": {
-   "frame": {
-    "x": 1024,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
   "cat@ginger/idle_0": {
    "frame": {
     "x": 0,
@@ -583,86 +503,6 @@
   "cat@ginger/poorly": {
    "frame": {
     "x": 768,
-    "y": 64,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "cat@ginger/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 64,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "cat@ginger/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 64,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "cat@ginger/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 64,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "cat@ginger/backwalk_1": {
-   "frame": {
-    "x": 1024,
     "y": 64,
     "w": 64,
     "h": 64
@@ -940,86 +780,6 @@
     "h": 64
    }
   },
-  "cat@charcoal/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 128,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "cat@charcoal/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 128,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "cat@charcoal/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 128,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "cat@charcoal/backwalk_1": {
-   "frame": {
-    "x": 1024,
-    "y": 128,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
   "cat@mint/idle_0": {
    "frame": {
     "x": 0,
@@ -1263,86 +1023,6 @@
   "cat@mint/poorly": {
    "frame": {
     "x": 768,
-    "y": 192,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "cat@mint/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 192,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "cat@mint/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 192,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "cat@mint/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 192,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "cat@mint/backwalk_1": {
-   "frame": {
-    "x": 1024,
     "y": 192,
     "w": 64,
     "h": 64
@@ -1620,86 +1300,6 @@
     "h": 64
    }
   },
-  "bunny/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 256,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "bunny/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 256,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "bunny/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 256,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "bunny/backwalk_1": {
-   "frame": {
-    "x": 1024,
-    "y": 256,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
   "bunny@cocoa/idle_0": {
    "frame": {
     "x": 0,
@@ -1943,86 +1543,6 @@
   "bunny@cocoa/poorly": {
    "frame": {
     "x": 768,
-    "y": 320,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "bunny@cocoa/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 320,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "bunny@cocoa/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 320,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "bunny@cocoa/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 320,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "bunny@cocoa/backwalk_1": {
-   "frame": {
-    "x": 1024,
     "y": 320,
     "w": 64,
     "h": 64
@@ -2300,86 +1820,6 @@
     "h": 64
    }
   },
-  "bunny@pebble/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 384,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "bunny@pebble/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 384,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "bunny@pebble/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 384,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "bunny@pebble/backwalk_1": {
-   "frame": {
-    "x": 1024,
-    "y": 384,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
   "bunny@blush/idle_0": {
    "frame": {
     "x": 0,
@@ -2623,86 +2063,6 @@
   "bunny@blush/poorly": {
    "frame": {
     "x": 768,
-    "y": 448,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "bunny@blush/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 448,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "bunny@blush/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 448,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "bunny@blush/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 448,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "bunny@blush/backwalk_1": {
-   "frame": {
-    "x": 1024,
     "y": 448,
     "w": 64,
     "h": 64
@@ -2980,86 +2340,6 @@
     "h": 64
    }
   },
-  "chick/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 512,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "chick/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 512,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "chick/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 512,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "chick/backwalk_1": {
-   "frame": {
-    "x": 1024,
-    "y": 512,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
   "chick@sky/idle_0": {
    "frame": {
     "x": 0,
@@ -3303,86 +2583,6 @@
   "chick@sky/poorly": {
    "frame": {
     "x": 768,
-    "y": 576,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "chick@sky/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 576,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "chick@sky/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 576,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "chick@sky/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 576,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "chick@sky/backwalk_1": {
-   "frame": {
-    "x": 1024,
     "y": 576,
     "w": 64,
     "h": 64
@@ -3660,86 +2860,6 @@
     "h": 64
    }
   },
-  "chick@rose/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 640,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "chick@rose/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 640,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "chick@rose/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 640,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "chick@rose/backwalk_1": {
-   "frame": {
-    "x": 1024,
-    "y": 640,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
   "chick@sprout/idle_0": {
    "frame": {
     "x": 0,
@@ -3983,86 +3103,6 @@
   "chick@sprout/poorly": {
    "frame": {
     "x": 768,
-    "y": 704,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "chick@sprout/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 704,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "chick@sprout/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 704,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "chick@sprout/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 704,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "chick@sprout/backwalk_1": {
-   "frame": {
-    "x": 1024,
     "y": 704,
     "w": 64,
     "h": 64
@@ -4340,86 +3380,6 @@
     "h": 64
    }
   },
-  "lop/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 768,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "lop/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 768,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "lop/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 768,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "lop/backwalk_1": {
-   "frame": {
-    "x": 1024,
-    "y": 768,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
   "lop@snow/idle_0": {
    "frame": {
     "x": 0,
@@ -4663,86 +3623,6 @@
   "lop@snow/poorly": {
    "frame": {
     "x": 768,
-    "y": 832,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "lop@snow/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 832,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "lop@snow/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 832,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "lop@snow/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 832,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "lop@snow/backwalk_1": {
-   "frame": {
-    "x": 1024,
     "y": 832,
     "w": 64,
     "h": 64
@@ -5020,86 +3900,6 @@
     "h": 64
    }
   },
-  "lop@smoke/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 896,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "lop@smoke/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 896,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "lop@smoke/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 896,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "lop@smoke/backwalk_1": {
-   "frame": {
-    "x": 1024,
-    "y": 896,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
   "lop@choc/idle_0": {
    "frame": {
     "x": 0,
@@ -5343,86 +4143,6 @@
   "lop@choc/poorly": {
    "frame": {
     "x": 768,
-    "y": 960,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "lop@choc/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 960,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "lop@choc/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 960,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "lop@choc/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 960,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "lop@choc/backwalk_1": {
-   "frame": {
-    "x": 1024,
     "y": 960,
     "w": 64,
     "h": 64
@@ -5700,86 +4420,6 @@
     "h": 64
    }
   },
-  "raccoon/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 1024,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "raccoon/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 1024,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "raccoon/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 1024,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "raccoon/backwalk_1": {
-   "frame": {
-    "x": 1024,
-    "y": 1024,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
   "raccoon@cinnamon/idle_0": {
    "frame": {
     "x": 0,
@@ -6023,86 +4663,6 @@
   "raccoon@cinnamon/poorly": {
    "frame": {
     "x": 768,
-    "y": 1088,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "raccoon@cinnamon/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 1088,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "raccoon@cinnamon/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 1088,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "raccoon@cinnamon/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 1088,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "raccoon@cinnamon/backwalk_1": {
-   "frame": {
-    "x": 1024,
     "y": 1088,
     "w": 64,
     "h": 64
@@ -6380,86 +4940,6 @@
     "h": 64
    }
   },
-  "raccoon@silver/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 1152,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "raccoon@silver/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 1152,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "raccoon@silver/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 1152,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "raccoon@silver/backwalk_1": {
-   "frame": {
-    "x": 1024,
-    "y": 1152,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
   "raccoon@midnight/idle_0": {
    "frame": {
     "x": 0,
@@ -6703,86 +5183,6 @@
   "raccoon@midnight/poorly": {
    "frame": {
     "x": 768,
-    "y": 1216,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "raccoon@midnight/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 1216,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "raccoon@midnight/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 1216,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "raccoon@midnight/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 1216,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "raccoon@midnight/backwalk_1": {
-   "frame": {
-    "x": 1024,
     "y": 1216,
     "w": 64,
     "h": 64
@@ -7060,86 +5460,6 @@
     "h": 64
    }
   },
-  "ferret/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 1280,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "ferret/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 1280,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "ferret/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 1280,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "ferret/backwalk_1": {
-   "frame": {
-    "x": 1024,
-    "y": 1280,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
   "ferret@albino/idle_0": {
    "frame": {
     "x": 0,
@@ -7383,86 +5703,6 @@
   "ferret@albino/poorly": {
    "frame": {
     "x": 768,
-    "y": 1344,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "ferret@albino/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 1344,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "ferret@albino/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 1344,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "ferret@albino/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 1344,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "ferret@albino/backwalk_1": {
-   "frame": {
-    "x": 1024,
     "y": 1344,
     "w": 64,
     "h": 64
@@ -7740,86 +5980,6 @@
     "h": 64
    }
   },
-  "ferret@cinnamon/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 1408,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "ferret@cinnamon/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 1408,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "ferret@cinnamon/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 1408,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "ferret@cinnamon/backwalk_1": {
-   "frame": {
-    "x": 1024,
-    "y": 1408,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
   "ferret@silver/idle_0": {
    "frame": {
     "x": 0,
@@ -8063,86 +6223,6 @@
   "ferret@silver/poorly": {
    "frame": {
     "x": 768,
-    "y": 1472,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "ferret@silver/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 1472,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "ferret@silver/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 1472,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "ferret@silver/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 1472,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "ferret@silver/backwalk_1": {
-   "frame": {
-    "x": 1024,
     "y": 1472,
     "w": 64,
     "h": 64
@@ -8420,86 +6500,6 @@
     "h": 64
    }
   },
-  "possum/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 1536,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "possum/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 1536,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "possum/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 1536,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "possum/backwalk_1": {
-   "frame": {
-    "x": 1024,
-    "y": 1536,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
   "possum@smoky/idle_0": {
    "frame": {
     "x": 0,
@@ -8743,86 +6743,6 @@
   "possum@smoky/poorly": {
    "frame": {
     "x": 768,
-    "y": 1600,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "possum@smoky/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 1600,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "possum@smoky/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 1600,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "possum@smoky/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 1600,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "possum@smoky/backwalk_1": {
-   "frame": {
-    "x": 1024,
     "y": 1600,
     "w": 64,
     "h": 64
@@ -9100,86 +7020,6 @@
     "h": 64
    }
   },
-  "possum@cream/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 1664,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "possum@cream/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 1664,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "possum@cream/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 1664,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "possum@cream/backwalk_1": {
-   "frame": {
-    "x": 1024,
-    "y": 1664,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
   "possum@blossom/idle_0": {
    "frame": {
     "x": 0,
@@ -9423,86 +7263,6 @@
   "possum@blossom/poorly": {
    "frame": {
     "x": 768,
-    "y": 1728,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "possum@blossom/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 1728,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "possum@blossom/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 1728,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "possum@blossom/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 1728,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "possum@blossom/backwalk_1": {
-   "frame": {
-    "x": 1024,
     "y": 1728,
     "w": 64,
     "h": 64
@@ -9780,86 +7540,6 @@
     "h": 64
    }
   },
-  "stitched/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 1792,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "stitched/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 1792,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "stitched/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 1792,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "stitched/backwalk_1": {
-   "frame": {
-    "x": 1024,
-    "y": 1792,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
   "stitched@mint/idle_0": {
    "frame": {
     "x": 0,
@@ -10103,86 +7783,6 @@
   "stitched@mint/poorly": {
    "frame": {
     "x": 768,
-    "y": 1856,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "stitched@mint/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 1856,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "stitched@mint/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 1856,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "stitched@mint/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 1856,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "stitched@mint/backwalk_1": {
-   "frame": {
-    "x": 1024,
     "y": 1856,
     "w": 64,
     "h": 64
@@ -10460,86 +8060,6 @@
     "h": 64
    }
   },
-  "stitched@bubblegum/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 1920,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "stitched@bubblegum/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 1920,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "stitched@bubblegum/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 1920,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "stitched@bubblegum/backwalk_1": {
-   "frame": {
-    "x": 1024,
-    "y": 1920,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
   "stitched@bone/idle_0": {
    "frame": {
     "x": 0,
@@ -10800,86 +8320,6 @@
     "h": 64
    }
   },
-  "stitched@bone/back_0": {
-   "frame": {
-    "x": 832,
-    "y": 1984,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "stitched@bone/back_1": {
-   "frame": {
-    "x": 896,
-    "y": 1984,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "stitched@bone/backwalk_0": {
-   "frame": {
-    "x": 960,
-    "y": 1984,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
-  "stitched@bone/backwalk_1": {
-   "frame": {
-    "x": 1024,
-    "y": 1984,
-    "w": 64,
-    "h": 64
-   },
-   "rotated": false,
-   "trimmed": false,
-   "spriteSourceSize": {
-    "x": 0,
-    "y": 0,
-    "w": 64,
-    "h": 64
-   },
-   "sourceSize": {
-    "w": 64,
-    "h": 64
-   }
-  },
   "egg/egg_0": {
    "frame": {
     "x": 0,
@@ -11012,14 +8452,6 @@
    "cat/poorly",
    "cat/sad"
   ],
-  "cat/idle_back": [
-   "cat/back_0",
-   "cat/back_1"
-  ],
-  "cat/walk_back": [
-   "cat/backwalk_0",
-   "cat/backwalk_1"
-  ],
   "cat@ginger/idle": [
    "cat@ginger/idle_0",
    "cat@ginger/idle_1",
@@ -11049,14 +8481,6 @@
   "cat@ginger/poorly": [
    "cat@ginger/poorly",
    "cat@ginger/sad"
-  ],
-  "cat@ginger/idle_back": [
-   "cat@ginger/back_0",
-   "cat@ginger/back_1"
-  ],
-  "cat@ginger/walk_back": [
-   "cat@ginger/backwalk_0",
-   "cat@ginger/backwalk_1"
   ],
   "cat@charcoal/idle": [
    "cat@charcoal/idle_0",
@@ -11088,14 +8512,6 @@
    "cat@charcoal/poorly",
    "cat@charcoal/sad"
   ],
-  "cat@charcoal/idle_back": [
-   "cat@charcoal/back_0",
-   "cat@charcoal/back_1"
-  ],
-  "cat@charcoal/walk_back": [
-   "cat@charcoal/backwalk_0",
-   "cat@charcoal/backwalk_1"
-  ],
   "cat@mint/idle": [
    "cat@mint/idle_0",
    "cat@mint/idle_1",
@@ -11125,14 +8541,6 @@
   "cat@mint/poorly": [
    "cat@mint/poorly",
    "cat@mint/sad"
-  ],
-  "cat@mint/idle_back": [
-   "cat@mint/back_0",
-   "cat@mint/back_1"
-  ],
-  "cat@mint/walk_back": [
-   "cat@mint/backwalk_0",
-   "cat@mint/backwalk_1"
   ],
   "bunny/idle": [
    "bunny/idle_0",
@@ -11164,14 +8572,6 @@
    "bunny/poorly",
    "bunny/sad"
   ],
-  "bunny/idle_back": [
-   "bunny/back_0",
-   "bunny/back_1"
-  ],
-  "bunny/walk_back": [
-   "bunny/backwalk_0",
-   "bunny/backwalk_1"
-  ],
   "bunny@cocoa/idle": [
    "bunny@cocoa/idle_0",
    "bunny@cocoa/idle_1",
@@ -11201,14 +8601,6 @@
   "bunny@cocoa/poorly": [
    "bunny@cocoa/poorly",
    "bunny@cocoa/sad"
-  ],
-  "bunny@cocoa/idle_back": [
-   "bunny@cocoa/back_0",
-   "bunny@cocoa/back_1"
-  ],
-  "bunny@cocoa/walk_back": [
-   "bunny@cocoa/backwalk_0",
-   "bunny@cocoa/backwalk_1"
   ],
   "bunny@pebble/idle": [
    "bunny@pebble/idle_0",
@@ -11240,14 +8632,6 @@
    "bunny@pebble/poorly",
    "bunny@pebble/sad"
   ],
-  "bunny@pebble/idle_back": [
-   "bunny@pebble/back_0",
-   "bunny@pebble/back_1"
-  ],
-  "bunny@pebble/walk_back": [
-   "bunny@pebble/backwalk_0",
-   "bunny@pebble/backwalk_1"
-  ],
   "bunny@blush/idle": [
    "bunny@blush/idle_0",
    "bunny@blush/idle_1",
@@ -11277,14 +8661,6 @@
   "bunny@blush/poorly": [
    "bunny@blush/poorly",
    "bunny@blush/sad"
-  ],
-  "bunny@blush/idle_back": [
-   "bunny@blush/back_0",
-   "bunny@blush/back_1"
-  ],
-  "bunny@blush/walk_back": [
-   "bunny@blush/backwalk_0",
-   "bunny@blush/backwalk_1"
   ],
   "chick/idle": [
    "chick/idle_0",
@@ -11316,14 +8692,6 @@
    "chick/poorly",
    "chick/sad"
   ],
-  "chick/idle_back": [
-   "chick/back_0",
-   "chick/back_1"
-  ],
-  "chick/walk_back": [
-   "chick/backwalk_0",
-   "chick/backwalk_1"
-  ],
   "chick@sky/idle": [
    "chick@sky/idle_0",
    "chick@sky/idle_1",
@@ -11353,14 +8721,6 @@
   "chick@sky/poorly": [
    "chick@sky/poorly",
    "chick@sky/sad"
-  ],
-  "chick@sky/idle_back": [
-   "chick@sky/back_0",
-   "chick@sky/back_1"
-  ],
-  "chick@sky/walk_back": [
-   "chick@sky/backwalk_0",
-   "chick@sky/backwalk_1"
   ],
   "chick@rose/idle": [
    "chick@rose/idle_0",
@@ -11392,14 +8752,6 @@
    "chick@rose/poorly",
    "chick@rose/sad"
   ],
-  "chick@rose/idle_back": [
-   "chick@rose/back_0",
-   "chick@rose/back_1"
-  ],
-  "chick@rose/walk_back": [
-   "chick@rose/backwalk_0",
-   "chick@rose/backwalk_1"
-  ],
   "chick@sprout/idle": [
    "chick@sprout/idle_0",
    "chick@sprout/idle_1",
@@ -11429,14 +8781,6 @@
   "chick@sprout/poorly": [
    "chick@sprout/poorly",
    "chick@sprout/sad"
-  ],
-  "chick@sprout/idle_back": [
-   "chick@sprout/back_0",
-   "chick@sprout/back_1"
-  ],
-  "chick@sprout/walk_back": [
-   "chick@sprout/backwalk_0",
-   "chick@sprout/backwalk_1"
   ],
   "lop/idle": [
    "lop/idle_0",
@@ -11468,14 +8812,6 @@
    "lop/poorly",
    "lop/sad"
   ],
-  "lop/idle_back": [
-   "lop/back_0",
-   "lop/back_1"
-  ],
-  "lop/walk_back": [
-   "lop/backwalk_0",
-   "lop/backwalk_1"
-  ],
   "lop@snow/idle": [
    "lop@snow/idle_0",
    "lop@snow/idle_1",
@@ -11505,14 +8841,6 @@
   "lop@snow/poorly": [
    "lop@snow/poorly",
    "lop@snow/sad"
-  ],
-  "lop@snow/idle_back": [
-   "lop@snow/back_0",
-   "lop@snow/back_1"
-  ],
-  "lop@snow/walk_back": [
-   "lop@snow/backwalk_0",
-   "lop@snow/backwalk_1"
   ],
   "lop@smoke/idle": [
    "lop@smoke/idle_0",
@@ -11544,14 +8872,6 @@
    "lop@smoke/poorly",
    "lop@smoke/sad"
   ],
-  "lop@smoke/idle_back": [
-   "lop@smoke/back_0",
-   "lop@smoke/back_1"
-  ],
-  "lop@smoke/walk_back": [
-   "lop@smoke/backwalk_0",
-   "lop@smoke/backwalk_1"
-  ],
   "lop@choc/idle": [
    "lop@choc/idle_0",
    "lop@choc/idle_1",
@@ -11581,14 +8901,6 @@
   "lop@choc/poorly": [
    "lop@choc/poorly",
    "lop@choc/sad"
-  ],
-  "lop@choc/idle_back": [
-   "lop@choc/back_0",
-   "lop@choc/back_1"
-  ],
-  "lop@choc/walk_back": [
-   "lop@choc/backwalk_0",
-   "lop@choc/backwalk_1"
   ],
   "raccoon/idle": [
    "raccoon/idle_0",
@@ -11620,14 +8932,6 @@
    "raccoon/poorly",
    "raccoon/sad"
   ],
-  "raccoon/idle_back": [
-   "raccoon/back_0",
-   "raccoon/back_1"
-  ],
-  "raccoon/walk_back": [
-   "raccoon/backwalk_0",
-   "raccoon/backwalk_1"
-  ],
   "raccoon@cinnamon/idle": [
    "raccoon@cinnamon/idle_0",
    "raccoon@cinnamon/idle_1",
@@ -11657,14 +8961,6 @@
   "raccoon@cinnamon/poorly": [
    "raccoon@cinnamon/poorly",
    "raccoon@cinnamon/sad"
-  ],
-  "raccoon@cinnamon/idle_back": [
-   "raccoon@cinnamon/back_0",
-   "raccoon@cinnamon/back_1"
-  ],
-  "raccoon@cinnamon/walk_back": [
-   "raccoon@cinnamon/backwalk_0",
-   "raccoon@cinnamon/backwalk_1"
   ],
   "raccoon@silver/idle": [
    "raccoon@silver/idle_0",
@@ -11696,14 +8992,6 @@
    "raccoon@silver/poorly",
    "raccoon@silver/sad"
   ],
-  "raccoon@silver/idle_back": [
-   "raccoon@silver/back_0",
-   "raccoon@silver/back_1"
-  ],
-  "raccoon@silver/walk_back": [
-   "raccoon@silver/backwalk_0",
-   "raccoon@silver/backwalk_1"
-  ],
   "raccoon@midnight/idle": [
    "raccoon@midnight/idle_0",
    "raccoon@midnight/idle_1",
@@ -11733,14 +9021,6 @@
   "raccoon@midnight/poorly": [
    "raccoon@midnight/poorly",
    "raccoon@midnight/sad"
-  ],
-  "raccoon@midnight/idle_back": [
-   "raccoon@midnight/back_0",
-   "raccoon@midnight/back_1"
-  ],
-  "raccoon@midnight/walk_back": [
-   "raccoon@midnight/backwalk_0",
-   "raccoon@midnight/backwalk_1"
   ],
   "ferret/idle": [
    "ferret/idle_0",
@@ -11772,14 +9052,6 @@
    "ferret/poorly",
    "ferret/sad"
   ],
-  "ferret/idle_back": [
-   "ferret/back_0",
-   "ferret/back_1"
-  ],
-  "ferret/walk_back": [
-   "ferret/backwalk_0",
-   "ferret/backwalk_1"
-  ],
   "ferret@albino/idle": [
    "ferret@albino/idle_0",
    "ferret@albino/idle_1",
@@ -11809,14 +9081,6 @@
   "ferret@albino/poorly": [
    "ferret@albino/poorly",
    "ferret@albino/sad"
-  ],
-  "ferret@albino/idle_back": [
-   "ferret@albino/back_0",
-   "ferret@albino/back_1"
-  ],
-  "ferret@albino/walk_back": [
-   "ferret@albino/backwalk_0",
-   "ferret@albino/backwalk_1"
   ],
   "ferret@cinnamon/idle": [
    "ferret@cinnamon/idle_0",
@@ -11848,14 +9112,6 @@
    "ferret@cinnamon/poorly",
    "ferret@cinnamon/sad"
   ],
-  "ferret@cinnamon/idle_back": [
-   "ferret@cinnamon/back_0",
-   "ferret@cinnamon/back_1"
-  ],
-  "ferret@cinnamon/walk_back": [
-   "ferret@cinnamon/backwalk_0",
-   "ferret@cinnamon/backwalk_1"
-  ],
   "ferret@silver/idle": [
    "ferret@silver/idle_0",
    "ferret@silver/idle_1",
@@ -11885,14 +9141,6 @@
   "ferret@silver/poorly": [
    "ferret@silver/poorly",
    "ferret@silver/sad"
-  ],
-  "ferret@silver/idle_back": [
-   "ferret@silver/back_0",
-   "ferret@silver/back_1"
-  ],
-  "ferret@silver/walk_back": [
-   "ferret@silver/backwalk_0",
-   "ferret@silver/backwalk_1"
   ],
   "possum/idle": [
    "possum/idle_0",
@@ -11924,14 +9172,6 @@
    "possum/poorly",
    "possum/sad"
   ],
-  "possum/idle_back": [
-   "possum/back_0",
-   "possum/back_1"
-  ],
-  "possum/walk_back": [
-   "possum/backwalk_0",
-   "possum/backwalk_1"
-  ],
   "possum@smoky/idle": [
    "possum@smoky/idle_0",
    "possum@smoky/idle_1",
@@ -11961,14 +9201,6 @@
   "possum@smoky/poorly": [
    "possum@smoky/poorly",
    "possum@smoky/sad"
-  ],
-  "possum@smoky/idle_back": [
-   "possum@smoky/back_0",
-   "possum@smoky/back_1"
-  ],
-  "possum@smoky/walk_back": [
-   "possum@smoky/backwalk_0",
-   "possum@smoky/backwalk_1"
   ],
   "possum@cream/idle": [
    "possum@cream/idle_0",
@@ -12000,14 +9232,6 @@
    "possum@cream/poorly",
    "possum@cream/sad"
   ],
-  "possum@cream/idle_back": [
-   "possum@cream/back_0",
-   "possum@cream/back_1"
-  ],
-  "possum@cream/walk_back": [
-   "possum@cream/backwalk_0",
-   "possum@cream/backwalk_1"
-  ],
   "possum@blossom/idle": [
    "possum@blossom/idle_0",
    "possum@blossom/idle_1",
@@ -12037,14 +9261,6 @@
   "possum@blossom/poorly": [
    "possum@blossom/poorly",
    "possum@blossom/sad"
-  ],
-  "possum@blossom/idle_back": [
-   "possum@blossom/back_0",
-   "possum@blossom/back_1"
-  ],
-  "possum@blossom/walk_back": [
-   "possum@blossom/backwalk_0",
-   "possum@blossom/backwalk_1"
   ],
   "stitched/idle": [
    "stitched/idle_0",
@@ -12076,14 +9292,6 @@
    "stitched/poorly",
    "stitched/sad"
   ],
-  "stitched/idle_back": [
-   "stitched/back_0",
-   "stitched/back_1"
-  ],
-  "stitched/walk_back": [
-   "stitched/backwalk_0",
-   "stitched/backwalk_1"
-  ],
   "stitched@mint/idle": [
    "stitched@mint/idle_0",
    "stitched@mint/idle_1",
@@ -12113,14 +9321,6 @@
   "stitched@mint/poorly": [
    "stitched@mint/poorly",
    "stitched@mint/sad"
-  ],
-  "stitched@mint/idle_back": [
-   "stitched@mint/back_0",
-   "stitched@mint/back_1"
-  ],
-  "stitched@mint/walk_back": [
-   "stitched@mint/backwalk_0",
-   "stitched@mint/backwalk_1"
   ],
   "stitched@bubblegum/idle": [
    "stitched@bubblegum/idle_0",
@@ -12152,14 +9352,6 @@
    "stitched@bubblegum/poorly",
    "stitched@bubblegum/sad"
   ],
-  "stitched@bubblegum/idle_back": [
-   "stitched@bubblegum/back_0",
-   "stitched@bubblegum/back_1"
-  ],
-  "stitched@bubblegum/walk_back": [
-   "stitched@bubblegum/backwalk_0",
-   "stitched@bubblegum/backwalk_1"
-  ],
   "stitched@bone/idle": [
    "stitched@bone/idle_0",
    "stitched@bone/idle_1",
@@ -12190,14 +9382,6 @@
    "stitched@bone/poorly",
    "stitched@bone/sad"
   ],
-  "stitched@bone/idle_back": [
-   "stitched@bone/back_0",
-   "stitched@bone/back_1"
-  ],
-  "stitched@bone/walk_back": [
-   "stitched@bone/backwalk_0",
-   "stitched@bone/backwalk_1"
-  ],
   "egg/wobble": [
    "egg/egg_0",
    "egg/egg_1",
@@ -12213,7 +9397,7 @@
   "format": "RGBA8888",
   "scale": 1,
   "size": {
-   "w": 1088,
+   "w": 832,
    "h": 2146
   },
   "fps": {
@@ -12224,8 +9408,6 @@
    "cat/sleep": 1.2,
    "cat/eat": 4,
    "cat/poorly": 1,
-   "cat/idle_back": 2,
-   "cat/walk_back": 6,
    "cat@ginger/idle": 3,
    "cat@ginger/walk": 6,
    "cat@ginger/happy": 4,
@@ -12233,8 +9415,6 @@
    "cat@ginger/sleep": 1.2,
    "cat@ginger/eat": 4,
    "cat@ginger/poorly": 1,
-   "cat@ginger/idle_back": 2,
-   "cat@ginger/walk_back": 6,
    "cat@charcoal/idle": 3,
    "cat@charcoal/walk": 6,
    "cat@charcoal/happy": 4,
@@ -12242,8 +9422,6 @@
    "cat@charcoal/sleep": 1.2,
    "cat@charcoal/eat": 4,
    "cat@charcoal/poorly": 1,
-   "cat@charcoal/idle_back": 2,
-   "cat@charcoal/walk_back": 6,
    "cat@mint/idle": 3,
    "cat@mint/walk": 6,
    "cat@mint/happy": 4,
@@ -12251,8 +9429,6 @@
    "cat@mint/sleep": 1.2,
    "cat@mint/eat": 4,
    "cat@mint/poorly": 1,
-   "cat@mint/idle_back": 2,
-   "cat@mint/walk_back": 6,
    "bunny/idle": 3,
    "bunny/walk": 6,
    "bunny/happy": 4,
@@ -12260,8 +9436,6 @@
    "bunny/sleep": 1.2,
    "bunny/eat": 4,
    "bunny/poorly": 1,
-   "bunny/idle_back": 2,
-   "bunny/walk_back": 6,
    "bunny@cocoa/idle": 3,
    "bunny@cocoa/walk": 6,
    "bunny@cocoa/happy": 4,
@@ -12269,8 +9443,6 @@
    "bunny@cocoa/sleep": 1.2,
    "bunny@cocoa/eat": 4,
    "bunny@cocoa/poorly": 1,
-   "bunny@cocoa/idle_back": 2,
-   "bunny@cocoa/walk_back": 6,
    "bunny@pebble/idle": 3,
    "bunny@pebble/walk": 6,
    "bunny@pebble/happy": 4,
@@ -12278,8 +9450,6 @@
    "bunny@pebble/sleep": 1.2,
    "bunny@pebble/eat": 4,
    "bunny@pebble/poorly": 1,
-   "bunny@pebble/idle_back": 2,
-   "bunny@pebble/walk_back": 6,
    "bunny@blush/idle": 3,
    "bunny@blush/walk": 6,
    "bunny@blush/happy": 4,
@@ -12287,8 +9457,6 @@
    "bunny@blush/sleep": 1.2,
    "bunny@blush/eat": 4,
    "bunny@blush/poorly": 1,
-   "bunny@blush/idle_back": 2,
-   "bunny@blush/walk_back": 6,
    "chick/idle": 3,
    "chick/walk": 6,
    "chick/happy": 4,
@@ -12296,8 +9464,6 @@
    "chick/sleep": 1.2,
    "chick/eat": 4,
    "chick/poorly": 1,
-   "chick/idle_back": 2,
-   "chick/walk_back": 6,
    "chick@sky/idle": 3,
    "chick@sky/walk": 6,
    "chick@sky/happy": 4,
@@ -12305,8 +9471,6 @@
    "chick@sky/sleep": 1.2,
    "chick@sky/eat": 4,
    "chick@sky/poorly": 1,
-   "chick@sky/idle_back": 2,
-   "chick@sky/walk_back": 6,
    "chick@rose/idle": 3,
    "chick@rose/walk": 6,
    "chick@rose/happy": 4,
@@ -12314,8 +9478,6 @@
    "chick@rose/sleep": 1.2,
    "chick@rose/eat": 4,
    "chick@rose/poorly": 1,
-   "chick@rose/idle_back": 2,
-   "chick@rose/walk_back": 6,
    "chick@sprout/idle": 3,
    "chick@sprout/walk": 6,
    "chick@sprout/happy": 4,
@@ -12323,8 +9485,6 @@
    "chick@sprout/sleep": 1.2,
    "chick@sprout/eat": 4,
    "chick@sprout/poorly": 1,
-   "chick@sprout/idle_back": 2,
-   "chick@sprout/walk_back": 6,
    "lop/idle": 3,
    "lop/walk": 6,
    "lop/happy": 4,
@@ -12332,8 +9492,6 @@
    "lop/sleep": 1.2,
    "lop/eat": 4,
    "lop/poorly": 1,
-   "lop/idle_back": 2,
-   "lop/walk_back": 6,
    "lop@snow/idle": 3,
    "lop@snow/walk": 6,
    "lop@snow/happy": 4,
@@ -12341,8 +9499,6 @@
    "lop@snow/sleep": 1.2,
    "lop@snow/eat": 4,
    "lop@snow/poorly": 1,
-   "lop@snow/idle_back": 2,
-   "lop@snow/walk_back": 6,
    "lop@smoke/idle": 3,
    "lop@smoke/walk": 6,
    "lop@smoke/happy": 4,
@@ -12350,8 +9506,6 @@
    "lop@smoke/sleep": 1.2,
    "lop@smoke/eat": 4,
    "lop@smoke/poorly": 1,
-   "lop@smoke/idle_back": 2,
-   "lop@smoke/walk_back": 6,
    "lop@choc/idle": 3,
    "lop@choc/walk": 6,
    "lop@choc/happy": 4,
@@ -12359,8 +9513,6 @@
    "lop@choc/sleep": 1.2,
    "lop@choc/eat": 4,
    "lop@choc/poorly": 1,
-   "lop@choc/idle_back": 2,
-   "lop@choc/walk_back": 6,
    "raccoon/idle": 3,
    "raccoon/walk": 6,
    "raccoon/happy": 4,
@@ -12368,8 +9520,6 @@
    "raccoon/sleep": 1.2,
    "raccoon/eat": 4,
    "raccoon/poorly": 1,
-   "raccoon/idle_back": 2,
-   "raccoon/walk_back": 6,
    "raccoon@cinnamon/idle": 3,
    "raccoon@cinnamon/walk": 6,
    "raccoon@cinnamon/happy": 4,
@@ -12377,8 +9527,6 @@
    "raccoon@cinnamon/sleep": 1.2,
    "raccoon@cinnamon/eat": 4,
    "raccoon@cinnamon/poorly": 1,
-   "raccoon@cinnamon/idle_back": 2,
-   "raccoon@cinnamon/walk_back": 6,
    "raccoon@silver/idle": 3,
    "raccoon@silver/walk": 6,
    "raccoon@silver/happy": 4,
@@ -12386,8 +9534,6 @@
    "raccoon@silver/sleep": 1.2,
    "raccoon@silver/eat": 4,
    "raccoon@silver/poorly": 1,
-   "raccoon@silver/idle_back": 2,
-   "raccoon@silver/walk_back": 6,
    "raccoon@midnight/idle": 3,
    "raccoon@midnight/walk": 6,
    "raccoon@midnight/happy": 4,
@@ -12395,8 +9541,6 @@
    "raccoon@midnight/sleep": 1.2,
    "raccoon@midnight/eat": 4,
    "raccoon@midnight/poorly": 1,
-   "raccoon@midnight/idle_back": 2,
-   "raccoon@midnight/walk_back": 6,
    "ferret/idle": 3,
    "ferret/walk": 6,
    "ferret/happy": 4,
@@ -12404,8 +9548,6 @@
    "ferret/sleep": 1.2,
    "ferret/eat": 4,
    "ferret/poorly": 1,
-   "ferret/idle_back": 2,
-   "ferret/walk_back": 6,
    "ferret@albino/idle": 3,
    "ferret@albino/walk": 6,
    "ferret@albino/happy": 4,
@@ -12413,8 +9555,6 @@
    "ferret@albino/sleep": 1.2,
    "ferret@albino/eat": 4,
    "ferret@albino/poorly": 1,
-   "ferret@albino/idle_back": 2,
-   "ferret@albino/walk_back": 6,
    "ferret@cinnamon/idle": 3,
    "ferret@cinnamon/walk": 6,
    "ferret@cinnamon/happy": 4,
@@ -12422,8 +9562,6 @@
    "ferret@cinnamon/sleep": 1.2,
    "ferret@cinnamon/eat": 4,
    "ferret@cinnamon/poorly": 1,
-   "ferret@cinnamon/idle_back": 2,
-   "ferret@cinnamon/walk_back": 6,
    "ferret@silver/idle": 3,
    "ferret@silver/walk": 6,
    "ferret@silver/happy": 4,
@@ -12431,8 +9569,6 @@
    "ferret@silver/sleep": 1.2,
    "ferret@silver/eat": 4,
    "ferret@silver/poorly": 1,
-   "ferret@silver/idle_back": 2,
-   "ferret@silver/walk_back": 6,
    "possum/idle": 3,
    "possum/walk": 6,
    "possum/happy": 4,
@@ -12440,8 +9576,6 @@
    "possum/sleep": 1.2,
    "possum/eat": 4,
    "possum/poorly": 1,
-   "possum/idle_back": 2,
-   "possum/walk_back": 6,
    "possum@smoky/idle": 3,
    "possum@smoky/walk": 6,
    "possum@smoky/happy": 4,
@@ -12449,8 +9583,6 @@
    "possum@smoky/sleep": 1.2,
    "possum@smoky/eat": 4,
    "possum@smoky/poorly": 1,
-   "possum@smoky/idle_back": 2,
-   "possum@smoky/walk_back": 6,
    "possum@cream/idle": 3,
    "possum@cream/walk": 6,
    "possum@cream/happy": 4,
@@ -12458,8 +9590,6 @@
    "possum@cream/sleep": 1.2,
    "possum@cream/eat": 4,
    "possum@cream/poorly": 1,
-   "possum@cream/idle_back": 2,
-   "possum@cream/walk_back": 6,
    "possum@blossom/idle": 3,
    "possum@blossom/walk": 6,
    "possum@blossom/happy": 4,
@@ -12467,8 +9597,6 @@
    "possum@blossom/sleep": 1.2,
    "possum@blossom/eat": 4,
    "possum@blossom/poorly": 1,
-   "possum@blossom/idle_back": 2,
-   "possum@blossom/walk_back": 6,
    "stitched/idle": 3,
    "stitched/walk": 6,
    "stitched/happy": 4,
@@ -12476,8 +9604,6 @@
    "stitched/sleep": 1.2,
    "stitched/eat": 4,
    "stitched/poorly": 1,
-   "stitched/idle_back": 2,
-   "stitched/walk_back": 6,
    "stitched@mint/idle": 3,
    "stitched@mint/walk": 6,
    "stitched@mint/happy": 4,
@@ -12485,8 +9611,6 @@
    "stitched@mint/sleep": 1.2,
    "stitched@mint/eat": 4,
    "stitched@mint/poorly": 1,
-   "stitched@mint/idle_back": 2,
-   "stitched@mint/walk_back": 6,
    "stitched@bubblegum/idle": 3,
    "stitched@bubblegum/walk": 6,
    "stitched@bubblegum/happy": 4,
@@ -12494,8 +9618,6 @@
    "stitched@bubblegum/sleep": 1.2,
    "stitched@bubblegum/eat": 4,
    "stitched@bubblegum/poorly": 1,
-   "stitched@bubblegum/idle_back": 2,
-   "stitched@bubblegum/walk_back": 6,
    "stitched@bone/idle": 3,
    "stitched@bone/walk": 6,
    "stitched@bone/happy": 4,
@@ -12503,8 +9625,6 @@
    "stitched@bone/sleep": 1.2,
    "stitched@bone/eat": 4,
    "stitched@bone/poorly": 1,
-   "stitched@bone/idle_back": 2,
-   "stitched@bone/walk_back": 6,
    "egg/wobble": 4
   }
  }

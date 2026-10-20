@@ -1,10 +1,9 @@
 """
 RoomiePet's pets, drawn from scratch as animals: a head, a body, four legs
 and a tail that grows from the rump, seen three-quarter from above like the
-apartment. Two views, mirrored for the other two directions:
-
-    front  facing us and to the left (the face shows) -- every mood
-    back   facing away and to the right (we see ears, back and tail) -- walking away
+apartment, always facing us: to the left as drawn, mirrored to go right.
+(A back view for walking away was tried and dropped -- they're nicer seen
+from the front.)
 
 64 x 64 frames, drawn with the pixel-art skill's Painter. Every species is
 the same build -- where the head, body, legs and tail go for each pose -- with
@@ -53,10 +52,6 @@ FRAMES = {
     "eat": ("front", "eat", "happy", "eat", None),
     "eat_1": ("front", "eat_2", "happy", "eat2", None),
     "poorly": ("front", "droop", "x", "wavy", "sad"),
-    "back_0": ("back", "stand", None, None, None),
-    "back_1": ("back", "breathe", None, None, None),
-    "backwalk_0": ("back", "walk_a", None, None, None),
-    "backwalk_1": ("back", "walk_b", None, None, None),
 }
 
 ANIMATIONS = {
@@ -67,8 +62,6 @@ ANIMATIONS = {
     "sleep": {"frames": ["sleep_0", "sleep_1"], "fps": 1.2},
     "eat": {"frames": ["eat", "eat_1"], "fps": 4},
     "poorly": {"frames": ["poorly", "sad"], "fps": 1},
-    "idle_back": {"frames": ["back_0", "back_1"], "fps": 2},
-    "walk_back": {"frames": ["backwalk_0", "backwalk_1"], "fps": 6},
 }
 
 
@@ -222,30 +215,10 @@ class Animal:
         p.outline("o")
         return p.rows()
 
-    def draw_back(self, pose):
-        """Walking away to the right: rump and tail nearest, head beyond with only the ears and back of it showing."""
-        P = POSES[pose]
-        p = Painter(N, N)
-        bx, by = 27, 46 + P["dy"]
-        hx, hy = 41, 29 + P["hdy"]
-        self.legs(p, P["legs"], True, bx + 2, by)
-        self.ears(p, hx, hy, "back", pose)
-        rx, ry = self.head
-        p.ellipse(hx, hy, rx, ry, "b")
-        p.ellipse(bx, by, self.body[0] + 1, self.body[1] + 1, "o", only=".ab")
-        p.ellipse(bx, by, *self.body, "b")
-        p.shade(body="b", dark="d", light="l", deep=2, glow=2)
-        self.legs(p, P["legs"], False, bx - 3, by)
-        self.markings(p, hx, hy, "back", pose)
-        self.tail(p, "back", bx, by, pose)
-        self.extra(p, hx, hy, bx, by, "back", pose)
-        p.outline("o")
-        return p.rows()
-
     def frames(self):
         out = {}
-        for name, (view, pose, eyes, mouth, brows) in FRAMES.items():
-            out[name] = self.draw_front(eyes, mouth, brows, pose) if view == "front" else self.draw_back(pose)
+        for name, (_view, pose, eyes, mouth, brows) in FRAMES.items():
+            out[name] = self.draw_front(eyes, mouth, brows, pose)
         return out
 
 
@@ -262,10 +235,6 @@ def tail_path(p, view, bx, by, rx, pts_front, radius, letter="a", tip=None):
     if view == "front":
         root = (bx + rx - 2, by - 3)
         pts = [(root[0] + dx, root[1] + dy) for dx, dy in pts_front]
-    elif view == "back":
-        root = (bx - rx + 3, by - 2)
-        pts = [(root[0] - dx * 0.9, root[1] + dy) for dx, dy in pts_front]   # towards us, to the left
-        letter = "b"
     else:                                                                   # lying: round the front
         root = (bx + rx + 1, by + 2)
         pts = [(root[0] + 2, root[1] + 3), (root[0] - 8, root[1] + 7), (root[0] - 20, root[1] + 7), (root[0] - 28, root[1] + 5)]
@@ -278,10 +247,6 @@ def tail_path(p, view, bx, by, rx, pts_front, radius, letter="a", tip=None):
 class Cat(Animal):
     def ears(self, p, hx, hy, view, pose):
         droop = 3 if pose in ("droop",) else 0
-        if view == "back":
-            for ex in (hx - 8, hx + 7):
-                p.poly([(ex - 6, hy - 4), (ex + 1, hy - 18 + droop), (ex + 6, hy - 6)], "b")
-            return
         for ex, far in ((hx - 6, False), (hx + 6, True)):
             pts = [(ex - 6, hy - 5), (ex - 2, hy - 19 + droop), (ex + 6, hy - 7)]
             p.poly(pts, "a" if far else "b")
@@ -298,10 +263,6 @@ class Bunny(Animal):
 
     def ears(self, p, hx, hy, view, pose):
         lean = 4 if pose == "droop" else 0
-        if view == "back":
-            for ex in (hx - 4, hx + 4):
-                p.ellipse(ex + lean, hy - 15 + lean, 3.6, 10, "b")
-            return
         if view == "lying":
             return
         p.ellipse(hx + 2 + lean, hy - 16 + lean, 3.4, 10, "a")
@@ -317,13 +278,11 @@ class Bunny(Animal):
     def tail(self, p, view, bx, by, pose):
         if view == "front":
             p.ellipse(bx + self.body[0], by - 3, 4, 4, "W")
-        elif view == "back":
-            p.ellipse(bx - self.body[0] + 3, by - 1, 5, 5, "W")
 
 
 class Lop(Bunny):
     def ears(self, p, hx, hy, view, pose):
-        if view in ("back", "lying"):
+        if view == "lying":
             return
         # Ears hang down beside the head: the far one behind, the near one in front of the cheek.
         p.ellipse(hx + 10, hy + 2, 3.8, 10, "a")
@@ -334,9 +293,6 @@ class Lop(Bunny):
             p.ellipse(hx - 11, hy + 3, 3.8, 9.8, "b")
             p.ellipse(hx - 11, hy + 4, 1.6, 7, "p")
             p.ellipse(hx - 1, hy - 10, 6, 2.5, "b")        # the crown between the ears
-        elif view == "back":
-            for ex in (hx - 10, hx + 10):
-                rimmed(p, ex, hy + 3, 4, 10, "a" if ex > hx else "b")
         else:
             rimmed(p, hx + 2, hy + 5, 4, 8, "b")
 
@@ -363,13 +319,11 @@ class Chick(Animal):
 
     def ears(self, p, hx, hy, view, pose):
         for x, y, r in ((hx - 2, hy - 9, 2.4), (hx + 1, hy - 11, 2.8), (hx + 4, hy - 9, 2.2)):
-            p.ellipse(x + (6 if view == "back" else 0), y, r, r + 1, "b")
+            p.ellipse(x, y, r, r + 1, "b")
 
     def tail(self, p, view, bx, by, pose):
         if view == "front":
             p.poly([(bx + 12, by - 4), (bx + 21, by - 13), (bx + 17, by - 1)], "a")
-        elif view == "back":
-            p.poly([(bx - 12, by - 4), (bx - 21, by - 13), (bx - 17, by - 1)], "b")
 
     def markings(self, p, hx, hy, view, pose):
         if view == "front":
@@ -392,8 +346,7 @@ class Raccoon(Animal):
     body = (16, 11)
 
     def ears(self, p, hx, hy, view, pose):
-        pts = ((hx - 8, hy - 9), (hx + 6, hy - 10)) if view != "back" else ((hx - 7, hy - 9), (hx + 7, hy - 9))
-        for i, (x, y) in enumerate(pts):
+        for i, (x, y) in enumerate(((hx - 8, hy - 9), (hx + 6, hy - 10))):
             p.ellipse(x, y, 4.2, 4.6, "a" if (i and view == "front") else "b")
             if view == "front" and not i:
                 p.ellipse(x, y + 0.5, 2, 2.4, "j")
@@ -402,16 +355,11 @@ class Raccoon(Animal):
         rel = [(4, -1), (9, -6), (11, -13), (10, -20)]
         tail_path(p, view, bx, by, self.body[0], rel, 4.2, letter="b")
         # Rings across the bushy tail.
-        if view in ("front", "back"):
-            sgn = 1 if view == "front" else -0.9
-            root_x = bx + self.body[0] - 2 if view == "front" else bx - self.body[0] + 3
-            root_y = by - 3 if view == "front" else by - 2
+        if view == "front":
             for dx, dy in ((7, -3), (10, -9), (11, -16)):
-                p.ellipse(root_x + dx * sgn, root_y + dy, 4.6, 1.6, "j", only="bad")
+                p.ellipse(bx + self.body[0] - 2 + dx, by - 3 + dy, 4.6, 1.6, "j", only="bad")
 
     def markings(self, p, hx, hy, view, pose):
-        if view == "back":
-            return
         fx = hx - 5
         p.ellipse(fx, hy + 6, 7, 4.6, "w", only="bld")                       # muzzle
         p.ellipse(fx - 4, hy - 4.5, 4, 1.4, "w", only="bld")                 # pale brows
@@ -446,8 +394,6 @@ class Ferret(Animal):
         tail_path(p, view, bx, by, self.body[0], [(5, 1), (11, 0), (16, -4), (18, -9)], 2.4)
 
     def markings(self, p, hx, hy, view, pose):
-        if view == "back":
-            return
         fx = hx - 5
         p.ellipse(fx - 1, hy + 4, 9, 5.5, "w", only="bld")                   # pale face
         p.ellipse(fx - 4, hy + 0.5, 3.6, 2.8, "j", only="bldw")              # the band: a soft patch at each eye
@@ -470,8 +416,6 @@ class Possum(Animal):
         tail_path(p, view, bx, by, self.body[0], [(4, 1), (10, 1), (14, -3), (14, -9), (10, -12)], 1.5, letter="t")
 
     def markings(self, p, hx, hy, view, pose):
-        if view == "back":
-            return
         p.ellipse(hx - 3, hy + 1, 11, 9.5, "w", only="bld")                  # white face
         p.ellipse(hx - 14, hy + 5, 5, 3.6, "w", only="bld")
         fx = hx - 5
@@ -507,11 +451,11 @@ class Stitched(Bunny):
             p.line(mx - 3 + i * 2, my + 2 + (i % 2) * (1 - 2 * drop), mx - 2 + i * 2, my + 2 + ((i + 1) % 2) * (1 - 2 * drop), "x", 1)
 
     def markings(self, p, hx, hy, view, pose):
-        bx, by = (self.body_at[0], self.body_at[1]) if view == "front" else (27, 46)
+        bx, by = self.body_at
         if pose in ("lie", "lie_2"):
             bx, by = 36, 51
         # A patch on its side, stitched round.
-        px, py = (bx + 3, by - 6) if view == "front" else (bx - 6, by - 6)
+        px, py = bx + 3, by - 6
         p.rect(px, py, 7, 6, "q", only="bld")
         for i in range(0, 7, 2):
             p._set(px + i, py, "x")
@@ -519,15 +463,15 @@ class Stitched(Bunny):
         if view == "front" and pose not in ("lie", "lie_2"):
             p.blit(bx - 14, by - 3, ["rr.rr", "rHrrR", ".rrR.", "..R.."])   # a heart on its chest
         # Stuffing out of a seam at the back of its head.
-        sx, sy = (hx + 9, hy - 6) if view == "front" else (hx - 7, hy - 2)
+        sx, sy = hx + 9, hy - 6
         p.ellipse(sx, sy, 3, 2.4, "W")
         p.ellipse(sx + 1, sy - 2, 2, 2, "W")
 
     def extra(self, p, hx, hy, bx, by, view, pose):
         super().extra(p, hx, hy, bx, by, view, pose)
-        if view in ("front", "back"):
+        if view == "front":
             # The near ear bandaged, a loose end hanging.
-            x = hx - 4 if view == "front" else hx - 4
+            x = hx - 4
             lean = 4 if pose == "droop" else 0
             y = hy - 18 + lean
             p.rect(x - 4 + lean, y, 9, 4, "B")

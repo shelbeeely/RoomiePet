@@ -31,7 +31,7 @@ function walkerFor(map, id, i) {
   let w = map.get(id);
   if (!w) {
     const start = { x: 13 + ((i * 3.1) % 6), y: 15 + ((i * 2.3) % 7) };
-    w = { ...start, z: 0, room: roomAt(start.x, start.y), path: [], mode: null, flip: false, away: false, rest: rand(0.5, 3) };
+    w = { ...start, z: 0, room: roomAt(start.x, start.y), path: [], mode: null, flip: false, rest: rand(0.5, 3) };
     map.set(id, w);
   }
   return w;
@@ -154,18 +154,14 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
           const speed = state === "sad" || state === "poorly" ? 1.8 : 3.4;
           if (dist < 0.08) {
             w.path.shift();
-            if (!w.path.length) w.away = false;   // arrived: turn round to us
           } else {
             const stepLen = Math.min(dist, speed * dt);
             const [ax, ay] = cam.project(w.x, w.y, 0);
             w.x += (dx / dist) * stepLen;
             w.y += (dy / dist) * stepLen;
             const [bx, by] = cam.project(w.x, w.y, 0);
-            // Facing: away when going up the screen; the sprites face left (front) and right (back).
-            if (Math.abs(bx - ax) > 0.02 || Math.abs(by - ay) > 0.02) {
-              w.away = by - ay < -0.02;
-              w.flip = w.away ? bx < ax : bx > ax;
-            }
+            // Pets always face us: drawn facing left, mirrored when they head right on the screen.
+            if (Math.abs(bx - ax) > 0.02) w.flip = bx > ax;
             walking = true;
           }
           w.room = roomAt(w.x, w.y) || w.room;
@@ -233,7 +229,7 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
         const { p, w, walking, effect } = u;
         const size = p.pet.stage === "baby" || p.pet.stage === "egg" ? 0.75 : 1;
         const key = p.pet.stage === "egg" ? "egg" : petKey(p.pet.species, p.pet.color);
-        const anim = animFor(p.cond, { walking, effect, away: w.away });
+        const anim = animFor(p.cond, { walking, effect });
         const [sx, sy] = cam.project(w.x, w.y, w.z);
         ctx.fillStyle = "rgba(40,25,20,.28)";
         ctx.beginPath();

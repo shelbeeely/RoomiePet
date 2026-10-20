@@ -1,11 +1,7 @@
 import { describe, expect, test } from "vitest";
-import { readFileSync } from "node:fs";
 import { CATALOG, DEFAULT_LAYOUTS, footprint, roomAt } from "@shared/home.js";
-import { SPECIES } from "@shared/pet.js";
 import { allLayouts, bedSpot, bedroomOf, bowlSpot, destination, findPath, free, gridOf, sleepSpots, wanderSpot } from "./house.js";
-import { petKey } from "./sprites.js";
 
-const atlas = JSON.parse(readFileSync(new URL("../public/sprites/sheet.json", import.meta.url)));
 const layouts = allLayouts({});
 const grid = gridOf(layouts);
 const solid = (room) => layouts[room].items.filter((i) => CATALOG[i.kind].layer === "solid").map(footprint);
@@ -81,12 +77,4 @@ describe("where pets go", () => {
     expect(destination(layouts, grid, cond("ok"), "clean", 0).room).toBe("bath");
     expect(destination(layouts, grid, cond("egg"), null, 0)).toBe(null);
   });
-});
-
-test("every pet has its back view, for walking away", () => {
-  for (const [species, s] of Object.entries(SPECIES)) {
-    for (const color of s.colors) {
-      for (const anim of ["idle_back", "walk_back"]) expect(atlas.animations[`${petKey(species, color)}/${anim}`], `${species} ${color} ${anim}`).toBeTruthy();
-    }
-  }
 });
