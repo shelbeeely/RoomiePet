@@ -14,7 +14,14 @@ export const ROOMS = {
   // The bedrooms are 13 ft wide (11 felt small), Bedroom 2 turned a quarter to 13 x 12 so its
   // beds and closet run along the front wall; the kitchen end of the main area is 8 ft.
   bedA: { label: "Bedroom 1", areas: [{ x0: 0, x1: 13, y0: 0, y1: 13 }] },
-  bedB: { label: "Bedroom 2", areas: [{ x0: 0, x1: 13, y0: 13, y1: 25 }] },
+  // Bedroom 2's closet is part of its walls: the room steps round it, walls along both its
+  // sides and across its front, where its two full-size doors are (facing into the room).
+  // It fills the front wall between the beds and stands 2 ft 6 into the room.
+  bedB: {
+    label: "Bedroom 2",
+    areas: [{ x0: 0, x1: 13, y0: 13, y1: 22.5 }, { x0: 0, x1: 3.25, y0: 22.5, y1: 25 }, { x0: 9.75, x1: 13, y0: 22.5, y1: 25 }],
+    builtins: [{ kind: "closet", x0: 3.25, x1: 9.75, y0: 22.5, y1: 25, doors: "n", clear: 3 }],
+  },
   main: { label: "Kitchen & living room", areas: [{ x0: 13, x1: 21, y0: 0, y1: 25 }, { x0: 21, x1: 30, y0: 9, y1: 25 }] },
   bath: { label: "Bathroom & laundry", areas: [{ x0: 21, x1: 30, y0: 0, y1: 9 }] },
 };
@@ -61,41 +68,70 @@ export function wallsOf(room) {
 const wallCache = new Map();
 
 function findWalls(room) {
+  // Walked a quarter foot at a time: a room's outline can step round a built-in closet at
+  // 3.25 ft. Edges with nothing beyond are outer -- unless what is beyond is a built-in,
+  // which is the room's own wall, not outdoors.
   const b = bounds(room);
   const runs = [];
-  const add = (side, line, along, outer) => {
+  const add = (side, line, along, outer, builtin, inside = false) => {
     const last = runs[runs.length - 1];
-    if (last && last.side === side && last.line === line && last.to === along && last.outer === outer) last.to = along + 1;
-    else runs.push({ side, line, from: along, to: along + 1, outer });
+    if (last && last.side === side && last.line === line && Math.abs(last.to - along) < EPS && last.outer === outer
+      && (last.builtin || null) === builtin && !!last.inside === inside) last.to = along + GRID;
+    else runs.push({ side, line, from: along, to: along + GRID, outer, ...(builtin ? { builtin } : {}), ...(inside ? { inside } : {}) });
   };
-  const sides = [
-    ["n", 0, -1, "y"], ["s", 0, 1, "y"], ["w", -1, 0, "x"], ["e", 1, 0, "x"],
-  ];
+  const nx = Math.round((b.x1 - b.x0) / GRID);
+  const ny = Math.round((b.y1 - b.y0) / GRID);
+  const at = (k, origin) => origin + k * GRID;
+  const sides = [["n", 0, -1, "y"], ["s", 0, 1, "y"], ["w", -1, 0, "x"], ["e", 1, 0, "x"]];
   for (const [side, dx, dy, axis] of sides) {
     // Walk the lines in order so each run is contiguous.
-    if (axis === "y") {
-      for (let y = b.y0; y < b.y1; y++) {
-        for (let x = b.x0; x < b.x1; x++) {
-          if (roomAt(x + 0.5, y + 0.5) !== room) continue;
-          const other = roomAt(x + 0.5 + dx, y + 0.5 + dy);
-          const line = dy < 0 ? y : y + 1;
-          if (other === room || doorAt("y", line, x + 0.5)) continue;
-          add(side, line, x, other === null);
-        }
+    const outerN = axis === "y" ? ny : nx;
+    const innerN = axis === "y" ? nx : ny;
+    for (let p = 0; p < outerN; p++) {
+      for (let q = 0; q < innerN; q++) {
+        const x = axis === "y" ? at(q, b.x0) : at(p, b.x0);
+        const y = axis === "y" ? at(p, b.y0) : at(q, b.y0);
+        const cx = x + GRID / 2;
+        const cy = y + GRID / 2;
+        if (roomAt(cx, cy) !== room) continue;
+        const ox = cx + dx * GRID;
+        const oy = cy + dy * GRID;
+        const other = roomAt(ox, oy);
+        const line = axis === "y" ? (dy < 0 ? y : y + GRID) : (dx < 0 ? x : x + GRID);
+        const along = axis === "y" ? x : y;
+        if (other === room || doorAt(axis, line, along + GRID / 2)) continue;
+        const inBuiltin = builtinAt(ox, oy);
+        add(side, line, along, other === null && !inBuiltin, inBuiltin ? inBuiltin.kind : null);
       }
-    } else {
-      for (let x = b.x0; x < b.x1; x++) {
-        for (let y = b.y0; y < b.y1; y++) {
-          if (roomAt(x + 0.5, y + 0.5) !== room) continue;
-          const other = roomAt(x + 0.5 + dx, y + 0.5 + dy);
-          const line = dx < 0 ? x : x + 1;
-          if (other === room || doorAt("x", line, y + 0.5)) continue;
-          add(side, line, y, other === null);
+    }
+  }
+  // A built-in's own outside walls (the back of Bedroom 2's closet is the flat's outside wall).
+  for (const bi of ROOMS[room].builtins || []) {
+    for (const [side, dx, dy, axis] of sides) {
+      const outerN = Math.round((axis === "y" ? bi.y1 - bi.y0 : bi.x1 - bi.x0) / GRID);
+      const innerN = Math.round((axis === "y" ? bi.x1 - bi.x0 : bi.y1 - bi.y0) / GRID);
+      for (let p = 0; p < outerN; p++) {
+        for (let q = 0; q < innerN; q++) {
+          const x = axis === "y" ? at(q, bi.x0) : at(p, bi.x0);
+          const y = axis === "y" ? at(p, bi.y0) : at(q, bi.y0);
+          const ox = x + GRID / 2 + dx * GRID;
+          const oy = y + GRID / 2 + dy * GRID;
+          if (builtinAt(ox, oy) || roomAt(ox, oy)) continue;
+          const line = axis === "y" ? (dy < 0 ? y : y + GRID) : (dx < 0 ? x : x + GRID);
+          add(side, line, axis === "y" ? x : y, true, bi.kind, true);
         }
       }
     }
   }
   return runs;
+}
+
+/** A built-in (Bedroom 2's closet) at a point, if any: part of a room's walls, not its floor. */
+export function builtinAt(x, y) {
+  for (const r of Object.values(ROOMS)) {
+    for (const bi of r.builtins || []) if (x >= bi.x0 && x < bi.x1 && y >= bi.y0 && y < bi.y1) return bi;
+  }
+  return null;
 }
 
 // -- the catalog -------------------------------------------------------------------------
@@ -492,7 +528,7 @@ function insideRoom(room, f) {
 /** Whether a wall piece's span along its wall is all wall of this room (no door, no corner). */
 function onWall(room, item) {
   const c = CATALOG[item.kind];
-  const walls = wallsOf(room).filter((w) => w.side === item.side && w.line === item.line && (!c.outer || w.outer));
+  const walls = wallsOf(room).filter((w) => !w.inside && w.side === item.side && w.line === item.line && (!c.outer || w.outer));
   for (let a = item.at + GRID / 2; a < item.at + c.w; a += GRID) {
     if (!walls.some((w) => a >= w.from && a <= w.to)) return false;
   }
@@ -516,7 +552,7 @@ export function layoutProblem(room, layout) {
     if (!c || !Object.hasOwn(CATALOG, item.kind)) return "Something in the room isn't in the catalog";
     if (!c.colors.includes(item.color)) return `${c.label} doesn't come in that colour`;
     if (c.layer === "wall") {
-      if (!["n", "e", "s", "w"].includes(item.side) || !onGrid(item.at) || !Number.isInteger(item.line)) return `${c.label} must hang on a wall`;
+      if (!["n", "e", "s", "w"].includes(item.side) || !onGrid(item.at) || !onGrid(item.line)) return `${c.label} must hang on a wall`;
       if (!onWall(room, item)) return c.outer ? `${c.label} must go on an outside wall` : `${c.label} must hang on one of the room's walls`;
       const span = { side: item.side, line: item.line, from: item.at, to: item.at + c.w };
       if (placed.some((p) => p.span && p.span.side === span.side && p.span.line === span.line && p.span.from < span.to - EPS && span.from < p.span.to - EPS)) {
@@ -536,6 +572,14 @@ export function layoutProblem(room, layout) {
     }
     if (c.layer === "solid" && doorways(room).some((d) => overlaps(f, d))) return `${c.label} blocks a doorway`;
     placed.push({ f, c });
+  }
+  // A built-in's doors (Bedroom 2's closet) need room to open too.
+  for (const bi of ROOMS[room].builtins || []) {
+    const d = bi.clear;
+    const front = { n: { x0: bi.x0, x1: bi.x1, y0: bi.y0 - d, y1: bi.y0 }, s: { x0: bi.x0, x1: bi.x1, y0: bi.y1, y1: bi.y1 + d },
+      w: { x0: bi.x0 - d, x1: bi.x0, y0: bi.y0, y1: bi.y1 }, e: { x0: bi.x1, x1: bi.x1 + d, y0: bi.y0, y1: bi.y1 } }[bi.doors];
+    const blocker = placed.find((p) => p.f && p.c.layer === "solid" && overlaps(p.f, front));
+    if (blocker) return `The ${blocker.c.label.toLowerCase()} is in front of the ${bi.kind}`;
   }
   // A built-in closet's doors need room to open: nothing solid on the floor in front of them.
   for (const item of layout.items) {
@@ -574,15 +618,14 @@ export const DEFAULT_LAYOUTS = {
   },
   bedB: {
     // A white basement bedroom: two twin beds with their headboards against the front wall, one
-    // in each corner, a small high window above each, and the built-in closet standing out from
-    // the wall between them, filling the space (a tight fit, flush with both); the desk, dresser
+    // in each corner, a small high window above each, and the closet (part of the walls, see
+    // ROOMS) between them, a tight fit flush with both; the desk, dresser
     // and pet bed along the back, the doorway on the right kept clear.
     wall: "white", floor: "oak",
     items: [
       W("basement_window", "white", "s", 25, 0.5), W("basement_window", "white", "s", 25, 10.25),
       W("picture", "blue", "w", 0, 14), W("clock", "white", "w", 0, 20),
       F("small_rug", "sage", 5, 18, 3), F("bed", "blue", 0, 18.5, 2), F("bed", "pink", 9.75, 18.5, 2),
-      F("closet", "white", 3.25, 22.5, 2),
       F("desk", "white", 0, 13, 3), F("chair", "white", 1.75, 14, 1), F("dresser", "white", 4, 13),
       F("pet_bed", "pink", 7.5, 13), F("plant", "white", 11.75, 13, 3),
     ],

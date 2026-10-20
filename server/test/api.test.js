@@ -250,7 +250,7 @@ test("a room arranged in the builder is kept for the household, checked as the a
     items: [
       { kind: "bed", color: "pink", x: 0.5, y: 13, rot: 0, extra: "dropped" },
       { kind: "pet_bed", color: "sun", x: 6, y: 14, rot: 1 },
-      { kind: "window", color: "oak", side: "s", line: 25, at: 2 },
+      { kind: "window", color: "oak", side: "s", line: 25, at: 10 },
     ],
   };
   const r = await call("PUT", "/api/rooms/bedB", { layout }, ana);

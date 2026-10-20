@@ -9,7 +9,7 @@
 //
 // Everything is in scene pixels, 16 to the foot; the canvas scales them up.
 import {
-  CATALOG, COLORWAYS, DOORS, FLAT, FLOORS, MATERIALS, ROOMS, WALLPAPERS, boxesOf, bounds, wallsOf,
+  CATALOG, COLORWAYS, DOORS, FLAT, FLOORS, MATERIALS, ROOMS, WALLPAPERS, boxesOf, bounds, roomAt, wallsOf,
 } from "@shared/home.js";
 
 export const PX = 16;
@@ -406,6 +406,69 @@ export function wallSprite(wall, height, paper, cam, nextPaper = null) {
   });
 }
 
+/**
+ * A built-in closet (Bedroom 2's), seen as the room's walls show it: thin walls round it (the
+ * room's own, drawn with the rest), its doors in the front one, and from above, through the
+ * cutaway, the inside -- a rail of hanging clothes. Drawn as a solid block of wall it read as
+ * a dark slab from the side.
+ */
+const CLOTHES = ["#7fa8d8", "#e7a1b6", "#f0c75e", "#55506a", "#a8c99a", "#efeae2", "#ee8f6f", "#c3b3e0"];
+
+export function closetInside(bi) {
+  const along = bi.doors === "n" || bi.doors === "s";
+  const len = along ? bi.x1 - bi.x0 : bi.y1 - bi.y0;
+  const depth = along ? bi.y1 - bi.y0 : bi.x1 - bi.x0;
+  const mid = depth / 2;
+  const boxes = [];
+  const put = (u0, u1, v0, v1, z0, z1, color) => {
+    const [x0, x1, y0, y1] = along ? [bi.x0 + u0, bi.x0 + u1, bi.y0 + v0, bi.y0 + v1] : [bi.x0 + v0, bi.x0 + v1, bi.y0 + u0, bi.y0 + u1];
+    boxes.push({ x0, x1, y0, y1, z0, z1, color });
+  };
+  put(0.1, len - 0.1, mid - 0.05, mid + 0.05, 5.4, 5.5, "#b8c0cc");                  // the rail
+  let u = 0.3;
+  for (let k = 0; u + 0.3 < len - 0.2; k++) {
+    const w = 0.28 + ((k * 7) % 3) * 0.06;
+    put(u, u + w, mid - 0.8, mid + 0.8, 2.2 + ((k * 5) % 3) * 0.4, 5.3, CLOTHES[k % CLOTHES.length]);
+    u += w + 0.12;
+  }
+  return boxes;
+}
+
+export function closetDoors(bi) {
+  const along = bi.doors === "n" || bi.doors === "s";
+  const a0 = along ? bi.x0 : bi.y0;
+  const len = along ? bi.x1 - bi.x0 : bi.y1 - bi.y0;
+  const face = { n: bi.y0, s: bi.y1, w: bi.x0, e: bi.x1 }[bi.doors];
+  const out = bi.doors === "n" || bi.doors === "w" ? -1 : 1;
+  const leaf = (len - 0.3) / 2;
+  const boxes = [];
+  const part = (u, w, z, h, depth, color) => {
+    const [p0, p1] = [face, face + out * depth].sort((m, n) => m - n);
+    boxes.push(along
+      ? { x0: a0 + u, x1: a0 + u + w, y0: p0, y1: p1, z0: z, z1: z + h, color }
+      : { x0: p0, x1: p1, y0: a0 + u, y1: a0 + u + w, z0: z, z1: z + h, color });
+  };
+  for (const u of [0.1, 0.2 + leaf]) {
+    part(u, leaf, 0, 6.67, 0.05, "#f4f2ed");
+    part(u + 0.3, leaf - 0.6, 3.7, 2.6, 0.06, "#e6e3dc");
+    part(u + 0.3, leaf - 0.6, 0.5, 2.8, 0.06, "#e6e3dc");
+  }
+  part(len / 2 - 0.25, 0.12, 3, 0.5, 0.1, MATERIALS.gold);
+  part(len / 2 + 0.13, 0.12, 3, 0.5, 0.1, MATERIALS.gold);
+  return boxes;
+}
+
+/** Boxes (with a colour each) drawn as one sprite, cut off at `top`. */
+export function boxesSprite(key, boxes, top, cam) {
+  return cached(`${cam.key}|${key}|${top}`, () => {
+    const cut = boxes.filter((b) => b.z0 < top).map((b) => ({ ...b, z1: Math.min(b.z1, top) }));
+    const r = new Raster(...screenBounds(cut.length ? cut : [{ x0: 0, x1: 0, y0: 0, y1: 0, z0: 0, z1: 0 }], cam));
+    drawBoxes(r, cut, cam, (b) => rgb(b.color));
+    if (cut.length) r.outline();
+    return r.toCanvas();
+  });
+}
+
 /** The floors (and the rugs on them) of some rooms, with the thresholds of their doors: drawn first, once. */
 export function floorSprite(rooms, layouts, cam) {
   const key = `${cam.key}|floor|${rooms.join()}|${JSON.stringify(rooms.map((r) => [layouts[r].floor, layouts[r].items.filter((i) => CATALOG[i.kind].layer === "rug")]))}`;
@@ -415,7 +478,7 @@ export function floorSprite(rooms, layouts, cam) {
     const r = new Raster(...screenBounds(corners, cam));
     for (const room of rooms) {
       const floor = layouts[room].floor;
-      for (const a of ROOMS[room].areas) {
+      for (const a of [...ROOMS[room].areas, ...(ROOMS[room].builtins || [])]) {
         const P = cam.project;
         r.face(P(a.x0, a.y0, 0), P(a.x1, a.y0, 0), P(a.x0, a.y1, 0), (u, v) => floorColor(floor, a.x0 + u * (a.x1 - a.x0), a.y0 + v * (a.y1 - a.y0)));
       }

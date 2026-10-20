@@ -1,10 +1,11 @@
 import { describe, expect, test } from "vitest";
 import {
   CATALOG, DEFAULT_LAYOUTS, DOORS, FLAT, FLOORS, GRID, MATERIALS, MAX_ITEMS, ROOMS, WALLPAPERS,
-  cleanLayout, footprint, freeSpot, layoutProblem, place, roomAt, turned, wallsOf,
+  bounds, cleanLayout, footprint, freeSpot, layoutProblem, place, roomAt, turned, wallsOf,
 } from "./home.js";
 
-const area = (id) => ROOMS[id].areas.reduce((s, a) => s + (a.x1 - a.x0) * (a.y1 - a.y0), 0);
+const rect = (a) => (a.x1 - a.x0) * (a.y1 - a.y0);
+const area = (id) => ROOMS[id].areas.reduce((s, a) => s + rect(a), 0) + (ROOMS[id].builtins || []).reduce((s, b) => s + rect(b), 0);
 const bedB = DEFAULT_LAYOUTS.bedB;
 const withItems = (items, base = bedB) => ({ ...base, items });
 
@@ -25,10 +26,10 @@ describe("the flat", () => {
 
   test("walls go round each room, with gaps where the doors are", () => {
     const walls = wallsOf("bedB");
-    const east = walls.filter((w) => w.side === "e");
+    const east = walls.filter((w) => w.side === "e" && !w.builtin);
     expect(east.map((w) => [w.from, w.to, w.line])).toEqual([[13, 15, 13], [18, 25, 13]]);
     expect(walls.find((w) => w.side === "n").outer).toBe(false);   // bedroom 1 is behind it
-    expect(walls.find((w) => w.side === "s").outer).toBe(true);
+    expect(walls.filter((w) => w.side === "s" && w.line === 25).every((w) => w.outer)).toBe(true);
   });
 });
 
@@ -117,7 +118,7 @@ describe("room to live in", () => {
     const l = DEFAULT_LAYOUTS.bedB;
     expect(layoutProblem("bedB", l)).toBe(null);
     expect(l.wall).toBe("white");
-    const room = ROOMS.bedB.areas[0];
+    const room = bounds("bedB");
     expect([room.x1 - room.x0, room.y1 - room.y0]).toEqual([13, 12]);     // turned a quarter: wide, not deep
     const beds = l.items.filter((i) => i.kind === "bed");
     expect(beds.length).toBe(2);
@@ -136,16 +137,24 @@ describe("room to live in", () => {
       expect(w.at >= bed.x0 && w.at + CATALOG.basement_window.w <= bed.x1).toBe(true);
     }
     expect(Math.min(...CATALOG.basement_window.boxes.map((b) => b[2]))).toBeGreaterThan(2.8);   // above the headboards
-    // The closet is built in on the front wall between the beds, standing out into the room,
-    // filling the space flush with both, its two full-size doors facing in, kept clear.
-    const closet = l.items.find((i) => i.kind === "closet");
-    const c = footprint(closet);
+    // The closet is part of the room's walls on the front wall between the beds: the room steps
+    // round it, walls along both its sides and across its front, where its two full-size doors
+    // face in. It fills the space flush with both beds, and nothing can stand in it or in front.
+    const c = ROOMS.bedB.builtins.find((bi) => bi.kind === "closet");
     expect(c.y1).toBe(25);
     expect(c.x0).toBe(left.x1);
     expect(c.x1).toBe(right.x0);
     expect(c.y1 - c.y0).toBeGreaterThanOrEqual(2);                    // a closet's depth, out into the room
-    expect(place(closet, CATALOG.closet.w / 2, CATALOG.closet.d)[1]).toBe(c.y0);   // doors facing in
-    expect(CATALOG.closet.w / 2).toBeGreaterThanOrEqual(3);           // two full-size doors
+    expect(c.doors).toBe("n");
+    expect((c.x1 - c.x0 - 0.3) / 2).toBeGreaterThanOrEqual(3);        // two full-size doors
+    const around = wallsOf("bedB").filter((w) => w.builtin === "closet" && !w.inside).map((w) => [w.side, w.line, w.from, w.to]);
+    expect(around.sort()).toEqual([["e", c.x0, c.y0, c.y1], ["s", c.y0, c.x0, c.x1], ["w", c.x1, c.y0, c.y1]].sort());
+    expect(wallsOf("bedB").some((w) => w.builtin && !w.inside && w.outer)).toBe(false);   // its walls aren't outside walls
+    // Its back is the flat's outside wall, and nothing hangs inside it.
+    expect(wallsOf("bedB").filter((w) => w.inside).map((w) => [w.side, w.line, w.from, w.to, w.outer])).toEqual([["s", 25, c.x0, c.x1, true]]);
+    expect(layoutProblem("bedB", { ...l, items: [...l.items, { kind: "picture", color: "sun", side: "s", line: 25, at: 5 }] })).toMatch(/walls/);
+    expect(roomAt(6, 24)).toBe(null);                                  // inside it is no floor
+    expect(layoutProblem("bedB", { ...l, items: [...l.items, { kind: "plant", color: "teal", x: 5, y: 23, rot: 0 }] })).toMatch(/doesn't fit/);
     expect(layoutProblem("bedB", { ...l, items: [...l.items, { kind: "beanbag", color: "teal", x: 5, y: 20, rot: 0 }] })).toMatch(/in front of the closet/);
     // The door is still on the right wall, into the living room.
     const door = DOORS.find((d) => d.rooms.includes("bedB"));

@@ -10,7 +10,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CATALOG, ROOMS, footprint, layoutProblem, snap, wallsOf } from "@shared/home.js";
 import { animFor, draw, frameAt, petKey } from "./sprites.js";
-import { PX, dollCamera, floorSprite, order, pieceBox, pieceSprite, wallBox, wallPieceBox, wallSprite } from "./dollhouse.js";
+import { PX, boxesSprite, closetDoors, closetInside, dollCamera, floorSprite, order, pieceBox, pieceSprite, wallBox, wallPieceBox, wallSprite } from "./dollhouse.js";
 import { allLayouts, bedroomOf, destination, findPath, gridOf, roomAt } from "./house.js";
 import RoomBuilder from "./RoomBuilder.jsx";
 
@@ -66,7 +66,8 @@ function stillScene(layouts, cam) {
   for (const room of rooms) {
     for (const wall of wallsOf(room)) {
       const h = cam.wallHeight(wall);
-      const next = wall.outer ? null : beyond(wall);
+      // A closet's walls are the room's own on both faces; others show the next room beyond.
+      const next = wall.builtin ? (wall.inside ? null : room) : wall.outer ? null : beyond(wall);
       const sprite = wallSprite(wall, h, layouts[room].wall, cam, next && layouts[next].wall);
       // One room alone: its back and side walls are behind everything in it.
       const back = cam.room && !(h < 1);
@@ -82,6 +83,20 @@ function stillScene(layouts, cam) {
           wallHits.unshift({ room, item: it, sprite: sp });
         } else units.push({ kind: "piece", room, item: it, box: wallPieceBox(it), sprite: sp });
       }
+    }
+  }
+  // Built-in closets (Bedroom 2's): the walls round them are the room's, above; inside, the
+  // clothes on their rail, seen through the cutaway; and the doors in the front wall, cut
+  // where that wall is cut.
+  for (const room of rooms) {
+    for (const bi of ROOMS[room].builtins || []) {
+      const front = wallsOf(room).find((w) => w.builtin && w.side === { n: "s", s: "n", w: "e", e: "w" }[bi.doors]);
+      const h = cam.wallHeight(front);
+      const inside = closetInside(bi);
+      units.push({ kind: "wall", box: { x0: bi.x0 + 0.1, x1: bi.x1 - 0.1, y0: bi.y0 + 0.1, y1: bi.y1 - 0.1, z0: 0, z1: 4 }, sprite: boxesSprite(`closet-in|${JSON.stringify(bi)}`, inside, cam.room ? 4 : 1, cam) });
+      const doors = closetDoors(bi);
+      const box = { x0: Math.min(...doors.map((d) => d.x0)), x1: Math.max(...doors.map((d) => d.x1)), y0: Math.min(...doors.map((d) => d.y0)), y1: Math.max(...doors.map((d) => d.y1)), z0: 0, z1: h };
+      units.push({ kind: "wall", box, sprite: boxesSprite(`closet-doors|${JSON.stringify(bi)}`, doors, h, cam) });
     }
   }
   for (const room of rooms) {
