@@ -8,7 +8,7 @@
 // after a cleaning one, mostly about the living room otherwise. Where they
 // walk is decided here, on each phone; how they are comes from the server.
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CATALOG, ROOMS, footprint, layoutProblem, snap, wallSpotNear, wallsOf } from "@shared/home.js";
+import { CATALOG, ROOMS, footprint, layoutProblem, postBox, snap, wallSpotNear, wallsOf } from "@shared/home.js";
 import { animFor, draw, frameAt, petKey } from "./sprites.js";
 import { PX, boxesSprite, closetDoors, closetInside, dollCamera, floorSprite, order, pieceBox, pieceSprite, wallBox, wallPieceBox, wallSprite } from "./dollhouse.js";
 import { allLayouts, bedroomOf, destination, findPath, gridOf, roomAt } from "./house.js";
@@ -111,6 +111,15 @@ function stillScene(layouts, cam, open) {
       const sprite = boxesSprite(`closet-doors|${JSON.stringify(bi)}|${isOpen}`, doors, h, cam);
       units.push({ kind: "wall", box, sprite });
       closets.push({ id, sprite });
+    }
+  }
+  // The posts holding the beam up across the living room, white, cut where the walls are.
+  for (const room of rooms) {
+    for (const p of ROOMS[room].posts || []) {
+      const f = postBox(p);
+      const top = cam.room ? 4 : 1;
+      const box = { ...f, z0: 0, z1: top };
+      units.push({ kind: "wall", box, sprite: boxesSprite(`post|${p.x},${p.y}`, [{ ...box, color: "#f1efea" }, { ...f, x0: f.x0 - 0.05, x1: f.x1 + 0.05, y0: f.y0 - 0.05, y1: f.y1 + 0.05, z0: 0, z1: 0.3, color: "#dedad2" }], top, cam) });
     }
   }
   for (const room of rooms) {

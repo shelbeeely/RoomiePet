@@ -126,15 +126,15 @@ npm run art        # -> client/public/sprites/sheet.png + sheet.json, art/previe
 ```
 
 The apartment is a model, not a picture: `shared/home.js` has its rooms in
-feet (about 750 sq ft -- the two bedrooms on the left, each opening onto the
-main area, kitchen along its back wall and living room in front, and the
-bathroom with the laundry in the back right corner), its walls and doors, a
-catalog of furniture made of boxes, and how each room comes furnished.
-`client/src/dollhouse.js` draws it as pixel art, as a dollhouse: front-on
-from a little above, so the furniture faces us as the pets do, turned a
-quarter at a time (⟲ ⟳) to see it from any side. The whole flat has the
-walls inside it cut down so no room hides another; tap a room or its chip
-to see it alone, its back walls standing.
+feet, laid out after the real basement flat's listing photos -- about 750 sq
+ft: the two bedrooms on the left (Bedroom 1 with a sliding-door closet,
+Bedroom 2 with its board-door closet built into the wall between the beds),
+each opening onto the open kitchen and living room, where an L of oak-and-
+granite kitchen fills the back left corner and white posts holding the beam
+stand in a row; the front door and a louvered bifold closet in its walls; and
+the bathroom with the washer and dryer in the back right corner. It also has
+the walls and doors, a catalog of furniture made of boxes, and how each room
+comes furnished.
 
 The room builder (✏️ under a room, `client/src/RoomBuilder.jsx`) is a small
 Sims-style editor: drag pieces about on a 3-inch grid, at real sizes, turn, recolour or

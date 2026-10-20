@@ -3,7 +3,7 @@
 // laid out to measure (the plan drawn to check Bedroom 2 against the real one was liked enough
 // to keep). Pieces are picked up and dragged here as in the dollhouse, by the same rules.
 import { useRef, useState } from "react";
-import { CATALOG, COLORWAYS, DOORS, ROOMS, bounds, footprint, layoutProblem, place, roomAt, snap, wallSpotNear, wallsOf } from "@shared/home.js";
+import { CATALOG, COLORWAYS, DOORS, ROOMS, bounds, footprint, layoutProblem, place, postBox, roomAt, snap, wallSpotNear, wallsOf } from "@shared/home.js";
 
 const INK = "#2b2238";
 const DOOR = "#c0564a";
@@ -121,8 +121,8 @@ export default function Blueprint({ room, draft, sel, open, onSelect, onMove, on
             <g key={id} className="bp-closet" onPointerDown={(e) => { e.stopPropagation(); onToggleCloset(id); }}>
               {rect(bi, { fill: "#ece8e1" })}
               <line x1={bi.x0 + 0.3} x2={bi.x1 - 0.3} y1={(bi.y0 + bi.y1) / 2} y2={(bi.y0 + bi.y1) / 2} stroke="#9a94a8" strokeWidth="0.06" />
-              <text x={(bi.x0 + bi.x1) / 2} y={(bi.y0 + bi.y1) / 2 + 0.75} className="bp-label">closet (built in)</text>
-              {closetSwings(bi).map((s, k) => (
+              <text x={(bi.x0 + bi.x1) / 2} y={(bi.y0 + bi.y1) / 2 + 0.75} className="bp-label">{bi.style === "sliding" ? "closet (sliding doors)" : bi.style === "louvered" ? "closet (bifold)" : "closet (built in)"}</text>
+              {bi.style !== "boards" && bi.style ? null : closetSwings(bi).map((s, k) => (
                 <g key={k}>
                   <path d={swing(s.h, s.shut, s.open, s.r)} fill="none" stroke={DOOR} strokeWidth="0.05" strokeDasharray={isOpen ? "" : "0.2 0.15"} />
                   <line x1={s.h[0]} y1={s.h[1]} x2={(isOpen ? s.open : s.shut)[0]} y2={(isOpen ? s.open : s.shut)[1]} stroke={DOOR} strokeWidth="0.12" />
@@ -131,12 +131,12 @@ export default function Blueprint({ room, draft, sel, open, onSelect, onMove, on
             </g>
           );
         })}
+        {(ROOMS[room].posts || []).map((p, k) => rect(postBox(p), { key: `post${k}`, fill: "#e8e5df", stroke: INK, strokeWidth: 0.06 }))}
         {order.map(([it, k]) => {
           const c = CATALOG[it.kind];
           if (c.layer === "wall") return null;
           const f = footprint(it);
           const picked = k === sel;
-          const small = Math.min(f.x1 - f.x0, f.y1 - f.y0) < 1.6;
           return (
             <g key={k} className="bp-piece" onPointerDown={(e) => down(e, k)}>
               {rect(f, { fill: c.layer === "rug" ? "none" : fill(it), stroke: picked ? "#f0a030" : c.layer === "rug" ? "#9fc49a" : "#5a5468",
@@ -146,7 +146,8 @@ export default function Blueprint({ room, draft, sel, open, onSelect, onMove, on
                 const [bx, by] = place(it, c.w, 0.3);
                 return <rect x={Math.min(ax, bx)} y={Math.min(ay, by)} width={Math.abs(bx - ax)} height={Math.abs(by - ay)} fill="#7a4f2e" />;
               })()}
-              <text x={(f.x0 + f.x1) / 2} y={(f.y0 + f.y1) / 2 + 0.17} className={`bp-label${small ? " tiny" : ""}`}>{short(c.label)}</text>
+              <text x={(f.x0 + f.x1) / 2} y={(f.y0 + f.y1) / 2 + 0.15} className="bp-label"
+                style={{ fontSize: `${Math.min(0.42, ((f.x1 - f.x0) * 0.9) / (short(c.label).length * 0.58))}px` }}>{short(c.label)}</text>
             </g>
           );
         })}

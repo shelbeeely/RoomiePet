@@ -215,3 +215,35 @@ describe("wall pieces dragged about", () => {
     expect(layoutProblem("bedB", withItems([wallSpotNear("bedB", picture, 6.5, 24.8)]))).toBe(null);
   });
 });
+
+describe("the real flat, from its photos", () => {
+  test("the kitchen is an L in the back left corner: stove and fridge on one wall, sink under a window and the dishwasher on the other", () => {
+    const items = DEFAULT_LAYOUTS.main.items;
+    const at = (kind) => footprint(items.find((i) => i.kind === kind));
+    for (const kind of ["stove", "fridge"]) expect(at(kind).x0, kind).toBe(13);          // the left wall
+    for (const kind of ["sink_counter", "dishwasher", "base_cabinet"]) expect(at(kind).y0, kind).toBe(0);   // the back wall
+    const sink = at("sink_counter");
+    const window = items.find((i) => i.kind === "basement_window" && i.side === "n");
+    expect(window.at >= sink.x0 && window.at + CATALOG.basement_window.w <= sink.x1).toBe(true);
+  });
+
+  test("the posts across the living room: nothing stands on them, pets go round", () => {
+    const post = ROOMS.main.posts[0];
+    const l = DEFAULT_LAYOUTS.main;
+    expect(layoutProblem("main", { ...l, items: [...l.items, { kind: "beanbag", color: "teal", x: post.x - 1, y: post.y - 1, rot: 0 }] })).toMatch(/post/);
+    expect(layoutProblem("main", { ...l, items: [...l.items, { kind: "small_rug", color: "pink", x: post.x - 2, y: post.y - 1, rot: 0 }] })).toBe(null);   // a rug can go under
+  });
+
+  test("the front door is in an outside wall and kept clear; Bedroom 1's door is just past the fridge", () => {
+    const door = DEFAULT_LAYOUTS.main.items.find((i) => i.kind === "entry_door");
+    expect(wallsOf("main").find((w) => w.side === door.side && w.line === door.line && w.from <= door.at).outer).toBe(true);
+    const fridge = footprint(DEFAULT_LAYOUTS.main.items.find((i) => i.kind === "fridge"));
+    const bedA = DOORS.find((d) => d.rooms.includes("bedA"));
+    expect(bedA.from).toBeGreaterThanOrEqual(fridge.y1);
+    expect(bedA.from - fridge.y1).toBeLessThan(1);
+  });
+
+  test("the bathroom has the laundry: washer and dryer, vanity, toilet, the tub with its shower", () => {
+    for (const kind of ["washer", "dryer", "vanity", "toilet", "tub_shower"]) expect(DEFAULT_LAYOUTS.bath.items.some((i) => i.kind === kind), kind).toBe(true);
+  });
+});

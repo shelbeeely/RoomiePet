@@ -11,24 +11,43 @@
 export const FLAT = { w: 30, d: 25 };
 
 export const ROOMS = {
-  // The bedrooms are 13 ft wide (11 felt small), Bedroom 2 turned a quarter to 13 x 12 so its
-  // beds and closet run along the front wall; the kitchen end of the main area is 8 ft.
-  bedA: { label: "Bedroom 1", areas: [{ x0: 0, x1: 13, y0: 0, y1: 13 }] },
+  // The real flat (from the listing's photos): a basement, the two bedrooms on the left, each
+  // opening onto the open kitchen and living room, the bathroom with the laundry in the back
+  // right corner. Bedrooms 13 ft wide, Bedroom 2 13 x 12.
+  // Bedroom 1: its reach-in closet, two sliding doors, stands in the front right corner.
+  bedA: {
+    label: "Bedroom 1",
+    areas: [{ x0: 0, x1: 13, y0: 0, y1: 10.5 }, { x0: 0, x1: 8, y0: 10.5, y1: 13 }],
+    builtins: [{ kind: "closet", style: "sliding", x0: 8, x1: 13, y0: 10.5, y1: 13, doors: "n", clear: 1 }],
+  },
   // Bedroom 2's closet is part of its walls: the room steps round it, walls along both its
   // sides and across its front, where its two full-size doors are (facing into the room).
   // It fills the front wall between the beds and stands 2 ft 6 into the room.
   bedB: {
     label: "Bedroom 2",
     areas: [{ x0: 0, x1: 13, y0: 13, y1: 22.5 }, { x0: 0, x1: 3.25, y0: 22.5, y1: 25 }, { x0: 9.75, x1: 13, y0: 22.5, y1: 25 }],
-    builtins: [{ kind: "closet", x0: 3.25, x1: 9.75, y0: 22.5, y1: 25, doors: "n", clear: 3 }],
+    builtins: [{ kind: "closet", style: "boards", x0: 3.25, x1: 9.75, y0: 22.5, y1: 25, doors: "n", clear: 3 }],
   },
-  main: { label: "Kitchen & living room", areas: [{ x0: 13, x1: 21, y0: 0, y1: 25 }, { x0: 21, x1: 30, y0: 9, y1: 25 }] },
+  // The open kitchen and living room: an L of kitchen in the back left corner, white posts
+  // holding the beam in a row across the middle, a louvered bifold closet in the front wall.
+  main: {
+    label: "Kitchen & living room",
+    areas: [
+      { x0: 13, x1: 21, y0: 0, y1: 23 }, { x0: 13, x1: 14, y0: 23, y1: 25 }, { x0: 19, x1: 21, y0: 23, y1: 25 },
+      { x0: 21, x1: 30, y0: 9, y1: 25 },
+    ],
+    builtins: [{ kind: "closet", style: "louvered", x0: 14, x1: 19, y0: 23, y1: 25, doors: "n", clear: 2 }],
+    posts: [{ x: 15.75, y: 11 }, { x: 20.75, y: 11 }, { x: 25.75, y: 11 }],
+  },
   bath: { label: "Bathroom & laundry", areas: [{ x0: 21, x1: 30, y0: 0, y1: 9 }] },
 };
 
+/** A post's footprint: 6 inches square. */
+export const postBox = (p) => ({ x0: p.x - 0.25, x1: p.x + 0.25, y0: p.y - 0.25, y1: p.y + 0.25 });
+
 // A door is a gap in the wall on a line: x = at (axis "x") or y = at (axis "y"), from..to along it.
 export const DOORS = [
-  { rooms: ["bedA", "main"], axis: "x", at: 13, from: 8, to: 11 },
+  { rooms: ["bedA", "main"], axis: "x", at: 13, from: 7.5, to: 10.5 },   // just past the fridge
   // Bedroom 2's: on its right wall, 2 ft from the top (back) corner, as the real one is.
   { rooms: ["bedB", "main"], axis: "x", at: 13, from: 15, to: 18 },
   { rooms: ["bath", "main"], axis: "y", at: 9, from: 22, to: 25 },
@@ -100,8 +119,11 @@ function findWalls(room) {
         const line = axis === "y" ? (dy < 0 ? y : y + GRID) : (dx < 0 ? x : x + GRID);
         const along = axis === "y" ? x : y;
         if (other === room || doorAt(axis, line, along + GRID / 2)) continue;
+        // Beyond is a built-in: this room's own (its closet's walls), or the next room's (a
+        // plain wall between, Bedroom 1's closet behind Bedroom 2's back wall).
         const inBuiltin = builtinAt(ox, oy);
-        add(side, line, along, other === null && !inBuiltin, inBuiltin ? inBuiltin.kind : null);
+        const own = inBuiltin && (ROOMS[room].builtins || []).includes(inBuiltin);
+        add(side, line, along, other === null && !inBuiltin, own ? inBuiltin.kind : null);
       }
     }
   }
@@ -147,6 +169,7 @@ export const MATERIALS = {
   glass: "#9fd3ef", leaf: "#5fae5a", leafDark: "#3f8a4a", pot: "#c8643c", screen: "#33406a", pillow: "#fffaf0",
   porcelain: "#f7f7fa", water: "#8fd0ef", shade: "#ffe6a8", gold: "#e9b64a", red: "#e05d5d", food: "#c08a50",
   book1: "#d8645a", book2: "#5a8ad8", book3: "#f0c75e", book4: "#6fbf8a", frame: "#7a4f2e", sky: "#bfe3f5", pink: "#f4a6b8",
+  granite: "#cfc9bf", graniteDark: "#a39d94", hob: "#2f2b36",
 };
 
 // Boxes: [x, y, z, w, d, h, material], in feet, x across the piece and y from its back (y = 0)
@@ -313,6 +336,32 @@ export const CATALOG = {
     boxes: [[0, 0, 0, 2.5, 2.5, 6, "main"], [0.1, 2.5, 3.6, 2.3, 0.04, 2.3, "main^"], [0.1, 2.5, 0.2, 2.3, 0.04, 3.2, "main^"],
       [0.2, 2.54, 2.8, 0.15, 0.06, 0.6, "metal"], [0.2, 2.54, 3.8, 0.15, 0.06, 0.6, "metal"]],
   },
+  // The real flat's kitchen, from its photos: oak cabinets, granite tops, white appliances,
+  // an L round the corner -- fridge and stove along one wall, sink and dishwasher the other.
+  base_cabinet: {
+    label: "Base cabinet", group: "kitchen", w: 2, d: 2, layer: "solid", colors: ["oak", "white", "sage", "blue"],
+    boxes: [[0, 0, 0, 2, 2, 2.8, "main"], [0, 0, 2.8, 2, 2, 0.2, "granite"], [0.15, 2, 0.3, 1.7, 0.04, 1.6, "main_"], [0.15, 2, 2.1, 1.7, 0.04, 0.55, "main_"]],
+  },
+  sink_counter: {
+    label: "Sink counter", group: "kitchen", w: 4, d: 2, layer: "solid", colors: ["oak", "white", "sage", "blue"],
+    boxes: [
+      [0, 0, 0, 4, 2, 2.8, "main"], [0, 0, 2.8, 4, 2, 0.2, "granite"],
+      [0.15, 2, 0.3, 1.75, 0.04, 2.2, "main_"], [2.1, 2, 0.3, 1.75, 0.04, 2.2, "main_"],
+      [0.8, 0.35, 2.96, 2.4, 1.3, 0.06, "metal"], [1.9, 0.08, 3, 0.2, 0.25, 0.7, "metal"],
+    ],
+  },
+  dishwasher: {
+    label: "Dishwasher", group: "kitchen", w: 2, d: 2, layer: "solid", colors: ["white", "grey", "black"],
+    boxes: [[0, 0, 0, 2, 2, 2.8, "main"], [0, 0, 2.8, 2, 2, 0.2, "granite"], [0.1, 2, 2.35, 1.8, 0.04, 0.3, "main_"], [0.6, 2.04, 2.45, 0.8, 0.06, 0.1, "metal"]],
+  },
+  stove: {
+    label: "Stove", group: "kitchen", w: 2.5, d: 2.25, layer: "solid", colors: ["white", "grey", "black"],
+    boxes: [
+      [0, 0, 0, 2.5, 2.25, 3, "main"], [0, 0, 3, 2.5, 0.35, 0.6, "main"],
+      [0.25, 0.55, 3, 0.75, 0.7, 0.03, "hob"], [1.5, 0.55, 3, 0.75, 0.7, 0.03, "hob"], [0.25, 1.4, 3, 0.75, 0.6, 0.03, "hob"], [1.5, 1.4, 3, 0.75, 0.6, 0.03, "hob"],
+      [0.3, 2.25, 0.5, 1.9, 0.04, 1.6, "screen"], [0.3, 2.29, 2.25, 1.9, 0.05, 0.1, "metal"],
+    ],
+  },
   bathtub: {
     label: "Bathtub", group: "bath", w: 5, d: 2.5, layer: "solid", colors: ["white", "pink", "sage", "blue"],
     boxes: [[0, 0, 0, 5, 2.5, 1.8, "main"], [0.3, 0.3, 1.8, 4.4, 1.9, 0.02, "water"], [4.4, 0.05, 1.8, 0.3, 0.25, 0.7, "metal"]],
@@ -326,8 +375,30 @@ export const CATALOG = {
     boxes: [[0, 0, 0, 2, 1.5, 2.6, "main"], [0, 0, 2.6, 2, 1.5, 0.2, "porcelain"], [0.4, 0.35, 2.8, 1.2, 0.9, 0.03, "water"], [0.9, 0.05, 2.8, 0.2, 0.3, 0.6, "metal"]],
   },
   washer: {
+    // Top-loading, as in the real bathroom: a lid on top, controls at the back.
     label: "Washer", group: "bath", w: 2.5, d: 2.5, layer: "solid", colors: ["white", "grey", "blue", "pink"],
-    boxes: [[0, 0, 0, 2.5, 2.5, 3, "main"], [0, 0, 3, 2.5, 0.6, 0.3, "main_"], [0.55, 2.5, 0.6, 1.4, 0.04, 1.4, "glass"], [0.2, 0.1, 3.3, 0.3, 0.3, 0.05, "red"]],
+    boxes: [[0, 0, 0, 2.5, 2.5, 3, "main"], [0, 0, 3, 2.5, 0.6, 0.35, "main_"], [0.2, 0.75, 3, 2.1, 1.55, 0.04, "main^"], [0.2, 0.1, 3.35, 0.3, 0.3, 0.05, "metal"]],
+  },
+  vanity: {
+    label: "Vanity", group: "bath", w: 3, d: 1.75, layer: "solid", colors: ["oak", "white", "walnut", "teal"],
+    boxes: [
+      [0, 0, 0, 3, 1.75, 2.6, "main"], [0, 0, 2.6, 3, 1.75, 0.15, "porcelain"], [0.8, 0.4, 2.75, 1.4, 0.9, 0.03, "water"],
+      [1.4, 0.05, 2.75, 0.2, 0.3, 0.5, "metal"], [0.15, 1.75, 0.3, 1.3, 0.04, 1.9, "main_"], [1.55, 1.75, 0.3, 1.3, 0.04, 1.9, "main_"],
+    ],
+  },
+  dryer: {
+    label: "Dryer", group: "bath", w: 2.25, d: 2.25, layer: "solid", colors: ["white", "grey"],
+    boxes: [[0, 0, 0, 2.25, 2.25, 3, "main"], [0, 0, 3, 2.25, 0.5, 0.35, "main_"], [0.35, 2.25, 0.9, 1.55, 0.04, 1.2, "main_"], [0.2, 0.1, 3.35, 0.3, 0.3, 0.05, "metal"]],
+  },
+  tub_shower: {
+    // The real bathroom's: a white tub with a shower surround to the ceiling and a curtain rod.
+    label: "Tub & shower", group: "bath", w: 5, d: 2.5, layer: "solid", colors: ["white"],
+    boxes: [
+      [0, 0, 0, 5, 2.5, 1.7, "main"], [0.25, 0.25, 1.7, 4.5, 2, 0.02, "water"],
+      [0, 0, 1.7, 5, 0.25, 4.6, "main"], [0, 0.25, 1.7, 0.25, 2.25, 4.6, "main"], [4.75, 0.25, 1.7, 0.25, 2.25, 4.6, "main"],
+      [2.3, 0.25, 2.6, 0.4, 0.15, 0.4, "metal"], [2.4, 0.25, 5.7, 0.2, 0.3, 0.15, "metal"],
+      [0, 2.4, 6.2, 5, 0.06, 0.06, "metal"],
+    ],
   },
   basket: {
     label: "Laundry basket", group: "bath", w: 1.5, d: 1.5, layer: "solid", colors: ["oak", "white", "teal", "pink"],
@@ -357,6 +428,25 @@ export const CATALOG = {
       [0, 0, 2.97, 2.5, 0.12, 0.85, "main"], [0.15, 0.12, 3.05, 2.2, 0.03, 0.68, "sky"], [0, 0, 2.85, 2.5, 0.4, 0.12, "main_"],
       [-0.4, 0.15, 3.88, 3.3, 0.06, 0.06, "dark"], [-0.45, 0.13, 3.84, 0.1, 0.1, 0.14, "dark"], [2.85, 0.13, 3.84, 0.1, 0.1, 0.14, "dark"],
     ],
+  },
+  wall_cabinets: {
+    label: "Wall cabinets", group: "wall", w: 3, d: 1.1, layer: "wall", colors: ["oak", "white", "sage", "blue"],
+    boxes: [[0, 0, 3.3, 3, 1.1, 2.5, "main"], [0.1, 1.1, 3.4, 1.35, 0.04, 2.3, "main_"], [1.55, 1.1, 3.4, 1.35, 0.04, 2.3, "main_"]],
+  },
+  entry_door: {
+    // The flat's front door, in an outside wall: a six-panel door with a knob and a deadbolt.
+    label: "Front door", group: "wall", w: 3, d: 0.12, layer: "wall", outer: true, clear: 3, colors: ["white", "oak", "teal", "black"],
+    boxes: [
+      [-0.2, 0, 0, 3.4, 0.06, 7, "white"], [0, 0.06, 0, 3, 0.05, 6.7, "main"],
+      [0.3, 0.11, 4.2, 0.95, 0.02, 1.9, "main_"], [1.75, 0.11, 4.2, 0.95, 0.02, 1.9, "main_"],
+      [0.3, 0.11, 2.6, 0.95, 0.02, 1.2, "main_"], [1.75, 0.11, 2.6, 0.95, 0.02, 1.2, "main_"],
+      [0.3, 0.11, 0.4, 0.95, 0.02, 1.9, "main_"], [1.75, 0.11, 0.4, 0.95, 0.02, 1.9, "main_"],
+      [2.6, 0.11, 3.0, 0.15, 0.08, 0.15, "metal"], [2.6, 0.11, 3.5, 0.15, 0.08, 0.12, "metal"],
+    ],
+  },
+  medicine_cabinet: {
+    label: "Medicine cabinet", group: "wall", w: 1.75, d: 0.4, layer: "wall", colors: ["white", "oak"],
+    boxes: [[0, 0, 3.2, 1.75, 0.4, 2.1, "main"], [0.55, 0.4, 3.3, 1.1, 0.03, 1.9, "glass"], [0.05, 0.4, 3.3, 0.4, 0.02, 1.9, "main_"]],
   },
   picture: {
     label: "Picture", group: "wall", w: 2, d: 0.1, layer: "wall", colors: ["blue", "pink", "sage", "sun"],
@@ -399,6 +489,7 @@ const REAL = {
   washer: [2.25, 2.25],       // 27 in
   basket: [1.25, 1.25],
   mat: [2.5, 1.75],
+  vanity: [2.5, 1.75],        // the real bathroom's, 30 in
 };
 for (const [kind, [w, d]] of Object.entries(REAL)) {
   const c = CATALOG[kind];
@@ -432,6 +523,7 @@ export const FLOORS = {
   check: { label: "Check tiles", base: "#f4efe6", pattern: "check" },
   // Bedroom 2's, from a photo of the real room: grey weathered wood-look vinyl planks.
   greywood: { label: "Grey planks", base: "#857c71", pattern: "weathered" },
+  brownwood: { label: "Brown planks", base: "#8a6a50", pattern: "weathered" },
   aqua: { label: "Aqua tiles", base: "#bfe6e2", pattern: "check" },
 };
 
@@ -577,6 +669,7 @@ export function layoutProblem(room, layout) {
       if (a === b || (a === "small" && b === "solid") || (a === "solid" && b === "small")) return `${c.label} overlaps the ${p.c.label.toLowerCase()}`;
     }
     if (c.layer === "solid" && doorways(room).some((d) => overlaps(f, d))) return `${c.label} blocks a doorway`;
+    if (c.layer !== "rug" && (ROOMS[room].posts || []).some((p) => overlaps(f, postBox(p)))) return `${c.label} is where a post is`;
     placed.push({ f, c });
   }
   // A built-in's doors (Bedroom 2's closet) need room to open too.
@@ -615,11 +708,13 @@ const F = (kind, color, x, y, rot = 0) => ({ kind, color, x, y, rot });
 // How the flat comes furnished, until someone rearranges a room.
 export const DEFAULT_LAYOUTS = {
   bedA: {
-    wall: "rose", floor: "oak",
+    // The other basement bedroom: white, brown planks, two small windows meeting in the back
+    // left corner, its closet in the front right.
+    wall: "white", floor: "brownwood",
     items: [
-      W("window", "white", "n", 0, 5), W("picture", "pink", "n", 0, 8.5),
-      F("small_rug", "pink", 4.5, 6.5), F("bed", "pink", 0.5, 0), F("nightstand", "oak", 4, 0), F("dresser", "white", 8, 0),
-      F("plant", "coral", 0.5, 10),
+      W("basement_window", "white", "n", 0, 0.75), W("basement_window", "white", "w", 0, 0.75), W("picture", "pink", "n", 0, 7),
+      F("small_rug", "pink", 4.5, 4), F("bed", "pink", 0, 4, 3), F("nightstand", "white", 0, 7.25, 3), F("dresser", "white", 6, 0),
+      F("plant", "coral", 11.75, 0),
     ],
   },
   bedB: {
@@ -638,20 +733,29 @@ export const DEFAULT_LAYOUTS = {
     ],
   },
   main: {
-    wall: "butter", floor: "oak",
+    // As in the photos: the kitchen an L round the back left corner -- base cabinet, stove and
+    // fridge down the left wall, dishwasher and the sink under its little window along the back,
+    // oak cabinets above -- and the living room in front of the posts, the front door on the right.
+    wall: "white", floor: "greywood",
     items: [
-      W("clock", "white", "n", 0, 19.5), W("window", "white", "n", 0, 15.5), W("picture", "sun", "n", 9, 26.5),
-      F("counter", "white", 15, 0), F("fridge", "white", 13, 2.5, 3), F("bowl", "blue", 16, 3), F("table", "oak", 15, 6),
-      F("chair", "oak", 16.5, 4.5), F("chair", "oak", 16.5, 8.5, 2),
-      F("bookshelf", "oak", 13, 18.5, 3), F("rug", "pink", 22.5, 14.5), F("tv", "walnut", 25.5, 9), F("sofa", "teal", 23, 20, 2),
-      F("plant", "coral", 19.5, 23.5), F("lamp", "sun", 29, 24), F("armchair", "coral", 18, 13.5, 1),
+      W("basement_window", "white", "n", 0, 17.75), W("wall_cabinets", "oak", "n", 0, 14.75), W("wall_cabinets", "oak", "w", 13, 0.25),
+      W("entry_door", "white", "e", 30, 20.5), W("basement_window", "white", "e", 30, 13), W("clock", "white", "n", 9, 26.5),
+      F("base_cabinet", "oak", 13, 0), F("dishwasher", "white", 15, 0), F("sink_counter", "oak", 17, 0),
+      F("stove", "white", 13, 2, 3), F("fridge", "white", 13, 4.5, 3), F("bowl", "blue", 17.5, 3),
+      F("table", "oak", 16, 5.5), F("chair", "oak", 17.25, 8, 2),
+      F("rug", "pink", 22.5, 14.5), F("tv", "walnut", 25.5, 9), F("sofa", "teal", 20.5, 19.5, 2),
+      F("bookshelf", "oak", 13, 19, 3), F("armchair", "coral", 17.5, 14, 1), F("plant", "coral", 19.75, 23), F("lamp", "sun", 21.5, 22.75),
     ],
   },
   bath: {
-    wall: "tiles", floor: "aqua",
+    // The bathroom with the laundry: washer and dryer side by side on the left, the oak vanity
+    // under the small window at the back with a mirror and medicine cabinet, the toilet, and the
+    // tub with its shower along the right.
+    wall: "white", floor: "greywood",
     items: [
-      W("mirror", "white", "e", 30, 3.5), F("mat", "blue", 23, 3), F("bathtub", "white", 21.5, 0), F("toilet", "white", 27.5, 0),
-      F("sink", "white", 28.5, 3.5, 3), F("washer", "white", 27.5, 6.5), F("basket", "oak", 25.5, 7),
+      W("basement_window", "white", "n", 0, 23.25), W("medicine_cabinet", "white", "n", 0, 25.75),
+      F("washer", "white", 21, 2.25, 3), F("dryer", "white", 21, 0, 3), F("vanity", "oak", 23.25, 0),
+      F("toilet", "white", 25.75, 0), F("tub_shower", "white", 27.5, 0, 3), F("mat", "blue", 24, 3.25),
     ],
   },
 };

@@ -461,6 +461,53 @@ export function closetDoors(bi, open = false) {
       ? { x0: a0 + u, x1: a0 + u + w, y0: p0, y1: p1, z0: z, z1: z + h, color }
       : { x0: p0, x1: p1, y0: a0 + u, y1: a0 + u + w, z0: z, z1: z + h, color });
   };
+  const style = bi.style || "boards";
+  if (style === "sliding") {
+    // Two six-panel doors on a track (Bedroom 1's): open, one slides behind the other.
+    const half = (len - 0.2) / 2;
+    const door = (u, inset) => {
+      part(u, half, 0, 6.67, 0.04 + inset, "#f4f2ed");
+      for (const [z, h] of [[0.4, 1.9], [2.6, 1.2], [4.2, 1.9]]) {
+        part(u + 0.2, half / 2 - 0.3, z, h, 0.06 + inset, "#e3e0d8");
+        part(u + half / 2 + 0.1, half / 2 - 0.3, z, h, 0.06 + inset, "#e3e0d8");
+      }
+      part(u + (u < len / 2 ? half - 0.25 : 0.12), 0.12, 3, 0.12, 0.08 + inset, "#9a958a");
+    };
+    part(0, 0.1, 0, 6.8, 0.1, "#e6e3dc");
+    part(len - 0.1, 0.1, 0, 6.8, 0.1, "#e6e3dc");
+    if (open) {
+      door(len - 0.1 - half, 0);
+      door(len - 0.1 - half - 0.05, 0.1);
+    } else {
+      door(0.1, 0.1);
+      door(0.1 + half, 0);
+    }
+    return boxes;
+  }
+  if (style === "louvered") {
+    // Four bifold panels with slats (the living room's); open, folded back at each end.
+    const panel = (len - 0.2) / 4;
+    const slats = (u, w, depth, along) => {
+      for (let z = 0.6; z < 6.2; z += 0.22) {
+        if (along) part(u + 0.1, w - 0.2, z, 0.06, depth + 0.02, "#dcd8cf");
+      }
+    };
+    part(0, 0.1, 0, 6.8, 0.1, "#e6e3dc");
+    part(len - 0.1, 0.1, 0, 6.8, 0.1, "#e6e3dc");
+    if (open) {
+      part(0.1, 0.12, 0, 6.67, panel * 0.9, "#f4f2ed");
+      part(len - 0.22, 0.12, 0, 6.67, panel * 0.9, "#f4f2ed");
+      return boxes;
+    }
+    for (let k = 0; k < 4; k++) {
+      const u = 0.1 + k * panel;
+      part(u, panel - 0.03, 0, 6.67, 0.05, "#f4f2ed");
+      slats(u, panel, 0.05, true);
+    }
+    part(0.1 + panel * 2 - 0.2, 0.08, 3.1, 0.12, 0.09, "#9a958a");
+    part(0.1 + panel * 2 + 0.12, 0.08, 3.1, 0.12, 0.09, "#9a958a");
+    return boxes;
+  }
   if (open) {
     // Jambs at each end, and each leaf standing out from its hinge, square to the wall.
     part(0, 0.1, 0, 6.8, 0.1, "#e6e3dc");
