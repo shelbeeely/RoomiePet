@@ -1,0 +1,8 @@
+node_modules/
+client/dist/
+# The households' data -- never committed
+data/
+*.db
+*.db-shm
+*.db-wal
+.DS_Store

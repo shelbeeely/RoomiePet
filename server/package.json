@@ -1,0 +1,13 @@
+{
+  "name": "roomiepet-server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --disable-warning=ExperimentalWarning --watch src/index.js",
+    "start": "node --disable-warning=ExperimentalWarning src/index.js",
+    "test": "node --disable-warning=ExperimentalWarning --test 'test/**/*.test.js'"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
