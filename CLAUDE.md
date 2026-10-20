@@ -17,7 +17,7 @@ Roommates' chores with a tamagotchi pet each (README.md has the whole picture).
   "shortcut", limited to `KEY_PATHS`. Integration tests:
   `server/test/integrations.test.js`.
 - `client/public/sw.js` is not bundled: bump `VERSION` when what it caches changes.
-- Art: pets are 64 x 64, drawn from shapes in `art/pets64.py`; furniture in
+- Art: pets are 64 x 64 animals, drawn from shapes in `art/pets.py`; furniture in
   `art/house64.py` (16 px to the foot); colours in `art/make_spec.py`. Then
   `npm run art` (the pixel-art skill renders it). Never hand-edit
   `client/public/sprites/*`. The floor plan is `client/src/house.js`.

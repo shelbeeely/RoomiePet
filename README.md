@@ -111,9 +111,11 @@ npm test           # server API tests (node:test) and the shared rules (vitest)
 
 ## Art
 
-The pets are 64 x 64 pixel art drawn from shapes in `art/pets64.py` -- one
-round chibi body and face shared by every species, each adding its ears,
-markings and tail, so all species share every mood and animation. The
+The pets are 64 x 64 pixel art drawn from shapes in `art/pets.py` -- animals,
+not people: a head, a body on four legs and a tail from the rump, seen
+three-quarter from above. Every species shares the build and each adds its
+ears, snout, markings and tail, so all of them have every mood and
+animation, facing us or walking away (mirrored for the other two ways). The
 apartment's furniture is drawn the same way at 16 pixels to the foot in
 `art/house64.py`. `art/make_spec.py` gives them their colours and writes
 `art/sprites.json`, rendered with the pixel-art skill in
