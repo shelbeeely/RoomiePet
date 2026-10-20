@@ -18,12 +18,16 @@ Roommates' chores with a tamagotchi pet each (README.md has the whole picture).
   `createApp` to catch messages. Shortcuts keys are tokens of kind
   "shortcut", limited to `KEY_PATHS`. Integration tests:
   `server/test/integrations.test.js`.
+- The scene canvas is the scene's own pixel size, scaled up by CSS
+  (`image-rendering: pixelated`) -- keep it that way: drawing at screen size
+  cost the frame rate. Name labels and bubbles are DOM, moved by transform.
 - `client/public/sw.js` is not bundled: bump `VERSION` when what it caches changes.
 - The flat is `shared/home.js`: rooms and doors in feet, the furniture
   catalog (pieces are boxes), default layouts, and `layoutProblem`, which
   the server checks saved rooms with (`PUT /api/rooms/:room`). A new piece
   goes in `CATALOG`; `shared/home.test.js` checks its materials.
-- Art: pets are 64 x 64 animals on all fours facing us (no side views), drawn from shapes in `art/pets.py`; colours
+- Art: pets are 64 x 64 flat 2D stickers, sitting facing us (no side views,
+  no shading), drawn from shapes in `art/pets.py`; colours
   in `art/make_spec.py`. Then `npm run art` (the pixel-art skill renders it).
   Never hand-edit `client/public/sprites/*`. Furniture isn't sprites: `dollhouse.js`
   draws it from the catalog.

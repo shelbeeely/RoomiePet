@@ -44,10 +44,66 @@ function beyond(wall) {
   return roomAt(x, y);
 }
 
-/** The canvas's pixels per scene pixel: enough for the screen it is on, whole numbers so pixels stay square. */
-function scaleFor(el, width) {
-  const css = el?.parentElement?.clientWidth || width;
-  return Math.max(1, Math.min(6, Math.ceil((css * (window.devicePixelRatio || 1)) / width)));
+/**
+ * The part of the scene that doesn't move -- floors, walls, furniture -- put
+ * together once for a layout and a view: a canvas, the pieces in drawing
+ * order with where each lands on the screen (so a pet can have what stands
+ * in front of it drawn over it again), what a tap can pick, and the lamps.
+ */
+function stillScene(layouts, cam) {
+  const canvas = document.createElement("canvas");
+  canvas.width = cam.width;
+  canvas.height = cam.height;
+  const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingEnabled = false;
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, cam.width, cam.height);
+  const blit = (sp) => ctx.drawImage(sp.canvas, sp.ox, sp.oy);
+  const rooms = cam.room ? [cam.room] : Object.keys(ROOMS);
+  blit(floorSprite(rooms, layouts, cam));
+  const units = [];
+  const glows = [];
+  const wallHits = [];
+  for (const room of rooms) {
+    for (const wall of wallsOf(room)) {
+      const h = cam.wallHeight(wall);
+      const next = wall.outer ? null : beyond(wall);
+      const sprite = wallSprite(wall, h, layouts[room].wall, cam, next && layouts[next].wall);
+      // One room alone: its back and side walls are behind everything in it.
+      const back = cam.room && !(h < 1);
+      if (back) blit(sprite);
+      else units.push({ kind: "wall", box: wallBox(wall, h), sprite });
+      if (!cam.far(wall) || h < 3) continue;
+      // Pictures, windows and clocks on the walls that stand.
+      for (const it of layouts[room].items) {
+        if (CATALOG[it.kind].layer !== "wall" || it.side !== wall.side || it.line !== wall.line || it.at < wall.from - 0.01 || it.at >= wall.to) continue;
+        const sp = pieceSprite(it, cam);
+        if (back) {
+          blit(sp);
+          wallHits.unshift({ room, item: it, sprite: sp });
+        } else units.push({ kind: "piece", room, item: it, box: wallPieceBox(it), sprite: sp });
+      }
+    }
+  }
+  for (const room of rooms) {
+    for (const it of layouts[room].items) {
+      const c = CATALOG[it.kind];
+      if (c.layer === "rug" || c.layer === "wall") continue;
+      units.push({ kind: "piece", room, item: it, box: pieceBox(it), sprite: pieceSprite(it, cam) });
+      if (c.glow) glows.push(it);
+    }
+  }
+  const list = order(units, cam, (u) => u.box);
+  for (const u of list) {
+    blit(u.sprite);
+    Object.assign(u, { x0: u.sprite.ox, y0: u.sprite.oy, x1: u.sprite.ox + u.sprite.w, y1: u.sprite.oy + u.sprite.h });
+  }
+  // What a tap picks, top first: the pieces as drawn, the wall pieces behind them, then the rugs.
+  const rugs = cam.room
+    ? layouts[cam.room].items.filter((it) => CATALOG[it.kind].layer === "rug").reverse().map((it) => ({ room: cam.room, item: it, sprite: pieceSprite(it, cam) }))
+    : [];
+  const hits = [...list.filter((u) => u.kind === "piece").reverse(), ...wallHits, ...rugs];
+  return { layouts, cam, canvas, units: list, hits, glows };
 }
 
 /** Round the piece that's picked up: its footprint on the floor, or for a wall piece where it hangs. */
@@ -74,6 +130,7 @@ function outlinePath(ctx, cam, item) {
 export default function HouseScene({ atlas, pets, effects, selectedId, onSelect, hour, layouts: saved, onSaveRoom }) {
   const canvas = useRef(null);
   const labels = useRef(new Map());
+  const bubbles = useRef(new Map());
   const walkers = useRef(new Map());
   const drawn = useRef([]);
   const drag = useRef(null);
@@ -100,29 +157,24 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
   useEffect(() => {
     if (!atlas) return;
     const el = canvas.current;
-    const screen = el.getContext("2d");
-    // The scene is put together at its own pixel-art size, then scaled up to the screen
-    // in one copy. Drawn piece by piece at the screen's size (1440 x 1400 on a phone)
-    // every frame went to filling pixels: a slowed-down CPU managed 13 frames a second.
-    const buf = document.createElement("canvas");
-    const ctx = buf.getContext("2d");
-    let S = 0;
+    // The canvas is the scene at its own pixel-art size; the browser scales it up to the
+    // screen (pixelated, in the compositor), so a frame only fills the scene's pixels.
+    // Drawn at the screen's size (1440 x 1400 on a phone) a frame went on filling pixels:
+    // a CPU slowed to a cheap phone's managed 13 frames a second, then 24 once the scene
+    // was drawn small and copied up -- the copy alone cost that much.
+    const ctx = el.getContext("2d");
     let size = "";
     const fit = () => {
       const c = latest.current.cam;
-      const s = scaleFor(el, c.width);
-      if (s !== S || size !== c.key) {
-        S = s;
+      if (size !== c.key) {
         size = c.key;
-        el.width = c.width * S;
-        el.height = c.height * S;
-        buf.width = c.width;
-        buf.height = c.height;
+        el.width = c.width;
+        el.height = c.height;
       }
     };
-    window.addEventListener("resize", fit);
     let raf;
     let last = performance.now();
+    let still = null;
 
     const frame = (nowMs) => {
       const dt = Math.min(0.1, (nowMs - last) / 1000);
@@ -131,10 +183,7 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
       const { pets, effects, selectedId, hour, layouts, grid, cam, edit } = latest.current;
       fit();
       const night = hour >= 20 || hour < 7;
-      ctx.fillStyle = BG;
-      ctx.fillRect(0, 0, buf.width, buf.height);
       ctx.imageSmoothingEnabled = false;
-      const texts = [];   // emoji and zzz, drawn sharp at the screen's size after the scale-up
       const blit = (sp) => ctx.drawImage(sp.canvas, sp.ox, sp.oy);
 
       // Where each pet goes now (all of them, seen or not, so they are where they should be).
@@ -182,55 +231,18 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
         return { kind: "pet", p, w, walking, effect, box: { x0: w.x - 0.4, x1: w.x + 0.4, y0: w.y - 0.4, y1: w.y + 0.4, z0: w.z, z1: w.z + 2.5 } };
       });
 
-      // The room(s) on show.
-      const rooms = cam.room ? [cam.room] : Object.keys(ROOMS);
-      blit(floorSprite(rooms, layouts, cam));
-      const units = [];
-      const glows = [];
-      const wallHits = [];
-      for (const room of rooms) {
-        for (const wall of wallsOf(room)) {
-          const h = cam.wallHeight(wall);
-          const next = wall.outer ? null : beyond(wall);
-          const sprite = wallSprite(wall, h, layouts[room].wall, cam, next && layouts[next].wall);
-          // One room alone: its back and side walls are behind everything in it.
-          const back = cam.room && !(h < 1);
-          if (back) blit(sprite);
-          else units.push({ kind: "wall", box: wallBox(wall, h), sprite });
-          if (!cam.far(wall) || h < 3) continue;
-          // Pictures, windows and clocks on the walls that stand.
-          for (const it of layouts[room].items) {
-            if (CATALOG[it.kind].layer !== "wall" || it.side !== wall.side || it.line !== wall.line || it.at < wall.from - 0.01 || it.at >= wall.to) continue;
-            const sp = pieceSprite(it, cam);
-            if (back) {
-              blit(sp);
-              wallHits.unshift({ room, item: it, sprite: sp });
-            } else units.push({ kind: "piece", room, item: it, box: wallPieceBox(it), sprite: sp });
-          }
-        }
-      }
-      for (const room of rooms) {
-        for (const it of layouts[room].items) {
-          const c = CATALOG[it.kind];
-          if (c.layer === "rug" || c.layer === "wall") continue;
-          units.push({ kind: "piece", room, item: it, box: pieceBox(it), sprite: pieceSprite(it, cam) });
-          if (c.glow && night) glows.push(it);
-        }
-      }
+      // The room(s) on show: kept, and only put together again for a new layout or view.
+      if (!still || still.layouts !== layouts || still.cam !== cam) still = stillScene(layouts, cam);
+      ctx.drawImage(still.canvas, 0, 0);
       const seen = cam.room ? placed.filter((u) => u.w.room === cam.room) : placed;
-      units.push(...seen);
+      // Labels and bubbles move by transform (no layout each frame): screen pixels per scene pixel.
+      const k = el.clientWidth / cam.width;
 
       // Picking up: the piece being dragged where it would go, red if it can't.
       const held = drag.current?.ghost && !drag.current.ok ? drag.current : null;
 
-      const list = order(units, cam, (u) => u.box);
-      const hits = [];
-      for (const u of list) {
-        if (u.kind !== "pet") {
-          if (u.sprite) blit(u.sprite);
-          if (u.kind === "piece") hits.push(u);
-          continue;
-        }
+      // Pets back to front; after each, whatever stands in front of it is drawn over it again.
+      for (const u of order(seen, cam, (x) => x.box)) {
         const { p, w, walking, effect } = u;
         const size = p.pet.stage === "baby" || p.pet.stage === "egg" ? 0.75 : 1;
         const key = p.pet.stage === "egg" ? "egg" : petKey(p.pet.species, p.pet.color);
@@ -253,34 +265,41 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
         draw(ctx, atlas, frameAt(atlas, key, anim, t + p.phase), 0, 0, 1, w.flip);
         if (p.pet.stage === "star") draw(ctx, atlas, "crown/crown", 0, -SPRITE + 14, 1);
         ctx.restore();
+        const reach = (SPRITE / 2) * size;
+        const rect = { x0: sx - reach, x1: sx + reach, y0: sy - SPRITE * size - 14, y1: sy + 4 };
+        const near = still.units.filter((s) => s.x0 < rect.x1 && rect.x0 < s.x1 && s.y0 < rect.y1 && rect.y0 < s.y1);
+        if (near.length) {
+          const mine = order([u, ...near], cam, (x) => x.box);
+          for (const s of mine.slice(mine.indexOf(u) + 1)) blit(s.sprite);
+        }
+        // What it needs, or what just happened, in a bubble over its head (sharp text, not canvas pixels).
         const top = sy - SPRITE * size;
         const need = p.cond.state === "asleep" ? "z" : p.cond.flags.hungry ? "🍖" : p.cond.flags.grubby ? "🫧" : null;
-        if (need === "z") {
-          texts.push(["bold 14px system-ui", "#fff", "z", sx + 14, top + 12 - ((t * 8 + p.phase * 6) % 16)]);
-        } else if (need && p.cond.state !== "egg") {
-          texts.push(["16px system-ui", "#fff", need, sx + 12, top + 8 - Math.abs(Math.sin(t * 2)) * 4]);
-        }
-        if (effect) {
-          texts.push(["14px system-ui", "#fff", effect === "eat" ? "🍖" : effect === "clean" ? "🫧" : "💖", sx - 8, top + 4 - ((t * 24) % 20)]);
+        const bubble = bubbles.current.get(p.id);
+        if (bubble) {
+          const shown = effect ? (effect === "eat" ? "🍖" : effect === "clean" ? "🫧" : "💖") : p.cond.state === "egg" ? "" : need || "";
+          if (bubble.textContent !== shown) bubble.textContent = shown;
+          const rise = effect ? (t * 24) % 20 : need === "z" ? (t * 8 + p.phase * 6) % 16 : Math.abs(Math.sin(t * 2)) * 4;
+          const cls = `pet-bubble${need === "z" && !effect ? " z" : ""}`;
+          if (bubble.className !== cls) bubble.className = cls;
+          bubble.style.display = shown ? "" : "none";
+          bubble.style.transform = `translate(${(sx + (effect ? -6 : 14)) * k}px, ${(top + 6 - rise) * k}px) translate(-50%, -100%)`;
         }
         const label = labels.current.get(p.id);
         if (label) {
           label.style.display = "";
-          label.style.left = `${(sx / cam.width) * 100}%`;
-          label.style.top = `${((sy + 2) / cam.height) * 100}%`;
+          label.style.transform = `translate(${sx * k}px, ${(sy + 2) * k}px) translate(-50%, 2px)`;
         }
       }
       for (const p of pets) {
         if (!seen.some((u) => u.p.id === p.id)) {
           const label = labels.current.get(p.id);
           if (label) label.style.display = "none";
+          const bubble = bubbles.current.get(p.id);
+          if (bubble) bubble.style.display = "none";
         }
       }
-      // What a tap picks, top first: the pieces as drawn, and the wall pieces behind them.
-      const rugs = cam.room
-        ? layouts[cam.room].items.filter((it) => CATALOG[it.kind].layer === "rug").reverse().map((it) => ({ room: cam.room, item: it, sprite: pieceSprite(it, cam) }))
-        : [];
-      drawn.current = [...hits.reverse(), ...wallHits, ...rugs];
+      drawn.current = still.hits;
 
       if (edit && cam.room) {
         const sel = edit.sel != null ? edit.draft.items[edit.sel] : null;
@@ -304,7 +323,7 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
         ctx.fillStyle = "rgba(20,24,60,.3)";
         ctx.fillRect(0, 0, cam.width, cam.height);
         ctx.globalCompositeOperation = "lighter";
-        for (const it of glows) {
+        for (const it of still.glows) {
           const box = pieceBox(it);
           const [gx, gy] = cam.project((box.x0 + box.x1) / 2, (box.y0 + box.y1) / 2, box.z1 - 0.3);
           const g = ctx.createRadialGradient(gx, gy, 2, gx, gy, 56);
@@ -315,22 +334,10 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
         }
         ctx.globalCompositeOperation = "source-over";
       }
-      screen.imageSmoothingEnabled = false;
-      screen.setTransform(1, 0, 0, 1, 0, 0);
-      screen.drawImage(buf, 0, 0, el.width, el.height);
-      screen.setTransform(S, 0, 0, S, 0, 0);
-      for (const [font, fill, str, x, y] of texts) {
-        screen.font = font;
-        screen.fillStyle = fill;
-        screen.fillText(str, x, y);
-      }
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("resize", fit);
-    };
+    return () => cancelAnimationFrame(raf);
   }, [atlas]);
 
   // -- taps and drags -----------------------------------------------------------------
@@ -486,8 +493,8 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
         <canvas
           ref={canvas}
           className={edit ? "editing" : ""}
-          width={cam.width * 2}
-          height={cam.height * 2}
+          width={cam.width}
+          height={cam.height}
           onPointerDown={down}
           onPointerMove={move}
           onPointerUp={up}
@@ -504,6 +511,10 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
           >
             {p.pet.name}
           </button>
+        ))}
+        {pets.map((p) => (
+          <span key={`b${p.id}`} className="pet-bubble" aria-hidden="true" style={{ display: "none" }}
+            ref={(el) => (el ? bubbles.current.set(p.id, el) : bubbles.current.delete(p.id))} />
         ))}
         <div className="scene-tools">
           <button aria-label="Turn the view left" onClick={() => setView({ ...view, rot: (view.rot + 3) % 4 })}>⟲</button>

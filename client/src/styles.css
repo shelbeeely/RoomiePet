@@ -48,8 +48,8 @@ main > * + * { margin-top: 12px; }
 
 /* The house */
 .scene { position: relative; border-radius: var(--radius); overflow: hidden; background: #000; }
-/* Drawn at the screen's own resolution (or a little over, then scaled down smoothly). */
-.scene canvas { display: block; width: 100%; height: auto; cursor: pointer; touch-action: manipulation; }
+/* The scene at its own pixel-art size, scaled up by the browser with square pixels. */
+.scene canvas { display: block; width: 100%; height: auto; cursor: pointer; touch-action: manipulation; image-rendering: pixelated; }
 .scene canvas.editing { touch-action: none; cursor: grab; }
 .house-view { display: grid; gap: 8px; }
 .room-chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
@@ -85,10 +85,12 @@ main > * + * { margin-top: 12px; }
 .swatch.floor-planks { background: repeating-linear-gradient(180deg, var(--c) 0 7px, color-mix(in srgb, var(--c) 75%, #000) 7px 8px); }
 .style-pick h4 { margin: 4px 0 6px; font-size: 13px; color: var(--muted); }
 .pet-label {
-  position: absolute; transform: translate(-50%, 2px); background: rgba(31,26,43,.72); color: var(--fg);
+  position: absolute; left: 0; top: 0; will-change: transform; background: rgba(31,26,43,.72); color: var(--fg);
   font-size: 11px; font-weight: 600; padding: 1px 7px; min-height: 0; border-radius: 999px; pointer-events: auto;
   white-space: nowrap;
 }
+.pet-bubble { position: absolute; left: 0; top: 0; will-change: transform; font-size: 15px; line-height: 1; pointer-events: none; }
+.pet-bubble.z { color: #fff; font-weight: 700; font-size: 14px; text-shadow: 0 1px 2px rgba(0,0,0,.4); }
 .pet-label.sel { background: var(--accent); color: var(--accent-fg); }
 
 /* A pet's card */
