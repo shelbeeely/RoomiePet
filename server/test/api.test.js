@@ -248,8 +248,8 @@ test("a room arranged in the builder is kept for the household, checked as the a
   const layout = {
     wall: "night", floor: "carpet",
     items: [
-      { kind: "bed", color: "pink", x: 0.5, y: 12, rot: 0, extra: "dropped" },
-      { kind: "pet_bed", color: "sun", x: 6, y: 13, rot: 1 },
+      { kind: "bed", color: "pink", x: 0.5, y: 13, rot: 0, extra: "dropped" },
+      { kind: "pet_bed", color: "sun", x: 6, y: 14, rot: 1 },
       { kind: "window", color: "oak", side: "s", line: 25, at: 2 },
     ],
   };
@@ -257,15 +257,15 @@ test("a room arranged in the builder is kept for the household, checked as the a
   assert.equal(r.status, 200);
   const seen = (await st(ben)).rooms.bedB;
   assert.equal(seen.wall, "night");
-  assert.deepEqual(seen.items[0], { kind: "bed", color: "pink", x: 0.5, y: 12, rot: 0 });
+  assert.deepEqual(seen.items[0], { kind: "bed", color: "pink", x: 0.5, y: 13, rot: 0 });
   assert.equal(seen.items.length, 3);
 
   const bad = [
-    [{ ...layout, items: [{ kind: "bed", color: "pink", x: 9.5, y: 12, rot: 0 }] }, /doesn't fit/],                // through the wall
-    [{ ...layout, items: [{ kind: "sofa", color: "teal", x: 8.5, y: 18, rot: 1 }] }, /blocks a doorway/],
-    [{ ...layout, items: [{ kind: "window", color: "oak", side: "n", line: 12, at: 2 }] }, /outside wall/],  // onto bedroom 1
+    [{ ...layout, items: [{ kind: "bed", color: "pink", x: 10.5, y: 13, rot: 0 }] }, /doesn't fit/],                // through the wall
+    [{ ...layout, items: [{ kind: "sofa", color: "teal", x: 9.5, y: 13, rot: 1 }] }, /blocks a doorway/],
+    [{ ...layout, items: [{ kind: "window", color: "oak", side: "n", line: 13, at: 2 }] }, /outside wall/],  // onto bedroom 1
     [{ ...layout, items: [layout.items[0], { ...layout.items[0], x: 1 }] }, /overlaps/],
-    [{ ...layout, items: [{ kind: "__proto__", color: "pink", x: 1, y: 13, rot: 0 }] }, /catalog/],
+    [{ ...layout, items: [{ kind: "__proto__", color: "pink", x: 1, y: 14, rot: 0 }] }, /catalog/],
     [{ ...layout, wall: "plaid" }, /wallpaper/],
   ];
   for (const [l, why] of bad) {

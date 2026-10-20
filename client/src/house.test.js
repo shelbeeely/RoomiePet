@@ -33,7 +33,7 @@ describe("getting about", () => {
     for (let k = 1; k < steps.length; k++) {
       const [a, b] = [steps[k - 1], steps[k]];
       if (roomAt(a.x, a.y) === roomAt(b.x, b.y)) continue;
-      const atDoor = (b.y > 20 && b.y < 23 && Math.abs(b.x - 12) < 0.3) || (b.x > 22 && b.x < 25 && Math.abs(b.y - 9) < 0.3);
+      const atDoor = (b.y > 15 && b.y < 18 && Math.abs(b.x - 13) < 0.3) || (b.x > 22 && b.x < 25 && Math.abs(b.y - 9) < 0.3);
       expect(atDoor, JSON.stringify([a, b])).toBe(true);
     }
   });

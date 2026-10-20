@@ -11,17 +11,19 @@
 export const FLAT = { w: 30, d: 25 };
 
 export const ROOMS = {
-  // The bedrooms are 12 ft wide (11 felt small), the kitchen end of the main area 9.
-  bedA: { label: "Bedroom 1", areas: [{ x0: 0, x1: 12, y0: 0, y1: 12 }] },
-  bedB: { label: "Bedroom 2", areas: [{ x0: 0, x1: 12, y0: 12, y1: 25 }] },
-  main: { label: "Kitchen & living room", areas: [{ x0: 12, x1: 21, y0: 0, y1: 25 }, { x0: 21, x1: 30, y0: 9, y1: 25 }] },
+  // The bedrooms are 13 ft wide (11 felt small), Bedroom 2 turned a quarter to 13 x 12 so its
+  // beds and closet run along the front wall; the kitchen end of the main area is 8 ft.
+  bedA: { label: "Bedroom 1", areas: [{ x0: 0, x1: 13, y0: 0, y1: 13 }] },
+  bedB: { label: "Bedroom 2", areas: [{ x0: 0, x1: 13, y0: 13, y1: 25 }] },
+  main: { label: "Kitchen & living room", areas: [{ x0: 13, x1: 21, y0: 0, y1: 25 }, { x0: 21, x1: 30, y0: 9, y1: 25 }] },
   bath: { label: "Bathroom & laundry", areas: [{ x0: 21, x1: 30, y0: 0, y1: 9 }] },
 };
 
 // A door is a gap in the wall on a line: x = at (axis "x") or y = at (axis "y"), from..to along it.
 export const DOORS = [
-  { rooms: ["bedA", "main"], axis: "x", at: 12, from: 8, to: 11 },
-  { rooms: ["bedB", "main"], axis: "x", at: 12, from: 20, to: 23 },
+  { rooms: ["bedA", "main"], axis: "x", at: 13, from: 8, to: 11 },
+  // At the back of Bedroom 2's right wall: the front of it is the second bed's.
+  { rooms: ["bedB", "main"], axis: "x", at: 13, from: 15, to: 18 },
   { rooms: ["bath", "main"], axis: "y", at: 9, from: 22, to: 25 },
 ];
 
@@ -337,7 +339,7 @@ export const CATALOG = {
 // What the pieces really measure, in feet (width x depth). The models above were drawn at
 // round sizes, a little big -- a "twin" 42 inches wide, a desk 4 ft -- so a bedroom held
 // less than a real one; each is scaled to these, boxes, spots and lamp glow with it.
-// Bedroom 2 (12 x 13 ft) takes two twin beds against the left wall with the closet between,
+// Bedroom 2 (13 x 12 ft) takes two twin beds against the front wall with the closet between,
 // a desk, a dresser and a pet bed (shared/home.test.js).
 const REAL = {
   bed: [3.25, 6.5],           // twin: 39 x 75 in mattress, and its headboard
@@ -480,6 +482,7 @@ export function doorways(room) {
 }
 
 function insideRoom(room, f) {
+  if (ROOMS[room].areas.some((a) => f.x0 >= a.x0 && f.x1 <= a.x1 && f.y0 >= a.y0 && f.y1 <= a.y1)) return true;
   for (let x = f.x0 + GRID / 2; x < f.x1; x += GRID) {
     for (let y = f.y0 + GRID / 2; y < f.y1; y += GRID) if (roomAt(x, y) !== room) return false;
   }
@@ -570,26 +573,27 @@ export const DEFAULT_LAYOUTS = {
     ],
   },
   bedB: {
-    // A white basement bedroom: two twin beds with their headboards against the left wall, one
-    // in each corner, a small high window above each, and the built-in closet standing out
-    // from the wall between them, filling the space (a tight fit, flush with both); the desk, dresser and pet bed along the right, the doorway clear.
+    // A white basement bedroom: two twin beds with their headboards against the front wall, one
+    // in each corner, a small high window above each, and the built-in closet standing out from
+    // the wall between them, filling the space (a tight fit, flush with both); the desk, dresser
+    // and pet bed along the back, the doorway on the right kept clear.
     wall: "white", floor: "oak",
     items: [
-      W("basement_window", "white", "w", 0, 12.5), W("basement_window", "white", "w", 0, 22.25),
-      W("picture", "blue", "n", 12, 9), W("clock", "white", "n", 12, 4),
-      F("small_rug", "sage", 3, 17), F("bed", "blue", 0, 12, 3), F("bed", "pink", 0, 21.75, 3),
-      F("closet", "white", 0, 15.25, 3),
-      F("desk", "white", 8.5, 12), F("chair", "white", 9.5, 13.75, 2), F("dresser", "white", 10.5, 16, 1),
-      F("pet_bed", "pink", 8.25, 23.25), F("plant", "white", 10.75, 23.75),
+      W("basement_window", "white", "s", 25, 0.5), W("basement_window", "white", "s", 25, 10.25),
+      W("picture", "blue", "w", 0, 14), W("clock", "white", "w", 0, 20),
+      F("small_rug", "sage", 5, 18, 3), F("bed", "blue", 0, 18.5, 2), F("bed", "pink", 9.75, 18.5, 2),
+      F("closet", "white", 3.25, 22.5, 2),
+      F("desk", "white", 0, 13, 3), F("chair", "white", 1.75, 14, 1), F("dresser", "white", 4, 13),
+      F("pet_bed", "pink", 7.5, 13), F("plant", "white", 11.75, 13, 3),
     ],
   },
   main: {
     wall: "butter", floor: "oak",
     items: [
       W("clock", "white", "n", 0, 19.5), W("window", "white", "n", 0, 15.5), W("picture", "sun", "n", 9, 26.5),
-      F("fridge", "white", 12.25, 0), F("counter", "white", 14.75, 0), F("bowl", "blue", 12.75, 4.5), F("table", "oak", 14.5, 6),
-      F("chair", "oak", 16, 4.5), F("chair", "oak", 16, 8.5, 2),
-      F("bookshelf", "oak", 12, 14, 3), F("rug", "pink", 22.5, 14.5), F("tv", "walnut", 25.5, 9), F("sofa", "teal", 23, 20, 2),
+      F("counter", "white", 15, 0), F("fridge", "white", 13, 2.5, 3), F("bowl", "blue", 16, 3), F("table", "oak", 15, 6),
+      F("chair", "oak", 16.5, 4.5), F("chair", "oak", 16.5, 8.5, 2),
+      F("bookshelf", "oak", 13, 18.5, 3), F("rug", "pink", 22.5, 14.5), F("tv", "walnut", 25.5, 9), F("sofa", "teal", 23, 20, 2),
       F("plant", "coral", 19.5, 23.5), F("lamp", "sun", 29, 24), F("armchair", "coral", 18, 13.5, 1),
     ],
   },
@@ -647,7 +651,14 @@ export function freeSpot(room, layout, kind, color) {
     }
   }
   tries.sort((a, b) => a.score - b.score);
+  // Most places are plainly taken: rule those out cheaply before checking the whole layout.
+  const taken = c.layer === "rug" || c.layer === "wall" ? [] : layout.items
+    .filter((i) => ["solid", "small"].includes(CATALOG[i.kind]?.layer)).map(footprint);
   for (const { score: _score, ...item } of tries) {
+    if (c.layer !== "wall") {
+      const f = footprint(item);
+      if (!insideRoom(room, f) || taken.some((t) => overlaps(f, t))) continue;
+    }
     if (!layoutProblem(room, { ...layout, items: [...layout.items, item] })) return item;
   }
   return null;

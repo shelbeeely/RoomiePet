@@ -112,18 +112,44 @@ export function findPath(g, from, to) {
   const cells = [];
   for (let k = goal; k !== -1; k = prev[k]) cells.unshift(k);
   const pts = cells.map((k) => centre(k % GW, Math.floor(k / GW)));
+  // Straighten from where the pet really is, not the middle of its cell: from there a line
+  // that cleared the doorway could clip its edge.
+  if (free(g, ...cellOf(from.x, from.y))) pts[0] = { x: from.x, y: from.y };
   return [...smooth(g, pts), { x: to.x, y: to.y, z: to.z || 0 }];
 }
 
-/** Whether a pet can walk straight from a to b: every cell on the way steppable from the last. */
+/**
+ * Whether a pet can walk straight from a to b: every cell the line passes through, in order,
+ * steppable from the one before (a line through a cell's corner is a diagonal step). Sampling
+ * points along the line missed a corner it clipped by half an inch -- through a wall, at the
+ * edge of a doorway.
+ */
 function clear(g, a, b) {
-  const n = Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / (CELL / 3));
-  let [pi, pj] = cellOf(a.x, a.y);
-  for (let k = 1; k <= n; k++) {
-    const [i, j] = cellOf(a.x + ((b.x - a.x) * k) / n, a.y + ((b.y - a.y) * k) / n);
-    if (i !== pi || j !== pj) {
-      if (Math.abs(i - pi) > 1 || Math.abs(j - pj) > 1 || !step(g, pi, pj, i - pi, j - pj)) return false;
-      [pi, pj] = [i, j];
+  let [i, j] = cellOf(a.x, a.y);
+  const [ti, tj] = cellOf(b.x, b.y);
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const si = Math.sign(dx);
+  const sj = Math.sign(dy);
+  const tdx = si ? CELL / Math.abs(dx) : Infinity;
+  const tdy = sj ? CELL / Math.abs(dy) : Infinity;
+  let tx = si ? (si > 0 ? (i + 1) * CELL - a.x : a.x - i * CELL) / Math.abs(dx) : Infinity;
+  let ty = sj ? (sj > 0 ? (j + 1) * CELL - a.y : a.y - j * CELL) / Math.abs(dy) : Infinity;
+  for (let guard = 0; (i !== ti || j !== tj) && guard < 400; guard++) {
+    if (Math.abs(tx - ty) < 1e-9) {
+      if (!step(g, i, j, si, sj)) return false;
+      i += si;
+      j += sj;
+      tx += tdx;
+      ty += tdy;
+    } else if (tx < ty) {
+      if (!step(g, i, j, si, 0)) return false;
+      i += si;
+      tx += tdx;
+    } else {
+      if (!step(g, i, j, 0, sj)) return false;
+      j += sj;
+      ty += tdy;
     }
   }
   return true;
