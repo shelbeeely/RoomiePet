@@ -293,15 +293,17 @@ export const CATALOG = {
     boxes: [[0, 0, 1.2, 3, 0.12, 2.6, "main"], [0.2, 0.12, 1.4, 1.2, 0.03, 2.2, "sky"], [1.6, 0.12, 1.4, 1.2, 0.03, 2.2, "sky"], [-0.1, 0, 1.1, 3.2, 0.3, 0.12, "main"]],
   },
   closet: {
-    // A built-in closet: a pair of doors set in the wall, not a cabinet on the floor. clear is
-    // the floor kept free in front of it so the doors open.
-    label: "Closet (built in)", group: "wall", w: 6, d: 0.12, layer: "wall", clear: 2, colors: ["white", "oak", "walnut", "sage", "lilac"],
+    // A built-in closet: two full-size doors (37 in each, 6 ft 8 tall) set in the wall, not a
+    // cabinet on the floor -- in Bedroom 2 it fills the wall between the beds. clear is the
+    // floor kept free in front of it, as far as a full door swings out.
+    label: "Closet (built in)", group: "wall", w: 6.5, d: 0.12, layer: "wall", clear: 3, colors: ["white", "oak", "walnut", "sage", "lilac"],
     boxes: [
-      [0, 0, 0, 6, 0.06, 6.8, "main_"],
-      [0.15, 0.06, 0, 2.8, 0.05, 6.6, "main^"], [3.05, 0.06, 0, 2.8, 0.05, 6.6, "main^"],
-      [0.4, 0.11, 3.7, 2.3, 0.01, 2.6, "main"], [0.4, 0.11, 0.5, 2.3, 0.01, 2.8, "main"],
-      [3.3, 0.11, 3.7, 2.3, 0.01, 2.6, "main"], [3.3, 0.11, 0.5, 2.3, 0.01, 2.8, "main"],
-      [2.75, 0.11, 3.0, 0.12, 0.06, 0.5, "gold"], [3.13, 0.11, 3.0, 0.12, 0.06, 0.5, "gold"],
+      [0, 0, 0, 6.5, 0.06, 7, "main_"],
+      ...[0.1, 3.27].flatMap((u) => [
+        [u, 0.06, 0, 3.13, 0.05, 6.67, "main^"],
+        [u + 0.3, 0.11, 3.7, 2.53, 0.01, 2.6, "main"], [u + 0.3, 0.11, 0.5, 2.53, 0.01, 2.8, "main"],
+      ]),
+      [2.95, 0.11, 3.0, 0.12, 0.06, 0.5, "gold"], [3.43, 0.11, 3.0, 0.12, 0.06, 0.5, "gold"],
     ],
   },
   basement_window: {
@@ -555,12 +557,12 @@ export const DEFAULT_LAYOUTS = {
   },
   bedB: {
     // A white basement bedroom: two twin beds with their headboards against the left wall, one
-    // in each corner, a small high window above each, and the built-in closet in the wall
-    // between them; the desk, dresser and pet bed along the right, the doorway clear.
+    // in each corner, a small high window above each, and the built-in closet filling the wall
+    // between them (a tight fit, flush with both); the desk, dresser and pet bed along the right, the doorway clear.
     wall: "white", floor: "oak",
     items: [
       W("basement_window", "white", "w", 0, 12.5), W("basement_window", "white", "w", 0, 22.25),
-      W("closet", "white", "w", 0, 15.5), W("picture", "blue", "n", 12, 9), W("clock", "white", "n", 12, 4),
+      W("closet", "white", "w", 0, 15.25), W("picture", "blue", "n", 12, 9), W("clock", "white", "n", 12, 4),
       F("small_rug", "sage", 3, 17), F("bed", "blue", 0, 12, 3), F("bed", "pink", 0, 21.75, 3),
       F("desk", "white", 8.5, 12), F("chair", "white", 9.5, 13.75, 2), F("dresser", "white", 10.5, 16, 1),
       F("pet_bed", "pink", 8.25, 23.25), F("plant", "white", 10.75, 23.75),

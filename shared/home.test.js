@@ -135,7 +135,9 @@ describe("room to live in", () => {
     // The closet is in the left wall between the beds, and nothing stands in front of its doors.
     const closet = l.items.find((i) => i.kind === "closet");
     expect([closet.side, closet.line]).toEqual(["w", 0]);
-    expect(closet.at >= back.y1 && closet.at + CATALOG.closet.w <= front.y0).toBe(true);
+    expect(closet.at).toBe(back.y1);                                  // filling the space: flush with both beds
+    expect(closet.at + CATALOG.closet.w).toBe(front.y0);
+    expect(CATALOG.closet.w / 2).toBeGreaterThanOrEqual(3);           // two full-size doors
     expect(layoutProblem("bedB", { ...l, items: [...l.items, { kind: "beanbag", color: "teal", x: 0.5, y: 17, rot: 0 }] })).toMatch(/in front of the closet/);
     for (const kind of ["desk", "dresser", "pet_bed"]) expect(l.items.some((i) => i.kind === kind), kind).toBe(true);
     // And there is still room to add things.
