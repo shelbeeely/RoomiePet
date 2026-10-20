@@ -793,6 +793,1001 @@
     }
    }
   },
+  "lop": {
+   "palette": {
+    "b": "#e2b77a",
+    "d": {
+     "from": "b",
+     "shade": 0.78,
+     "hue": -8
+    },
+    "l": {
+     "from": "b",
+     "shade": 1.4
+    },
+    "p": "#f4a6b8"
+   },
+   "frames": {
+    "_body": [
+     "................",
+     "................",
+     ".....oooooo.....",
+     "...oobbbbbboo...",
+     "..obblbbbbbbbo..",
+     ".ooobbbbbbbbooo.",
+     "odpobbbbbbbbopdo",
+     "odpobbbbbbbbopdo",
+     "odpobbbbbbbbopdo",
+     "odpobbbbbbbbopdo",
+     "odpobbwwwwbbopdo",
+     ".oo.obwwwwbo.oo.",
+     "....odbbbbdo....",
+     "....oddddddo....",
+     ".....oo..oo.....",
+     "................"
+    ],
+    "idle_0": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_open",
+       "onto": "blw"
+      }
+     ]
+    },
+    "idle_1": {
+     "base": "idle_0",
+     "shift": [
+      0,
+      1
+     ]
+    },
+    "blink": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_blink",
+       "onto": "blw"
+      }
+     ]
+    },
+    "walk_0": {
+     "base": "idle_0",
+     "patch": [
+      {
+       "at": [
+        0,
+        14
+       ],
+       "rows": [
+        ".....oo_.._oo..."
+       ]
+      }
+     ]
+    },
+    "happy": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_happy",
+       "onto": "blw"
+      }
+     ]
+    },
+    "happy_1": {
+     "base": "happy",
+     "shift": [
+      0,
+      -1
+     ]
+    },
+    "sad": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_sad",
+       "onto": "blw"
+      }
+     ],
+     "shift": [
+      0,
+      1
+     ]
+    },
+    "sleep_0": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_sleep",
+       "onto": "blw"
+      }
+     ],
+     "shift": [
+      0,
+      1
+     ]
+    },
+    "sleep_1": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_sleep",
+       "onto": "blw"
+      }
+     ]
+    },
+    "eat": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_eat",
+       "onto": "blw"
+      }
+     ]
+    },
+    "poorly": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_poorly",
+       "onto": "blw"
+      }
+     ],
+     "shift": [
+      0,
+      1
+     ]
+    }
+   },
+   "animations": {
+    "idle": {
+     "frames": [
+      "idle_0",
+      "idle_1",
+      "idle_0",
+      "idle_1",
+      "blink"
+     ],
+     "fps": 3
+    },
+    "walk": {
+     "frames": [
+      "walk_0",
+      "idle_1"
+     ],
+     "fps": 6
+    },
+    "happy": {
+     "frames": [
+      "happy",
+      "happy_1"
+     ],
+     "fps": 4
+    },
+    "sad": {
+     "frames": [
+      "sad"
+     ],
+     "fps": 1
+    },
+    "sleep": {
+     "frames": [
+      "sleep_0",
+      "sleep_1"
+     ],
+     "fps": 1.5
+    },
+    "eat": {
+     "frames": [
+      "eat",
+      "idle_0"
+     ],
+     "fps": 4
+    },
+    "poorly": {
+     "frames": [
+      "poorly",
+      "sad"
+     ],
+     "fps": 1
+    }
+   },
+   "variants": {
+    "snow": {
+     "b": "#f3eee8",
+     "p": "#f7b6c6"
+    },
+    "smoke": {
+     "b": "#8e8a98"
+    },
+    "choc": {
+     "b": "#7a553c",
+     "w": "#f1e2cf"
+    }
+   }
+  },
+  "raccoon": {
+   "palette": {
+    "b": "#a9a6b2",
+    "d": {
+     "from": "b",
+     "shade": 0.78,
+     "hue": -8
+    },
+    "l": {
+     "from": "b",
+     "shade": 1.4
+    },
+    "k": {
+     "from": "b",
+     "shade": 0.42,
+     "hue": -6
+    },
+    "w": "#f4f1ec",
+    "e": "#fff6e0"
+   },
+   "frames": {
+    "_body": [
+     "................",
+     "..oo........oo..",
+     ".okko......okko.",
+     ".obbboooooobbbo.",
+     ".obbbbbbbbbbbbo.",
+     "obblbbbbbbbbbbbo",
+     "obbwwbbbbbbwwbbo",
+     "obkkkkkbbkkkkkbo",
+     "okkkkkkbbkkkkkko",
+     "obbbbbwwwwbbbbbo",
+     "obbbbwwwwwwbbbbo",
+     ".obbbwwwwwwbbbo.",
+     ".odbbbwwwwbbbdo.",
+     "..oddddddddddo..",
+     "...oo......oo...",
+     "................"
+    ],
+    "idle_0": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_open",
+       "onto": "blkw"
+      }
+     ]
+    },
+    "idle_1": {
+     "base": "idle_0",
+     "shift": [
+      0,
+      1
+     ]
+    },
+    "blink": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_blink",
+       "onto": "blkw"
+      }
+     ]
+    },
+    "walk_0": {
+     "base": "idle_0",
+     "patch": [
+      {
+       "at": [
+        0,
+        14
+       ],
+       "rows": [
+        "..oo_......_oo.."
+       ]
+      }
+     ]
+    },
+    "happy": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_happy",
+       "onto": "blkw"
+      }
+     ]
+    },
+    "happy_1": {
+     "base": "happy",
+     "shift": [
+      0,
+      -1
+     ]
+    },
+    "sad": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_sad",
+       "onto": "blkw"
+      }
+     ],
+     "shift": [
+      0,
+      1
+     ]
+    },
+    "sleep_0": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_sleep",
+       "onto": "blkw"
+      }
+     ],
+     "shift": [
+      0,
+      1
+     ]
+    },
+    "sleep_1": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_sleep",
+       "onto": "blkw"
+      }
+     ]
+    },
+    "eat": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_eat",
+       "onto": "blkw"
+      }
+     ]
+    },
+    "poorly": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_poorly",
+       "onto": "blkw"
+      }
+     ],
+     "shift": [
+      0,
+      1
+     ]
+    }
+   },
+   "animations": {
+    "idle": {
+     "frames": [
+      "idle_0",
+      "idle_1",
+      "idle_0",
+      "idle_1",
+      "blink"
+     ],
+     "fps": 3
+    },
+    "walk": {
+     "frames": [
+      "walk_0",
+      "idle_1"
+     ],
+     "fps": 6
+    },
+    "happy": {
+     "frames": [
+      "happy",
+      "happy_1"
+     ],
+     "fps": 4
+    },
+    "sad": {
+     "frames": [
+      "sad"
+     ],
+     "fps": 1
+    },
+    "sleep": {
+     "frames": [
+      "sleep_0",
+      "sleep_1"
+     ],
+     "fps": 1.5
+    },
+    "eat": {
+     "frames": [
+      "eat",
+      "idle_0"
+     ],
+     "fps": 4
+    },
+    "poorly": {
+     "frames": [
+      "poorly",
+      "sad"
+     ],
+     "fps": 1
+    }
+   },
+   "variants": {
+    "cinnamon": {
+     "b": "#b88a64"
+    },
+    "silver": {
+     "b": "#cfccd6"
+    },
+    "midnight": {
+     "b": "#6c6878",
+     "w": "#d9d6e0",
+     "k": "#2e2a36"
+    }
+   }
+  },
+  "ferret": {
+   "palette": {
+    "b": "#8a6a4f",
+    "d": {
+     "from": "b",
+     "shade": 0.78,
+     "hue": -8
+    },
+    "l": {
+     "from": "b",
+     "shade": 1.4
+    },
+    "k": {
+     "from": "b",
+     "shade": 0.8,
+     "hue": -4,
+     "sat": 0.85
+    },
+    "w": "#f6ead2",
+    "p": "#f4a6b8"
+   },
+   "frames": {
+    "_body": [
+     "................",
+     "................",
+     "...oo......oo...",
+     "..obpo....opbo..",
+     "..obbboooobbbo..",
+     "..obbbbbbbbbbo..",
+     ".obwwbbbbbbwwbo.",
+     ".obkkkbbbbkkkbo.",
+     ".obkkkwwwwkkkbo.",
+     ".obwwwwwwwwwwbo.",
+     "..obwwwwwwwwbo..",
+     "..obbwwwwwwbbo..",
+     "..obbbbbbbbbbo..",
+     "..oddddddddddo..",
+     "...oo......oo...",
+     "................"
+    ],
+    "idle_0": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_open",
+       "onto": "blkw"
+      }
+     ]
+    },
+    "idle_1": {
+     "base": "idle_0",
+     "shift": [
+      0,
+      1
+     ]
+    },
+    "blink": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_blink",
+       "onto": "blkw"
+      }
+     ]
+    },
+    "walk_0": {
+     "base": "idle_0",
+     "patch": [
+      {
+       "at": [
+        0,
+        14
+       ],
+       "rows": [
+        "..oo_......_oo.."
+       ]
+      }
+     ]
+    },
+    "happy": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_happy",
+       "onto": "blkw"
+      }
+     ]
+    },
+    "happy_1": {
+     "base": "happy",
+     "shift": [
+      0,
+      -1
+     ]
+    },
+    "sad": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_sad",
+       "onto": "blkw"
+      }
+     ],
+     "shift": [
+      0,
+      1
+     ]
+    },
+    "sleep_0": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_sleep",
+       "onto": "blkw"
+      }
+     ],
+     "shift": [
+      0,
+      1
+     ]
+    },
+    "sleep_1": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_sleep",
+       "onto": "blkw"
+      }
+     ]
+    },
+    "eat": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_eat",
+       "onto": "blkw"
+      }
+     ]
+    },
+    "poorly": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_poorly",
+       "onto": "blkw"
+      }
+     ],
+     "shift": [
+      0,
+      1
+     ]
+    }
+   },
+   "animations": {
+    "idle": {
+     "frames": [
+      "idle_0",
+      "idle_1",
+      "idle_0",
+      "idle_1",
+      "blink"
+     ],
+     "fps": 3
+    },
+    "walk": {
+     "frames": [
+      "walk_0",
+      "idle_1"
+     ],
+     "fps": 6
+    },
+    "happy": {
+     "frames": [
+      "happy",
+      "happy_1"
+     ],
+     "fps": 4
+    },
+    "sad": {
+     "frames": [
+      "sad"
+     ],
+     "fps": 1
+    },
+    "sleep": {
+     "frames": [
+      "sleep_0",
+      "sleep_1"
+     ],
+     "fps": 1.5
+    },
+    "eat": {
+     "frames": [
+      "eat",
+      "idle_0"
+     ],
+     "fps": 4
+    },
+    "poorly": {
+     "frames": [
+      "poorly",
+      "sad"
+     ],
+     "fps": 1
+    }
+   },
+   "variants": {
+    "albino": {
+     "b": "#f1e6d4",
+     "k": "#e3d2bc",
+     "e": "#c2405a"
+    },
+    "cinnamon": {
+     "b": "#c08850"
+    },
+    "silver": {
+     "b": "#a29da8"
+    }
+   }
+  },
+  "possum": {
+   "palette": {
+    "b": "#9c98a3",
+    "d": {
+     "from": "b",
+     "shade": 0.78,
+     "hue": -8
+    },
+    "l": {
+     "from": "b",
+     "shade": 1.4
+    },
+    "k": "#3a3540",
+    "r": "#b4afbd",
+    "p": "#f2a6b8",
+    "w": "#f6f3ee",
+    "m": "#e0849c"
+   },
+   "frames": {
+    "_body": [
+     ".ooo........ooo.",
+     "okkko......okkko",
+     "okppko....okppko",
+     "okppkooooookppko",
+     ".okkowwwwwwokko.",
+     ".obwwwwwwwwwwbo.",
+     "obwwwwwwwwwwwwbo",
+     "obwrrrwwwwrrrwbo",
+     "obwrrrwwwwrrrwbo",
+     "obwwwwwwwwwwwwbo",
+     "obbwwwwwwwwwwbbo",
+     ".obbbwwwwwwbbbo.",
+     ".odbbbbbbbbbbdo.",
+     "..oddddddddddo..",
+     "...oo......oo...",
+     "................"
+    ],
+    "idle_0": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_open",
+       "onto": "blrw"
+      }
+     ]
+    },
+    "idle_1": {
+     "base": "idle_0",
+     "shift": [
+      0,
+      1
+     ]
+    },
+    "blink": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_blink",
+       "onto": "blrw"
+      }
+     ]
+    },
+    "walk_0": {
+     "base": "idle_0",
+     "patch": [
+      {
+       "at": [
+        0,
+        14
+       ],
+       "rows": [
+        "..oo_......_oo.."
+       ]
+      }
+     ]
+    },
+    "happy": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_happy",
+       "onto": "blrw"
+      }
+     ]
+    },
+    "happy_1": {
+     "base": "happy",
+     "shift": [
+      0,
+      -1
+     ]
+    },
+    "sad": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_sad",
+       "onto": "blrw"
+      }
+     ],
+     "shift": [
+      0,
+      1
+     ]
+    },
+    "sleep_0": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_sleep",
+       "onto": "blrw"
+      }
+     ],
+     "shift": [
+      0,
+      1
+     ]
+    },
+    "sleep_1": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_sleep",
+       "onto": "blrw"
+      }
+     ]
+    },
+    "eat": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_eat",
+       "onto": "blrw"
+      }
+     ]
+    },
+    "poorly": {
+     "base": "_body",
+     "patch": [
+      {
+       "at": [
+        4,
+        6
+       ],
+       "part": "face_poorly",
+       "onto": "blrw"
+      }
+     ],
+     "shift": [
+      0,
+      1
+     ]
+    }
+   },
+   "animations": {
+    "idle": {
+     "frames": [
+      "idle_0",
+      "idle_1",
+      "idle_0",
+      "idle_1",
+      "blink"
+     ],
+     "fps": 3
+    },
+    "walk": {
+     "frames": [
+      "walk_0",
+      "idle_1"
+     ],
+     "fps": 6
+    },
+    "happy": {
+     "frames": [
+      "happy",
+      "happy_1"
+     ],
+     "fps": 4
+    },
+    "sad": {
+     "frames": [
+      "sad"
+     ],
+     "fps": 1
+    },
+    "sleep": {
+     "frames": [
+      "sleep_0",
+      "sleep_1"
+     ],
+     "fps": 1.5
+    },
+    "eat": {
+     "frames": [
+      "eat",
+      "idle_0"
+     ],
+     "fps": 4
+    },
+    "poorly": {
+     "frames": [
+      "poorly",
+      "sad"
+     ],
+     "fps": 1
+    }
+   },
+   "variants": {
+    "smoky": {
+     "b": "#6f6a78"
+    },
+    "cream": {
+     "b": "#d8cfc0"
+    },
+    "blossom": {
+     "b": "#c9a3b5"
+    }
+   }
+  },
   "egg": {
    "palette": {
     "w": "#fff6e6",

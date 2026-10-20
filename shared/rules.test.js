@@ -1,11 +1,25 @@
 // The rules both the server and the app go by: pets' needs and growing up, and chores' schedules.
 import { describe, expect, test } from "vitest";
-import { apply, choreReward, conditionOf, settle, stageFor, nextStage, sayHow } from "./pet.js";
+import { SPECIES, apply, choreReward, conditionOf, settle, stageFor, nextStage, sayHow } from "./pet.js";
 import { addDays, afterDone, daysBetween, dueStatus, nextInRotation, sortChores, todayIn } from "./chores.js";
 
 const HOUR = 3600000;
 
+import { readFileSync } from "node:fs";
+
 describe("pets", () => {
+  test("every species and colour the app offers has its art", () => {
+    const atlas = JSON.parse(readFileSync(new URL("../client/public/sprites/sheet.json", import.meta.url)));
+    for (const [species, { colors }] of Object.entries(SPECIES)) {
+      colors.forEach((color, i) => {
+        const key = i === 0 ? species : `${species}@${color}`;
+        for (const anim of ["idle", "walk", "happy", "sad", "sleep", "eat", "poorly"]) {
+          expect(atlas.animations[`${key}/${anim}`], `${key}/${anim}`).toBeTruthy();
+        }
+      });
+    }
+  });
+
   test("growing up by xp", () => {
     expect([0, 9, 10, 199, 200, 600, 5000].map((x) => stageFor(x).id)).toEqual(["egg", "egg", "baby", "baby", "grown", "star", "star"]);
     expect(nextStage(0).id).toBe("baby");

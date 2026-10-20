@@ -89,12 +89,90 @@ CHICK = [
     "................",
 ]
 
+# The raccoon: grey, a dark mask across the eyes, white brows and muzzle.
+RACCOON = [
+    "................",
+    "..oo........oo..",
+    ".okko......okko.",
+    ".obbboooooobbbo.",
+    ".obbbbbbbbbbbbo.",
+    "obblbbbbbbbbbbbo",
+    "obbwwbbbbbbwwbbo",
+    "obkkkkkbbkkkkkbo",
+    "okkkkkkbbkkkkkko",
+    "obbbbbwwwwbbbbbo",
+    "obbbbwwwwwwbbbbo",
+    ".obbbwwwwwwbbbo.",
+    ".odbbbwwwwbbbdo.",
+    "..oddddddddddo..",
+    "...oo......oo...",
+    "................",
+]
+# The ferret: narrower than the rest, little round ears, a cream face with a dark band over the eyes.
+FERRET = [
+    "................",
+    "................",
+    "...oo......oo...",
+    "..obpo....opbo..",
+    "..obbboooobbbo..",
+    "..obbbbbbbbbbo..",
+    ".obwwbbbbbbwwbo.",
+    ".obkkkbbbbkkkbo.",
+    ".obkkkwwwwkkkbo.",
+    ".obwwwwwwwwwwbo.",
+    "..obwwwwwwwwbo..",
+    "..obbwwwwwwbbo..",
+    "..obbbbbbbbbbo..",
+    "..oddddddddddo..",
+    "...oo......oo...",
+    "................",
+]
+# The possum: big round dark ears, pink inside, a white face with dark rings round the eyes.
+POSSUM = [
+    ".ooo........ooo.",
+    "okkko......okkko",
+    "okppko....okppko",
+    "okppk" + "oooooo" + "kppko",
+    ".okko" + "wwwwww" + "okko.",
+    ".obwwwwwwwwwwbo.",
+    "obwwwwwwwwwwwwbo",
+    "obwrrrwwwwrrrwbo",
+    "obwrrrwwwwrrrwbo",
+    "obwwwwwwwwwwwwbo",
+    "obbwwwwwwwwwwbbo",
+    ".obbbwwwwwwbbbo.",
+    ".odbbbbbbbbbbdo.",
+    "..oddddddddddo..",
+    "...oo......oo...",
+    "................",
+]
+# The lop bunny: ears hanging down beside its face instead of standing up.
+LOP = [
+    "................",
+    "................",
+    ".....oooooo.....",
+    "...oobbbbbboo...",
+    "..obblbbbbbbbo..",
+    ".ooobbbbbbbbooo.",
+    "odpobbbbbbbbopdo",
+    "odpobbbbbbbbopdo",
+    "odpobbbbbbbbopdo",
+    "odpobbbbbbbbopdo",
+    "odpobbwwwwbbopdo",
+    ".oo.obwwwwbo.oo.",
+    "....odbbbbdo....",
+    "....oddddddo....",
+    ".....oo..oo.....",
+    "................",
+]
+
 SHADES = {"d": {"from": "b", "shade": 0.78, "hue": -8}, "l": {"from": "b", "shade": 1.4}}
 
 
-def pet(body, face_at, walk_row, walk, base_color, variants, extra_palette=None):
+def pet(body, face_at, walk_row, walk, base_color, variants, extra_palette=None, onto="bl"):
+    """onto: the letters a face may be drawn over -- a masked face (raccoon, ferret) or a white one (possum) adds its own."""
     x, y = face_at
-    face = lambda part: {"at": [x, y], "part": part, "onto": "bl"}
+    face = lambda part: {"at": [x, y], "part": part, "onto": onto}
     return {
         "palette": {"b": base_color, **SHADES, **(extra_palette or {})},
         "frames": {
@@ -184,6 +262,26 @@ spec = {
             "rose": ("#f7a8c4", {}),
             "sprout": ("#a8dc8a", {}),
         }, {"m": "#f4a23a", "c": "#ff9a7a"}),
+        "lop": pet(LOP, (4, 6), 14, ".....oo_.._oo...", "#e2b77a", {
+            "snow": ("#f3eee8", {"p": "#f7b6c6"}),
+            "smoke": ("#8e8a98", {}),
+            "choc": ("#7a553c", {"w": "#f1e2cf"}),
+        }, {"p": "#f4a6b8"}, onto="blw"),
+        "raccoon": pet(RACCOON, (4, 6), 14, "..oo_......_oo..", "#a9a6b2", {
+            "cinnamon": ("#b88a64", {}),
+            "silver": ("#cfccd6", {}),
+            "midnight": ("#6c6878", {"w": "#d9d6e0", "k": "#2e2a36"}),
+        }, {"k": {"from": "b", "shade": 0.42, "hue": -6}, "w": "#f4f1ec", "e": "#fff6e0"}, onto="blkw"),
+        "ferret": pet(FERRET, (4, 6), 14, "..oo_......_oo..", "#8a6a4f", {
+            "albino": ("#f1e6d4", {"k": "#e3d2bc", "e": "#c2405a"}),
+            "cinnamon": ("#c08850", {}),
+            "silver": ("#a29da8", {}),
+        }, {"k": {"from": "b", "shade": 0.8, "hue": -4, "sat": 0.85}, "w": "#f6ead2", "p": "#f4a6b8"}, onto="blkw"),
+        "possum": pet(POSSUM, (4, 6), 14, "..oo_......_oo..", "#9c98a3", {
+            "smoky": ("#6f6a78", {}),
+            "cream": ("#d8cfc0", {}),
+            "blossom": ("#c9a3b5", {}),
+        }, {"k": "#3a3540", "r": "#b4afbd", "p": "#f2a6b8", "w": "#f6f3ee", "m": "#e0849c"}, onto="blrw"),
         "egg": {
             "palette": {"w": "#fff6e6", "s": "#f4a6b8", "d": "#e8d8c0"},
             "frames": {

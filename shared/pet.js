@@ -42,6 +42,10 @@ export const SPECIES = {
   cat: { label: "Cat", colors: ["cream", "ginger", "charcoal", "mint"] },
   bunny: { label: "Bunny", colors: ["snow", "cocoa", "pebble", "blush"] },
   chick: { label: "Chick", colors: ["sunny", "sky", "rose", "sprout"] },
+  lop: { label: "Lop bunny", colors: ["honey", "snow", "smoke", "choc"] },
+  raccoon: { label: "Raccoon", colors: ["grey", "cinnamon", "silver", "midnight"] },
+  ferret: { label: "Ferret", colors: ["sable", "albino", "cinnamon", "silver"] },
+  possum: { label: "Possum", colors: ["grey", "smoky", "cream", "blossom"] },
 };
 
 export const PAT_COOLDOWN_MS = 10 * 60 * 1000;
