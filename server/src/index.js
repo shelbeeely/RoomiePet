@@ -18,7 +18,18 @@ if (process.env.TRUST_PROXY) app.set("trust proxy", process.env.TRUST_PROXY);
 
 const dist = path.join(here, "..", "..", "client", "dist");
 if (fs.existsSync(dist)) {
-  app.use(express.static(dist, { index: false, maxAge: "1h" }));
+  app.use(express.static(dist, {
+    index: false,
+    maxAge: "1h",
+    setHeaders(res, file) {
+      const name = path.basename(file);
+      // The service worker and manifest must always be the latest, or phones keep an old app.
+      if (name === "sw.js" || name === "manifest.webmanifest") res.set("Cache-Control", "no-cache");
+      if (name === "manifest.webmanifest") res.type("application/manifest+json");
+      // Built files have content hashes in their names: they never change.
+      if (file.includes(`${path.sep}assets${path.sep}`)) res.set("Cache-Control", "public, max-age=31536000, immutable");
+    },
+  }));
   app.get(/^(?!\/api\/).*/, (_req, res) => res.sendFile(path.join(dist, "index.html")));
 }
 
@@ -26,8 +37,12 @@ const server = app.listen(port, host, () => {
   console.log(`RoomiePet on http://localhost:${port}` + (fs.existsSync(dist) ? "" : " (API only; run the client with npm run dev)"));
 });
 
+// Morning lists and pet alerts: checked every minute, sent at most once each.
+const ticking = setInterval(() => app.locals.tick().catch((e) => console.error("notifications:", e)), 60 * 1000);
+
 for (const sig of ["SIGINT", "SIGTERM"]) {
   process.on(sig, () => {
+    clearInterval(ticking);
     app.locals.hub.closeAll();
     server.close(() => process.exit(0));
   });

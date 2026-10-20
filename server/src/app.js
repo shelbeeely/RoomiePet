@@ -8,10 +8,19 @@ import {
   CATEGORIES, PAT_COOLDOWN_MS, KUDOS_GAIN, PAT_GAIN, SPECIES,
   apply, choreReward, settle, stageFor, nextStage,
 } from "../../shared/pet.js";
-import { ASSIGNMENTS, RECURRENCES, afterDone, dueStatus, todayIn } from "../../shared/chores.js";
+import { ASSIGNMENTS, RECURRENCES, afterDone, dueStatus, sortChores, todayIn } from "../../shared/chores.js";
+import { NOTIFY_KINDS, digest, doneLine, hourIn, openFor, petAlerts, prefsOf } from "../../shared/notify.js";
+import { matchChore } from "../../shared/match.js";
+import { Pusher, makeSender, vapidKeys } from "./push.js";
 
 const INVITE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; // nothing that reads as another letter
 const FEED_LIMIT = 40;
+// A tag tapped twice, or Siri asked twice: a chore done this recently is not done again.
+const RECENT_DONE_MS = 30 * 60 * 1000;
+// Pet alerts wait for daytime where the household is.
+const QUIET = { from: 21, to: 8 };
+// What an Apple Shortcuts key may do: the Shortcut-shaped endpoints and NFC tags, nothing else.
+const KEY_PATHS = [/^\/api\/shortcuts\//, /^\/api\/tags\/[\w-]+(\/tap)?$/];
 
 export class HttpError extends Error {
   constructor(status, message) {
@@ -77,7 +86,7 @@ function limiter({ max, windowMs }) {
   };
 }
 
-export function createApp(db, { now = () => Date.now(), codeLimit = { max: 30, windowMs: 15 * 60 * 1000 } } = {}) {
+export function createApp(db, { now = () => Date.now(), codeLimit = { max: 30, windowMs: 15 * 60 * 1000 }, send = null } = {}) {
   const app = express();
   const hub = new Hub();
   app.locals.hub = hub;
@@ -94,12 +103,16 @@ export function createApp(db, { now = () => Date.now(), codeLimit = { max: 30, w
 
   const q = (sql) => db.prepare(sql);
   const guard = limiter(codeLimit);
+  const vapid = vapidKeys(db);
+  const pusher = new Pusher(db, send || makeSender(vapid, process.env.VAPID_SUBJECT));
+  app.locals.pusher = pusher;
 
   // -- who is asking ------------------------------------------------------
 
-  function signIn(memberId) {
+  function signIn(memberId, kind = "device", label = null) {
     const token = crypto.randomBytes(32).toString("base64url");
-    q("INSERT INTO tokens (hash, member_id, created_at) VALUES (?, ?, ?)").run(hash(token), memberId, now());
+    q("INSERT INTO tokens (hash, member_id, created_at, kind, label) VALUES (?, ?, ?, ?, ?)")
+      .run(hash(token), memberId, now(), kind, label);
     return token;
   }
 
@@ -107,10 +120,19 @@ export function createApp(db, { now = () => Date.now(), codeLimit = { max: 30, w
     const header = req.get("authorization") || "";
     const token = header.startsWith("Bearer ") ? header.slice(7) : req.originalUrl.startsWith("/api/events?") ? req.query.token : "";
     if (!token || typeof token !== "string") return next(new HttpError(401, "Not signed in"));
-    const me = q(`SELECT m.* FROM tokens t JOIN members m ON m.id = t.member_id
+    const row = q(`SELECT m.*, t.kind AS token_kind, t.hash AS token_hash FROM tokens t JOIN members m ON m.id = t.member_id
                   WHERE t.hash = ? AND m.left_at IS NULL`).get(hash(token));
-    if (!me) return next(new HttpError(401, "Not signed in"));
+    if (!row) return next(new HttpError(401, "Not signed in"));
+    const { token_kind: kind, token_hash: tokenHash, ...me } = row;
+    if (kind === "shortcut") {
+      if (!KEY_PATHS.some((re) => re.test(req.originalUrl.split("?")[0]))) {
+        return next(new HttpError(403, "A Shortcuts key can only do chores and tags -- open the app for the rest"));
+      }
+      q("UPDATE tokens SET last_used_at = ? WHERE hash = ?").run(now(), tokenHash);
+    }
     req.me = me;
+    req.tokenKind = kind;
+    req.tokenHash = tokenHash;
     req.household = q("SELECT * FROM households WHERE id = ?").get(me.household_id);
     next();
   }
@@ -166,16 +188,27 @@ export function createApp(db, { now = () => Date.now(), codeLimit = { max: 30, w
     };
   }
 
+  function choresView(h) {
+    const today = todayIn(h.timezone, new Date(now()));
+    return q("SELECT * FROM chores WHERE household_id = ? AND archived = 0").all(h.id).map((c) => ({
+      id: c.id, title: c.title, category: c.category, effort: c.effort, recurrence: c.recurrence,
+      everyDays: c.every_days, assignment: c.assignment, assigneeId: c.assignee_id,
+      rotation: JSON.parse(c.rotation), dueDate: c.due_date, ...dueStatus(c, today),
+    }));
+  }
+
+  function tagsView(h) {
+    return q(`SELECT t.id, t.label, t.chore_id, c.title FROM nfc_tags t LEFT JOIN chores c ON c.id = t.chore_id AND c.archived = 0
+              WHERE t.household_id = ? ORDER BY t.created_at`).all(h.id)
+      .map((t) => ({ id: t.id, label: t.label, choreId: t.title ? t.chore_id : null, choreTitle: t.title || null }));
+  }
+
   function state(req) {
     const h = req.household;
     tx(db, () => settleAll(h));
     const today = todayIn(h.timezone, new Date(now()));
     const people = members(h.id);
-    const chores = q("SELECT * FROM chores WHERE household_id = ? AND archived = 0").all(h.id).map((c) => ({
-      id: c.id, title: c.title, category: c.category, effort: c.effort, recurrence: c.recurrence,
-      everyDays: c.every_days, assignment: c.assignment, assigneeId: c.assignee_id,
-      rotation: JSON.parse(c.rotation), dueDate: c.due_date, ...dueStatus(c, today),
-    }));
+    const chores = choresView(h);
     const events = q("SELECT * FROM events WHERE household_id = ? ORDER BY at DESC, rowid DESC LIMIT ?").all(h.id, FEED_LIMIT);
     const kudos = q(`SELECT k.event_id, k.from_member FROM kudos k JOIN events e ON e.id = k.event_id
                      WHERE e.household_id = ?`).all(h.id);
@@ -185,8 +218,11 @@ export function createApp(db, { now = () => Date.now(), codeLimit = { max: 30, w
       now: now(),
       household: { id: h.id, name: h.name, inviteCode: h.invite_code, timezone: h.timezone },
       me: req.me.id,
+      notify: prefsOf(people.find((m) => m.id === req.me.id)?.notify),
+      pushDevices: q("SELECT COUNT(*) AS n FROM push_subscriptions WHERE member_id = ?").get(req.me.id).n,
       members: people.map((m) => ({ id: m.id, name: m.name, pet: petView(m) })),
       chores,
+      tags: tagsView(h),
       feed: events.map((e) => ({
         id: e.id, kind: e.kind, memberId: e.member_id, who: names[e.member_id] || "Someone",
         at: e.at, data: JSON.parse(e.data),
@@ -328,6 +364,7 @@ export function createApp(db, { now = () => Date.now(), codeLimit = { max: 30, w
     tx(db, () => {
       q("UPDATE members SET left_at = ? WHERE id = ?").run(now(), req.me.id);
       q("DELETE FROM tokens WHERE member_id = ?").run(req.me.id);
+      q("DELETE FROM push_subscriptions WHERE member_id = ?").run(req.me.id);
       q("UPDATE chores SET assignment = 'anyone', assignee_id = NULL WHERE household_id = ? AND assignment = 'fixed' AND assignee_id = ?")
         .run(hid, req.me.id);
       const ids = members(hid).map((m) => m.id);
@@ -351,6 +388,12 @@ export function createApp(db, { now = () => Date.now(), codeLimit = { max: 30, w
       .run(id, req.household.id, f.title, f.category, f.effort, f.recurrence, f.every_days, f.assignment,
         f.assignee_id, JSON.stringify(f.rotation), f.due_date, req.me.id, now());
     hub.notify(req.household.id);
+    if (f.assignee_id && f.assignee_id !== req.me.id) {
+      tell(req.household, f.assignee_id, "assigned", {
+        title: f.assignment === "rotate" ? `Your turn first: ${f.title}` : `${req.me.name} gave you a chore: ${f.title}`,
+        body: `Due ${f.due_date}`, tag: `assigned-${id}`,
+      });
+    }
     res.status(201).json({ id });
   });
 
@@ -378,27 +421,73 @@ export function createApp(db, { now = () => Date.now(), codeLimit = { max: 30, w
     res.json({ ok: true });
   });
 
-  // Done: whoever did it gets the reward for their pet, even if it was someone else's turn.
-  app.post("/api/chores/:id/done", (req, res) => {
-    const h = req.household;
+  /**
+   * Whoever did it gets the reward for their pet, even if it was someone else's
+   * turn. `via` says how (app, siri, tag). With `recentGuard`, a chore someone
+   * already did in the last half hour is not done again -- a tag tapped twice.
+   */
+  function completeChore(me, h, choreId, { via = "app", recentGuard = false } = {}) {
     const out = tx(db, () => {
       settleAll(h);
-      const c = findChore(req);
+      const c = q("SELECT * FROM chores WHERE id = ? AND household_id = ? AND archived = 0").get(choreId, h.id);
+      if (!c) throw new HttpError(404, "No such chore");
+      if (recentGuard) {
+        const recent = q(`SELECT e.at, m.name FROM events e LEFT JOIN members m ON m.id = e.member_id
+                          WHERE e.household_id = ? AND e.kind = 'done' AND json_extract(e.data, '$.choreId') = ? AND e.at > ?
+                          ORDER BY e.at DESC LIMIT 1`).get(h.id, c.id, now() - RECENT_DONE_MS);
+        if (recent) return { already: { at: recent.at, who: recent.name }, chore: c };
+      }
       const today = todayIn(h.timezone, new Date(now()));
       const { gain, xp } = choreReward(c.category, c.effort);
-      const stages = reward(req.me, gain, xp);
-      const coveredFor = c.assignment !== "anyone" && c.assignee_id && c.assignee_id !== req.me.id ? c.assignee_id : null;
-      const eventId = event(h.id, "done", req.me.id, {
+      const stages = reward(me, gain, xp);
+      const coveredFor = c.assignment !== "anyone" && c.assignee_id && c.assignee_id !== me.id ? c.assignee_id : null;
+      const eventId = event(h.id, "done", me.id, {
         choreId: c.id, title: c.title, category: c.category, effort: c.effort, gain, xp, coveredFor,
-        late: dueStatus(c, today).overdue,
+        late: dueStatus(c, today).overdue, via,
       });
       const next = afterDone({ ...c, rotation: JSON.parse(c.rotation) }, today, members(h.id).map((m) => m.id));
       q("UPDATE chores SET archived = ?, due_date = ?, assignee_id = ? WHERE id = ?")
         .run(next.archived, next.due_date, next.assignee_id, c.id);
-      return { eventId, gain, xp, stage: stages };
+      return { eventId, gain, xp, stage: stages, chore: c, coveredFor, next };
     });
+    if (out.already) return out;
     hub.notify(h.id);
-    res.json(out);
+    const c = out.chore;
+    // Who to tell: the one covered for, the one whose turn it is now, and anyone who wants to hear it all.
+    if (out.coveredFor) tell(h, out.coveredFor, "covered", { title: `${me.name} did ${c.title} for you 💪`, body: "Send them a 💖?", tag: `covered-${c.id}` });
+    if (c.assignment === "rotate" && !out.next.archived && out.next.assignee_id && out.next.assignee_id !== me.id) {
+      tell(h, out.next.assignee_id, "assigned", { title: `Your turn next: ${c.title}`, body: `Due ${out.next.due_date}`, tag: `turn-${c.id}` });
+    }
+    for (const m of members(h.id)) {
+      if (m.id !== me.id && m.id !== out.coveredFor) {
+        tell(h, m.id, "roommates", { title: doneLine(me.name, c.title, c.category), body: "Send a 💖?", tag: `done-${c.id}` });
+      }
+    }
+    return out;
+  }
+
+  function petName(memberId) {
+    return q("SELECT pet_name FROM members WHERE id = ?").get(memberId)?.pet_name || "Your pet";
+  }
+
+  /** What a chore done gives, said for Siri and notifications. */
+  function doneSpeech(me, out) {
+    const name = petName(me.id);
+    if (out.already) {
+      const mins = Math.max(1, Math.round((now() - out.already.at) / 60000));
+      const who = out.already.who === me.name ? "you" : out.already.who || "someone";
+      return `${out.chore.title} was already done ${mins} minute${mins === 1 ? "" : "s"} ago by ${who}.`;
+    }
+    if (out.stage.after !== out.stage.before) {
+      return out.stage.after === "baby" ? `Done! ${name} hatched!` : `Done! ${name} grew up!`;
+    }
+    const bits = Object.entries(out.gain).filter(([, v]) => v > 0).map(([k, v]) => `${v} ${k}`);
+    return `Done! ${name} got ${bits.join(" and ")}.`;
+  }
+
+  app.post("/api/chores/:id/done", (req, res) => {
+    const out = completeChore(req.me, req.household, req.params.id);
+    res.json({ eventId: out.eventId, gain: out.gain, xp: out.xp, stage: out.stage });
   });
 
   // Kudos for a roommate's chore: a little fun for their pet, once from each roommate.
@@ -418,6 +507,9 @@ export function createApp(db, { now = () => Date.now(), codeLimit = { max: 30, w
       }
     });
     hub.notify(req.household.id);
+    tell(req.household, e.member_id, "cheers", {
+      title: `${req.me.name} cheered your ${JSON.parse(e.data).title} 💖`, body: `${petName(e.member_id)} is chuffed.`, tag: `cheer-${e.id}`,
+    });
     res.json({ ok: true });
   });
 
@@ -432,6 +524,244 @@ export function createApp(db, { now = () => Date.now(), codeLimit = { max: 30, w
     });
     hub.notify(req.household.id);
     res.json({ ok: true });
+  });
+
+  // -- notifications -------------------------------------------------------
+
+  /** Push a message to a roommate if they want this kind; the app badge shows how many chores are theirs. */
+  function tell(h, memberId, kind, msg) {
+    const m = q("SELECT * FROM members WHERE id = ? AND left_at IS NULL").get(memberId);
+    if (!m || !prefsOf(m.notify)[kind]) return Promise.resolve(0);
+    const badge = openFor(memberId, choresView(h)).length;
+    return pusher.toMember(memberId, { url: "/", ...msg, badge, kind }).catch((e) => console.warn(`push: ${e.message}`));
+  }
+  app.locals.tell = tell;
+
+  /**
+   * Run every minute: each roommate's morning list at their hour, and pet
+   * alerts (in the daytime only). Only households with someone who has
+   * notifications on are looked at.
+   */
+  async function tick() {
+    const sends = [];
+    const households = q(`SELECT DISTINCT h.* FROM households h JOIN members m ON m.household_id = h.id
+                          JOIN push_subscriptions s ON s.member_id = m.id WHERE m.left_at IS NULL`).all();
+    for (const h of households) {
+      tx(db, () => settleAll(h));
+      const today = todayIn(h.timezone, new Date(now()));
+      const hour = hourIn(h.timezone, new Date(now()));
+      const quiet = hour >= QUIET.from || hour < QUIET.to;
+      const chores = sortChores(choresView(h), today);
+      for (const m of members(h.id)) {
+        const prefs = prefsOf(m.notify);
+        const stats = { food: m.food, clean: m.clean, fun: m.fun };
+        const egg = stageFor(m.xp).id === "egg";
+        if (prefs.digest && hour === prefs.digestHour && m.digest_on !== today) {
+          q("UPDATE members SET digest_on = ? WHERE id = ?").run(today, m.id);
+          const low = egg ? null : petAlerts(m.pet_name, stats, {}).send[0];
+          const msg = digest(m.id, chores, low ? low.title : "");
+          if (msg) sends.push(tell(h, m.id, "digest", msg));
+        }
+        if (prefs.pet && !egg && !quiet) {
+          const r = petAlerts(m.pet_name, stats, JSON.parse(m.alerted || "{}"));
+          q("UPDATE members SET alerted = ? WHERE id = ?").run(JSON.stringify(r.alerted), m.id);
+          for (const msg of r.send) sends.push(tell(h, m.id, "pet", msg));
+        }
+      }
+    }
+    await Promise.all(sends);
+    return sends.length;
+  }
+  app.locals.tick = tick;
+
+  app.get("/api/push/key", (_req, res) => res.json({ publicKey: vapid.publicKey }));
+
+  app.post("/api/push/subscribe", (req, res) => {
+    const b = req.body || {};
+    const endpoint = typeof b.endpoint === "string" ? b.endpoint : "";
+    let url;
+    try {
+      url = new URL(endpoint);
+    } catch {
+      throw new HttpError(400, "Not a push subscription");
+    }
+    // Only real push services: the server makes requests to this address. Apple (Safari, iOS), Google (Chrome:
+    // fcm.googleapis.com; Chromium: *.google.com), Mozilla (Firefox), Microsoft (Edge on Windows).
+    if (url.protocol !== "https:" || !/(^|\.)(push\.apple\.com|googleapis\.com|google\.com|mozilla\.com|mozaws\.net|notify\.windows\.com)$/.test(url.hostname)) {
+      throw new HttpError(400, "That push service is not one RoomiePet sends to");
+    }
+    const keys = b.keys || {};
+    if (typeof keys.p256dh !== "string" || typeof keys.auth !== "string" || keys.p256dh.length > 200 || keys.auth.length > 100) {
+      throw new HttpError(400, "Not a push subscription");
+    }
+    q(`INSERT INTO push_subscriptions (endpoint, member_id, p256dh, auth, user_agent, created_at) VALUES (?, ?, ?, ?, ?, ?)
+       ON CONFLICT(endpoint) DO UPDATE SET member_id = excluded.member_id, p256dh = excluded.p256dh, auth = excluded.auth`)
+      .run(endpoint, req.me.id, keys.p256dh, keys.auth, String(req.get("user-agent") || "").slice(0, 200), now());
+    res.status(201).json({ ok: true });
+  });
+
+  app.post("/api/push/unsubscribe", (req, res) => {
+    q("DELETE FROM push_subscriptions WHERE endpoint = ? AND member_id = ?").run(String(req.body?.endpoint || ""), req.me.id);
+    res.json({ ok: true });
+  });
+
+  app.post("/api/push/test", async (req, res) => {
+    const n = await pusher.toMember(req.me.id, {
+      title: `${req.me.pet_name} says hi 👋`, body: "Notifications are working.", tag: "test", url: "/",
+      badge: openFor(req.me.id, choresView(req.household)).length,
+    });
+    if (!n) throw new HttpError(400, "Turn notifications on first");
+    res.json({ ok: true, devices: n });
+  });
+
+  app.patch("/api/me/notify", (req, res) => {
+    const given = req.body || {};
+    const current = prefsOf(req.me.notify);
+    for (const k of [...Object.keys(NOTIFY_KINDS), "digestHour"]) if (given[k] !== undefined) current[k] = given[k];
+    const clean = prefsOf(current);
+    q("UPDATE members SET notify = ? WHERE id = ?").run(JSON.stringify(clean), req.me.id);
+    res.json(clean);
+  });
+
+  // -- keys for Apple Shortcuts ----------------------------------------------
+
+  app.get("/api/me/keys", (req, res) => {
+    const rows = q("SELECT hash, label, created_at, last_used_at FROM tokens WHERE member_id = ? AND kind = 'shortcut' ORDER BY created_at")
+      .all(req.me.id);
+    res.json(rows.map((r) => ({ id: r.hash.slice(0, 16), label: r.label, createdAt: r.created_at, lastUsedAt: r.last_used_at })));
+  });
+
+  app.post("/api/me/keys", (req, res) => {
+    if (req.tokenKind !== "device") throw new HttpError(403, "Make keys from the app");
+    const n = q("SELECT COUNT(*) AS n FROM tokens WHERE member_id = ? AND kind = 'shortcut'").get(req.me.id).n;
+    if (n >= 10) throw new HttpError(400, "That's 10 keys already -- remove one first");
+    const label = text(req.body?.label || "Shortcuts", "Name", 40);
+    res.status(201).json({ key: signIn(req.me.id, "shortcut", label) });
+  });
+
+  app.delete("/api/me/keys/:id", (req, res) => {
+    const id = String(req.params.id);
+    if (!/^[0-9a-f]{16}$/.test(id)) throw new HttpError(404, "No such key");
+    const r = q("DELETE FROM tokens WHERE member_id = ? AND kind = 'shortcut' AND substr(hash, 1, 16) = ?").run(req.me.id, id);
+    if (!r.changes) throw new HttpError(404, "No such key");
+    res.json({ ok: true });
+  });
+
+  // -- Siri and Apple Shortcuts ------------------------------------------------
+  // Shaped for "Get Contents of URL": always 200 with {ok, speak}, so a
+  // Shortcut can just speak or show `speak` whatever happened.
+
+  const speakList = (titles) => (titles.length <= 1 ? titles.join("") : `${titles.slice(0, -1).join(", ")} and ${titles.at(-1)}`);
+
+  app.get("/api/shortcuts/summary", (req, res) => {
+    const h = req.household;
+    tx(db, () => settleAll(h));
+    const chores = sortChores(choresView(h), todayIn(h.timezone, new Date(now())));
+    const mine = openFor(req.me.id, chores);
+    const m = q("SELECT * FROM members WHERE id = ?").get(req.me.id);
+    const low = stageFor(m.xp).id === "egg" ? [] : petAlerts(m.pet_name, { food: m.food, clean: m.clean, fun: m.fun }, {}).send;
+    const parts = [
+      mine.length ? `You have ${mine.length} chore${mine.length === 1 ? "" : "s"} today: ${speakList(mine.map((c) => c.title))}.` : "Nothing due for you today.",
+      stageFor(m.xp).id === "egg" ? `${m.pet_name} is still an egg -- do a chore to hatch it.` : low.length ? low.map((x) => x.title.replace(/ \S+$/u, ".")).join(" ") : `${m.pet_name} is doing fine.`,
+    ];
+    res.json({
+      ok: true, speak: parts.join(" "), count: mine.length,
+      chores: mine.map((c) => ({ id: c.id, title: c.title, late: c.overdue })),
+      pet: { name: m.pet_name, food: Math.round(m.food), clean: Math.round(m.clean), fun: Math.round(m.fun) },
+    });
+  });
+
+  // For "Choose from List": every open chore, yours first.
+  app.get("/api/shortcuts/chores", (req, res) => {
+    const h = req.household;
+    const chores = sortChores(choresView(h), todayIn(h.timezone, new Date(now())));
+    const mine = (c) => c.assignment === "anyone" || c.assigneeId === req.me.id;
+    res.json([...chores.filter(mine), ...chores.filter((c) => !mine(c))].map((c) => ({ id: c.id, title: c.title })));
+  });
+
+  app.post("/api/shortcuts/done", (req, res) => {
+    const h = req.household;
+    const said = String(req.body?.chore ?? req.body?.text ?? "").slice(0, 200);
+    const id = typeof req.body?.id === "string" ? req.body.id : null;
+    const chores = choresView(h);
+    let chore = id ? chores.find((c) => c.id === id || c.title.toLowerCase() === id.toLowerCase()) : null;
+    if (!chore) {
+      const m = matchChore(said, chores, req.me.id);
+      if (!m.chore) {
+        const options = (m.candidates.length ? m.candidates : chores).slice(0, 4).map((c) => c.title);
+        return res.json({
+          ok: false,
+          speak: m.candidates.length
+            ? `Which one: ${speakList(options)}?`
+            : options.length ? `I couldn't find "${said}". Your chores are ${speakList(options)}.` : "There are no chores yet.",
+          options,
+        });
+      }
+      chore = m.chore;
+    }
+    const out = completeChore(req.me, h, chore.id, { via: "siri", recentGuard: true });
+    res.json({ ok: !out.already, speak: doneSpeech(req.me, out), chore: chore.title });
+  });
+
+  // -- NFC tags --------------------------------------------------------------
+  // A tag holds https://<server>/t/<id>. The id names the tag, not a person:
+  // tapping only works for someone signed in (the app, or a Shortcuts key).
+
+  const findTag = (req) => {
+    const t = q("SELECT * FROM nfc_tags WHERE id = ? AND household_id = ?").get(String(req.params.id), req.household.id);
+    if (!t) throw new HttpError(404, "That tag isn't one of your household's");
+    return t;
+  };
+
+  app.post("/api/tags", (req, res) => {
+    const choreId = String(req.body?.choreId || "");
+    const c = q("SELECT * FROM chores WHERE id = ? AND household_id = ? AND archived = 0").get(choreId, req.household.id);
+    if (!c) throw new HttpError(400, "Pick a chore for the tag");
+    const id = crypto.randomBytes(12).toString("base64url");
+    const label = req.body?.label ? text(req.body.label, "Where it is", 40) : c.title;
+    q("INSERT INTO nfc_tags (id, household_id, chore_id, label, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?)")
+      .run(id, req.household.id, c.id, label, req.me.id, now());
+    hub.notify(req.household.id);
+    res.status(201).json({ id, path: `/t/${id}` });
+  });
+
+  app.patch("/api/tags/:id", (req, res) => {
+    const t = findTag(req);
+    const choreId = req.body?.choreId !== undefined ? String(req.body.choreId) : t.chore_id;
+    if (!q("SELECT 1 FROM chores WHERE id = ? AND household_id = ? AND archived = 0").get(choreId, req.household.id)) {
+      throw new HttpError(400, "Pick a chore for the tag");
+    }
+    const label = req.body?.label !== undefined ? text(req.body.label, "Where it is", 40) : t.label;
+    q("UPDATE nfc_tags SET chore_id = ?, label = ? WHERE id = ?").run(choreId, label, t.id);
+    hub.notify(req.household.id);
+    res.json({ ok: true });
+  });
+
+  app.delete("/api/tags/:id", (req, res) => {
+    const t = findTag(req);
+    q("DELETE FROM nfc_tags WHERE id = ?").run(t.id);
+    hub.notify(req.household.id);
+    res.json({ ok: true });
+  });
+
+  app.get("/api/tags/:id", (req, res) => {
+    const t = findTag(req);
+    const c = choresView(req.household).find((x) => x.id === t.chore_id) || null;
+    res.json({ id: t.id, label: t.label, chore: c });
+  });
+
+  // Tapped: the chore is done (unless someone did it in the last half hour).
+  app.post("/api/tags/:id/tap", (req, res) => {
+    const t = findTag(req);
+    if (!q("SELECT 1 FROM chores WHERE id = ? AND archived = 0").get(t.chore_id)) {
+      return res.json({ ok: false, speak: `The ${t.label} tag's chore was removed. Set the tag up again in RoomiePet.` });
+    }
+    q("UPDATE nfc_tags SET last_tap_at = ? WHERE id = ?").run(now(), t.id);
+    const out = completeChore(req.me, req.household, t.chore_id, { via: "tag", recentGuard: true });
+    res.json({
+      ok: !out.already, already: Boolean(out.already), speak: doneSpeech(req.me, out), chore: out.chore.title,
+      gain: out.gain, stage: out.stage, eventId: out.eventId,
+    });
   });
 
   app.use("/api", (_req, _res, next) => next(new HttpError(404, "No such endpoint")));

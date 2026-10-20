@@ -1,0 +1,34 @@
+{
+  "id": "/",
+  "name": "RoomiePet",
+  "short_name": "RoomiePet",
+  "description": "Share the chores with your roommates, and each raise a little pet that thrives when you get yours done.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1f1a2b",
+  "theme_color": "#1f1a2b",
+  "categories": ["lifestyle", "productivity"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "My chores",
+      "short_name": "Chores",
+      "url": "/?tab=chores",
+      "icons": [{ "src": "/icons/shortcut-chores.png", "sizes": "96x96", "type": "image/png" }]
+    },
+    {
+      "name": "Add a chore",
+      "short_name": "Add",
+      "url": "/?tab=chores&add=1",
+      "icons": [{ "src": "/icons/shortcut-add.png", "sizes": "96x96", "type": "image/png" }]
+    }
+  ],
+  "launch_handler": { "client_mode": "focus-existing" },
+  "handle_links": "preferred"
+}

@@ -76,3 +76,73 @@ describe("chores", () => {
     expect(list.map((c) => c.title)).toEqual(["late", "soon", "a", "b"]);
   });
 });
+
+import { digest, hourIn, openFor, petAlerts, prefsOf } from "./notify.js";
+import { matchChore } from "./match.js";
+
+describe("notifications", () => {
+  const chores = [
+    { id: "1", title: "Dishes", assignment: "anyone", dueToday: true, overdue: false },
+    { id: "2", title: "Bins", assignment: "rotate", assigneeId: "ben", dueToday: true, overdue: false },
+    { id: "3", title: "Plants", assignment: "fixed", assigneeId: "ana", overdue: true },
+    { id: "4", title: "Hoover", assignment: "fixed", assigneeId: "ana", daysLeft: 3 },
+  ];
+
+  test("prefs: defaults, and only sensible values kept", () => {
+    expect(prefsOf("")).toMatchObject({ digest: true, digestHour: 9, roommates: false });
+    expect(prefsOf('{"digest":false,"digestHour":7,"roommates":"yes"}')).toMatchObject({ digest: false, digestHour: 7, roommates: false });
+    expect(prefsOf({ digestHour: 25 }).digestHour).toBe(9);
+    expect(prefsOf("not json").pet).toBe(true);
+  });
+
+  test("the morning list: yours and anyone's, due or late; nothing when nothing is due", () => {
+    expect(openFor("ana", chores).map((c) => c.id)).toEqual(["1", "3"]);
+    expect(digest("ana", chores, "Mochi is hungry")).toEqual({
+      title: "2 chores today", body: "Dishes and Plants · 1 late · Mochi is hungry", tag: "digest", url: "/",
+    });
+    expect(digest("ben", [chores[1]]).title).toBe("1 chore today: Bins");
+    expect(digest("cleo", [chores[3]])).toBeNull();
+  });
+
+  test("pet alerts: once under 25, again only after it was back over 50; poorly says it alone", () => {
+    let r = petAlerts("Mochi", { food: 20, clean: 80, fun: 80 });
+    expect(r.send.map((m) => m.tag)).toEqual(["pet-food"]);
+    r = petAlerts("Mochi", { food: 10, clean: 80, fun: 80 }, r.alerted);
+    expect(r.send).toEqual([]);
+    r = petAlerts("Mochi", { food: 40, clean: 80, fun: 80 }, r.alerted);
+    r = petAlerts("Mochi", { food: 20, clean: 80, fun: 80 }, r.alerted);
+    expect(r.send).toEqual([]);
+    r = petAlerts("Mochi", { food: 60, clean: 80, fun: 80 }, r.alerted);
+    expect(petAlerts("Mochi", { food: 20, clean: 80, fun: 80 }, r.alerted).send.length).toBe(1);
+    const p = petAlerts("Mochi", { food: 5, clean: 10, fun: 50 });
+    expect(p.send.map((m) => m.tag)).toEqual(["pet-poorly"]);
+  });
+
+  test("the hour where the household is", () => {
+    expect(hourIn("Asia/Tokyo", new Date("2026-03-02T00:30:00Z"))).toBe(9);
+    expect(hourIn("Europe/London", new Date("2026-03-02T23:30:00Z"))).toBe(23);
+  });
+});
+
+describe("finding the chore someone said", () => {
+  const chores = [
+    { id: "1", title: "Do the dishes", assignment: "anyone" },
+    { id: "2", title: "Take out bins", assignment: "rotate", assigneeId: "ben" },
+    { id: "3", title: "Take out recycling", assignment: "fixed", assigneeId: "ana" },
+    { id: "4", title: "Water plants", assignment: "fixed", assigneeId: "ana" },
+  ];
+  test("by words, forgiving of how it was said", () => {
+    expect(matchChore("I did the dishes", chores, "ana").chore.id).toBe("1");
+    expect(matchChore("dishes", chores, "ana").chore.id).toBe("1");
+    expect(matchChore("watered the plant", chores, "ana").chore.id).toBe("4");
+    expect(matchChore("the bins", chores, "ben").chore.id).toBe("2");
+  });
+  test("ambiguous or unknown says so, with what there is", () => {
+    const amb = matchChore("take out", chores, "cleo");
+    expect(amb.chore).toBeNull();
+    expect(amb.candidates.map((c) => c.id).sort()).toEqual(["2", "3"]);
+    expect(matchChore("walk the dog", chores, "ana").chore).toBeNull();
+    // Yours wins a tie.
+    expect(matchChore("take out", chores, "ana").chore.id).toBe("3");
+  });
+});

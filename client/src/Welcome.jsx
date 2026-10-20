@@ -4,9 +4,9 @@ import { useState } from "react";
 import { api, setToken } from "./api.js";
 import { PetPicker } from "./components.jsx";
 
-export default function Welcome({ atlas, onIn }) {
+export default function Welcome({ atlas, onIn, initialMode = null, keepPath = false }) {
   const fromLink = new URLSearchParams(location.search).get("join") || "";
-  const [mode, setMode] = useState(fromLink ? "join" : "start");
+  const [mode, setMode] = useState(initialMode || (fromLink ? "join" : "start"));
   const [f, setF] = useState({ householdName: "", code: fromLink, name: "", petName: "", species: "cat", color: "cream", device: "" });
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -25,7 +25,7 @@ export default function Welcome({ atlas, onIn }) {
             ? await api("POST", "/api/households/join", { ...pet, code: f.code })
             : await api("POST", "/api/device", { code: f.device });
       setToken(token);
-      history.replaceState(null, "", "/");
+      if (!keepPath) history.replaceState(null, "", "/");
       onIn();
     } catch (err) {
       setError(err.message);
@@ -48,7 +48,7 @@ export default function Welcome({ atlas, onIn }) {
       <form className="card form" onSubmit={submit}>
         {mode === "device" ? (
           <>
-            <p>On the phone you already use, go to <b>House → Add another device</b> and enter the code it shows.</p>
+            <p>On the phone you already use, go to <b>Me → Add another device</b> and enter the code it shows.</p>
             <label>
               Device code
               <input value={f.device} onChange={set("device")} placeholder="ABCD2345" autoCapitalize="characters" required />

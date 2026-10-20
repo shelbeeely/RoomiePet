@@ -11,7 +11,7 @@
     "build": "npm run build -w client",
     "start": "npm start -w server",
     "test": "npm test -w server && npm test -w client",
-    "art": "python3 art/make_spec.py && python3 .claude/skills/pixel-art/scripts/pixelart.py render art/sprites.json --out client/public/sprites && mv client/public/sprites/preview.png art/preview.png"
+    "art": "python3 art/make_spec.py && python3 .claude/skills/pixel-art/scripts/pixelart.py render art/sprites.json --out client/public/sprites && mv client/public/sprites/preview.png art/preview.png && python3 art/make_icons.py"
   },
   "engines": {
     "node": ">=22.5"

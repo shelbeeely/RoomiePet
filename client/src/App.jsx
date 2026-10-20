@@ -6,16 +6,26 @@ import { loadAtlas } from "./sprites.js";
 import HouseScene from "./HouseScene.jsx";
 import Welcome from "./Welcome.jsx";
 import { ChoreForm, ChoreList, Feed, PetCard, PetPicker } from "./components.jsx";
+import { InstallCard, NotificationsCard, ShortcutsCard, TagPage, TagsCard, TagWriter } from "./integrations.jsx";
+import { resyncPush, setBadge } from "./pwa.js";
 
 const EFFECT_MS = 4500;
 
+const TABS = ["home", "chores", "house", "me"];
+
 export default function App() {
+  const params = new URLSearchParams(location.search);
+  // /t/<id>: an NFC tag was tapped.
+  const tagId = location.pathname.match(/^\/t\/([\w-]{8,64})$/)?.[1] || null;
   const [atlas, setAtlas] = useState(null);
   const [signedIn, setSignedIn] = useState(() => Boolean(getToken()));
+  const [onTag, setOnTag] = useState(Boolean(tagId));
   const [state, setState] = useState(null);
-  const [tab, setTab] = useState("home");
+  // The app's long-press shortcuts open a tab directly (?tab=chores, &add=1).
+  const [tab, setTab] = useState(() => (TABS.includes(params.get("tab")) ? params.get("tab") : "home"));
   const [selected, setSelected] = useState(null);
-  const [editing, setEditing] = useState(null); // a chore, "new", or null
+  const [editing, setEditing] = useState(() => (params.get("add") ? "new" : null)); // a chore, "new", or null
+  const [writingTag, setWritingTag] = useState(null);
   const [toast, setToast] = useState(null);
   const [busy, setBusy] = useState(null);
   const [effects, setEffects] = useState({});
@@ -46,8 +56,10 @@ export default function App() {
 
   // Fetch now, whenever anything changes, every minute (needs fade), and on coming back to the tab.
   useEffect(() => {
-    if (!signedIn) return;
+    if (!signedIn || onTag) return;
     refresh();
+    resyncPush();
+    if (params.get("tab") || params.get("add") || params.get("source")) history.replaceState(null, "", "/");
     const stop = listen(refresh);
     const every = setInterval(refresh, 60000);
     const tick = setInterval(() => setClock(Date.now()), 15000);
@@ -59,7 +71,7 @@ export default function App() {
       clearInterval(tick);
       document.removeEventListener("visibilitychange", back);
     };
-  }, [signedIn, refresh]);
+  }, [signedIn, onTag, refresh]);
 
   // A chore done by anyone plays on their pet: to the bowl for kitchen chores, a happy hop otherwise.
   useEffect(() => {
@@ -91,13 +103,30 @@ export default function App() {
   );
   const names = Object.fromEntries(members.map((m) => [m.id, m.name]));
 
+  const myOpen = state
+    ? sortChores(state.chores, state.today).filter((c) => (c.overdue || c.dueToday) && (c.assignment === "anyone" || c.assigneeId === state.me))
+    : [];
+  // The number on the app icon: how many chores are yours today.
+  useEffect(() => {
+    if (state) setBadge(myOpen.length);
+  }, [state, myOpen.length]);
+
+  const openApp = () => {
+    history.replaceState(null, "", "/");
+    setOnTag(false);
+  };
+  if (onTag && tagId && (signedIn || !getToken())) {
+    if (!signedIn && onTag === "signing-in") {
+      return <Welcome atlas={atlas} initialMode="device" keepPath onIn={() => { setSignedIn(true); setOnTag(true); }} />;
+    }
+    return <TagPage id={tagId} onOpenApp={openApp} onSignIn={() => setOnTag("signing-in")} />;
+  }
   if (!signedIn) return <Welcome atlas={atlas} onIn={() => setSignedIn(true)} />;
   if (!state) return <main className="loading">Loading your house…</main>;
 
   const me = members.find((m) => m.id === state.me);
   const shown = members.find((m) => m.id === selected) || me;
   const chores = sortChores(state.chores, state.today);
-  const myOpen = chores.filter((c) => (c.overdue || c.dueToday) && (c.assignment === "anyone" || c.assigneeId === state.me));
 
   const run = async (fn, okText) => {
     try {
@@ -175,7 +204,9 @@ export default function App() {
           </>
         )}
 
-        {tab === "house" && <House atlas={atlas} state={state} members={members} run={run} onLeave={() => { setToken(null); setSignedIn(false); setState(null); }} />}
+        {tab === "house" && <House state={state} members={members} run={run} />}
+        {tab === "me" && <Me atlas={atlas} state={state} members={members} run={run} say={say}
+          onLeave={() => { setToken(null); setSignedIn(false); setState(null); }} />}
       </main>
 
       {editing && (
@@ -187,11 +218,21 @@ export default function App() {
           onSave={saveChore}
           onDelete={async () => { await run(() => api("DELETE", `/api/chores/${editing.id}`), "Removed"); setEditing(null); }}
           onClose={() => setEditing(null)}
+          tags={editing === "new" ? [] : state.tags.filter((t) => t.choreId === editing.id)}
+          onAddTag={async () => {
+            const label = prompt(`Where will the tag go? (e.g. "Dishwasher")`, editing.title);
+            if (label === null) return;
+            const t = await run(() => api("POST", "/api/tags", { choreId: editing.id, label: label || editing.title }));
+            setEditing(null);
+            setWritingTag({ id: t.id, label: label || editing.title, choreTitle: editing.title });
+          }}
+          onSetUpTag={(t) => { setEditing(null); setWritingTag(t); }}
         />
       )}
+      {writingTag && <TagWriter tag={writingTag} onClose={() => setWritingTag(null)} />}
 
       <nav className="tabbar">
-        {[["home", "🏠", "Home"], ["chores", "🧹", "Chores"], ["house", "👥", "House"]].map(([k, icon, label]) => (
+        {[["home", "🏠", "Home"], ["chores", "🧹", "Chores"], ["house", "👥", "House"], ["me", "⚙️", "Me"]].map(([k, icon, label]) => (
           <button key={k} className={tab === k ? "on" : ""} onClick={() => setTab(k)} aria-current={tab === k}>
             <span>{icon}</span>
             {label}
@@ -203,10 +244,7 @@ export default function App() {
   );
 }
 
-function House({ atlas, state, members, run, onLeave }) {
-  const me = members.find((m) => m.id === state.me);
-  const [edit, setEdit] = useState({ name: me.name, petName: me.pet.name, species: me.pet.species, color: me.pet.color });
-  const [device, setDevice] = useState(null);
+function House({ state, members, run }) {
   const link = `${location.origin}/?join=${state.household.inviteCode}`;
   const share = async () => {
     const text = `Join our household on RoomiePet: ${link} (code ${state.household.inviteCode})`;
@@ -237,6 +275,20 @@ function House({ atlas, state, members, run, onLeave }) {
         </ul>
       </section>
 
+      <TagsCard state={state} run={run} />
+    </>
+  );
+}
+
+function Me({ atlas, state, members, run, say, onLeave }) {
+  const me = members.find((m) => m.id === state.me);
+  const [edit, setEdit] = useState({ name: me.name, petName: me.pet.name, species: me.pet.species, color: me.pet.color });
+  const [device, setDevice] = useState(null);
+  return (
+    <>
+      <InstallCard />
+      <NotificationsCard prefs={state.notify} run={run} say={say} />
+
       <form className="card form" onSubmit={(e) => { e.preventDefault(); run(() => api("PATCH", "/api/me", edit), "Saved"); }}>
         <h3>You and your pet</h3>
         <label>Your name<input value={edit.name} maxLength={30} onChange={(e) => setEdit({ ...edit, name: e.target.value })} /></label>
@@ -245,8 +297,11 @@ function House({ atlas, state, members, run, onLeave }) {
         <button type="submit">Save</button>
       </form>
 
+      <ShortcutsCard run={run} />
+
       <section className="card">
         <h3>Add another device</h3>
+        <p className="hint">A new phone, a tablet -- or on iPhone, the Home Screen app after using Safari (they keep separate sign-ins).</p>
         {device ? (
           <p>On the other device choose <b>I'm already in</b> and enter <b className="code">{device.code}</b> (works once, for 15 minutes).</p>
         ) : (

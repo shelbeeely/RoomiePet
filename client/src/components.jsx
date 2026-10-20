@@ -121,7 +121,7 @@ export function ChoreList({ chores, names, me, onDone, onEdit, busy, flat = fals
   ));
 }
 
-export function ChoreForm({ chore, members, me, today, onSave, onDelete, onClose }) {
+export function ChoreForm({ chore, members, me, today, onSave, onDelete, onClose, tags = [], onAddTag, onSetUpTag }) {
   const [f, setF] = useState(() => ({
     title: chore?.title ?? "",
     category: chore?.category ?? "cleaning",
@@ -209,6 +209,14 @@ export function ChoreForm({ chore, members, me, today, onSave, onDelete, onClose
           {chore ? "Due" : "First due"}
           <input type="date" value={f.dueDate} min={addDays(today, -365)} onChange={set("dueDate")} required />
         </label>
+        {chore && onAddTag && (
+          <div className="tag-row">
+            {tags.map((t) => (
+              <button type="button" key={t.id} className="ghost small" onClick={() => onSetUpTag(t)}>📎 {t.label}</button>
+            ))}
+            <button type="button" className="ghost small" onClick={onAddTag}>📎 Add an NFC tag</button>
+          </div>
+        )}
         {error && <p className="error">{error}</p>}
         <div className="row">
           {chore && (

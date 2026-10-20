@@ -71,12 +71,53 @@ CREATE TABLE IF NOT EXISTS kudos (
   at INTEGER NOT NULL,
   PRIMARY KEY (event_id, from_member)
 );
+-- Where to send a roommate's push notifications: one row per installed app / browser.
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+  endpoint TEXT PRIMARY KEY,
+  member_id TEXT NOT NULL REFERENCES members(id),
+  p256dh TEXT NOT NULL,
+  auth TEXT NOT NULL,
+  user_agent TEXT,
+  created_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS push_member ON push_subscriptions(member_id);
+-- An NFC tag stuck somewhere in the flat: its URL carries only this id, never a key.
+CREATE TABLE IF NOT EXISTS nfc_tags (
+  id TEXT PRIMARY KEY,
+  household_id TEXT NOT NULL REFERENCES households(id),
+  chore_id TEXT NOT NULL REFERENCES chores(id),
+  label TEXT NOT NULL,
+  created_by TEXT,
+  created_at INTEGER NOT NULL,
+  last_tap_at INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS nfc_household ON nfc_tags(household_id);
+CREATE TABLE IF NOT EXISTS settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
 `;
+
+// Columns added after the first release, for databases made before them.
+const COLUMNS = [
+  // A token is a device's sign-in, or a key for Apple Shortcuts and the like.
+  ["tokens", "kind", "TEXT NOT NULL DEFAULT 'device'"],
+  ["tokens", "label", "TEXT"],
+  ["tokens", "last_used_at", "INTEGER"],
+  // What each roommate wants to be told, and what they were last told.
+  ["members", "notify", "TEXT NOT NULL DEFAULT '{}'"],
+  ["members", "digest_on", "TEXT"],
+  ["members", "alerted", "TEXT NOT NULL DEFAULT '{}'"],
+];
 
 export function openDb(path = ":memory:") {
   const db = new DatabaseSync(path);
   db.exec("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;");
   db.exec(SCHEMA);
+  for (const [table, column, type] of COLUMNS) {
+    const has = db.prepare(`SELECT 1 FROM pragma_table_info('${table}') WHERE name = ?`).get(column);
+    if (!has) db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`);
+  }
   return db;
 }
 
