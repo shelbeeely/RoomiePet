@@ -8,11 +8,12 @@
 // after a cleaning one, mostly about the living room otherwise. Where they
 // walk is decided here, on each phone; how they are comes from the server.
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CATALOG, ROOMS, footprint, layoutProblem, snap, wallsOf } from "@shared/home.js";
+import { CATALOG, ROOMS, footprint, layoutProblem, snap, wallSpotNear, wallsOf } from "@shared/home.js";
 import { animFor, draw, frameAt, petKey } from "./sprites.js";
 import { PX, boxesSprite, closetDoors, closetInside, dollCamera, floorSprite, order, pieceBox, pieceSprite, wallBox, wallPieceBox, wallSprite } from "./dollhouse.js";
 import { allLayouts, bedroomOf, destination, findPath, gridOf, roomAt } from "./house.js";
 import RoomBuilder from "./RoomBuilder.jsx";
+import Blueprint from "./Blueprint.jsx";
 
 const SPRITE = 64;
 const BG = "#2a2236";
@@ -49,7 +50,7 @@ function beyond(wall) {
  * order with where each lands on the screen (so a pet can have what stands
  * in front of it drawn over it again), what a tap can pick, and the lamps.
  */
-function stillScene(layouts, cam) {
+function stillScene(layouts, cam, open) {
   const canvas = document.createElement("canvas");
   canvas.width = cam.width;
   canvas.height = cam.height;
@@ -63,8 +64,12 @@ function stillScene(layouts, cam) {
   const units = [];
   const glows = [];
   const wallHits = [];
+  const closets = [];   // closet doors, for a tap to open or shut
   for (const room of rooms) {
     for (const wall of wallsOf(room)) {
+      // An open closet's front is its doorway, not a wall: the doors stand open in it.
+      const closet = wall.builtin && !wall.inside && (ROOMS[room].builtins || []).find((bi) => bi.kind === wall.builtin);
+      if (closet && open.includes(`${room}:${closet.kind}`) && wall.side === { n: "s", s: "n", w: "e", e: "w" }[closet.doors]) continue;
       const h = cam.wallHeight(wall);
       // A closet's walls are the room's own on both faces; others show the next room beyond.
       const next = wall.builtin ? (wall.inside ? null : room) : wall.outer ? null : beyond(wall);
@@ -94,9 +99,13 @@ function stillScene(layouts, cam) {
       const h = cam.wallHeight(front);
       const inside = closetInside(bi);
       units.push({ kind: "wall", box: { x0: bi.x0 + 0.1, x1: bi.x1 - 0.1, y0: bi.y0 + 0.1, y1: bi.y1 - 0.1, z0: 0, z1: 4 }, sprite: boxesSprite(`closet-in|${JSON.stringify(bi)}`, inside, cam.room ? 4 : 1, cam) });
-      const doors = closetDoors(bi);
+      const id = `${room}:${bi.kind}`;
+      const isOpen = open.includes(id);
+      const doors = closetDoors(bi, isOpen);
       const box = { x0: Math.min(...doors.map((d) => d.x0)), x1: Math.max(...doors.map((d) => d.x1)), y0: Math.min(...doors.map((d) => d.y0)), y1: Math.max(...doors.map((d) => d.y1)), z0: 0, z1: h };
-      units.push({ kind: "wall", box, sprite: boxesSprite(`closet-doors|${JSON.stringify(bi)}`, doors, h, cam) });
+      const sprite = boxesSprite(`closet-doors|${JSON.stringify(bi)}|${isOpen}`, doors, h, cam);
+      units.push({ kind: "wall", box, sprite });
+      closets.push({ id, sprite });
     }
   }
   for (const room of rooms) {
@@ -117,7 +126,7 @@ function stillScene(layouts, cam) {
     ? layouts[cam.room].items.filter((it) => CATALOG[it.kind].layer === "rug").reverse().map((it) => ({ room: cam.room, item: it, sprite: pieceSprite(it, cam) }))
     : [];
   const hits = [...list.filter((u) => u.kind === "piece").reverse(), ...wallHits, ...rugs];
-  return { layouts, cam, canvas, units: list, hits, glows };
+  return { layouts, cam, open, canvas, units: list, hits, glows, closets };
 }
 
 /** Round the piece that's picked up: its footprint on the floor, or for a wall piece where it hangs. */
@@ -148,6 +157,7 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
   const walkers = useRef(new Map());
   const drawn = useRef([]);
   const drag = useRef(null);
+  const stillRef = useRef(null);
   const [view, setView] = useState({ room: null, rot: 0 });
   const [edit, setEdit] = useState(null); // {room, draft, sel, history}
   const [saving, setSaving] = useState(false);
@@ -157,11 +167,14 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
     if (edit) all[edit.room] = edit.draft;
     return all;
   }, [saved, edit]);
-  const grid = useMemo(() => gridOf(layouts), [layouts]);
+  // Closet doors opened with a tap (on this phone): "bedB:closet".
+  const [open, setOpen] = useState([]);
+  const toggleCloset = (id) => setOpen((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]));
+  const grid = useMemo(() => gridOf(layouts, open), [layouts, open]);
   const cam = useMemo(() => dollCamera(view.room, view.rot), [view]);
 
   const latest = useRef({});
-  latest.current = { pets, effects, selectedId, hour, layouts, grid, cam, edit };
+  latest.current = { pets, effects, selectedId, hour, layouts, grid, cam, edit, open };
 
   // A new layout (saved, or being arranged): pets look again for their way.
   useEffect(() => {
@@ -194,7 +207,7 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
       const dt = Math.min(0.1, (nowMs - last) / 1000);
       last = nowMs;
       const t = nowMs / 1000;
-      const { pets, effects, selectedId, hour, layouts, grid, cam, edit } = latest.current;
+      const { pets, effects, selectedId, hour, layouts, grid, cam, edit, open } = latest.current;
       fit();
       const night = hour >= 20 || hour < 7;
       ctx.imageSmoothingEnabled = false;
@@ -246,7 +259,8 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
       });
 
       // The room(s) on show: kept, and only put together again for a new layout or view.
-      if (!still || still.layouts !== layouts || still.cam !== cam) still = stillScene(layouts, cam);
+      if (!still || still.layouts !== layouts || still.cam !== cam || still.open !== open) still = stillScene(layouts, cam, open);
+      stillRef.current = still;
       ctx.drawImage(still.canvas, 0, 0);
       const seen = cam.room ? placed.filter((u) => u.w.room === cam.room) : placed;
       // Labels and bubbles move by transform (no layout each frame): screen pixels per scene pixel.
@@ -393,25 +407,31 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
       const [x, y] = cam.unproject(sx, sy);
       return { ...item, x: snap(x - grab[0]), y: snap(y - grab[1]) };
     }
-    // Wall pieces slide along the far walls, at the height they hang.
+    // Wall pieces slide along the walls that stand, at the height they hang.
     const zMid = c.boxes[0][2] + c.boxes[0][5] / 2;
     const [x, y] = cam.unproject(sx, sy + zMid * PX);
-    let best = null;
-    for (const wl of wallsOf(view.room)) {
-      if (!cam.far(wl) || (c.outer && !wl.outer)) continue;
-      const along = wl.side === "n" || wl.side === "s" ? x : y;
-      const across = wl.side === "n" || wl.side === "s" ? y : x;
-      const at = Math.max(wl.from, Math.min(wl.to - c.w, snap(along - c.w / 2)));
-      const d = Math.abs(across - wl.line) + Math.max(0, wl.from - along, along - wl.to);
-      if (!best || d < best.d) best = { d, at, side: wl.side, line: wl.line };
+    return wallSpotNear(view.room, item, x, y, (wl) => cam.far(wl));
+  };
+
+  /** Closet doors under a tap, to open or shut them. */
+  const closetAt = (sx, sy) => {
+    for (const c of stillRef.current?.closets || []) {
+      const sp = c.sprite;
+      const x = Math.floor(sx - sp.ox);
+      const y = Math.floor(sy - sp.oy);
+      if (x >= 0 && y >= 0 && x < sp.w && y < sp.h && sp.data[(y * sp.w + x) * 4 + 3]) return c.id;
     }
-    return best ? { ...item, side: best.side, line: best.line, at: best.at } : item;
+    return null;
   };
 
   const down = (e) => {
     const [sx, sy] = scenePoint(e);
     if (edit) {
       const item = pieceAt(sx, sy);
+      if (!item && closetAt(sx, sy)) {
+        toggleCloset(closetAt(sx, sy));
+        return;
+      }
       const sel = item ? edit.draft.items.indexOf(item) : null;
       setEdit({ ...edit, sel: sel >= 0 ? sel : null });
       if (item && sel >= 0) {
@@ -424,6 +444,11 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
     const pet = petAt(sx, sy);
     if (pet) {
       onSelect(pet);
+      return;
+    }
+    const closet = closetAt(sx, sy);
+    if (closet) {
+      toggleCloset(closet);
       return;
     }
     if (!view.room) {
@@ -503,7 +528,23 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
           </button>
         ))}
       </div>
-      <div className="scene" style={{ aspectRatio: `${cam.width} / ${cam.height}` }}>
+      {edit && (
+        <div className="seg view-seg" role="tablist" aria-label="How to see the room">
+          <button role="tab" aria-selected={!edit.plan} className={!edit.plan ? "on" : ""} onClick={() => setEdit({ ...edit, plan: false })}>🏠 Dollhouse</button>
+          <button role="tab" aria-selected={!!edit.plan} className={edit.plan ? "on" : ""} onClick={() => setEdit({ ...edit, plan: true })}>📐 Blueprint</button>
+        </div>
+      )}
+      {edit?.plan && (
+        <Blueprint room={edit.room} draft={edit.draft} sel={edit.sel} open={open}
+          onSelect={(sel) => setEdit((cur) => ({ ...cur, sel }))}
+          onMove={(index, next) => setEdit((cur) => ({ ...cur, draft: { ...cur.draft, items: cur.draft.items.map((it, k) => (k === index ? next : it)) } }))}
+          onMoveEnd={(index, start) => setEdit((cur) => {
+            if (JSON.stringify(cur.draft.items[index]) === JSON.stringify(start)) return cur;
+            return { ...cur, history: [...cur.history, { ...cur.draft, items: cur.draft.items.map((it, k) => (k === index ? start : it)) }] };
+          })}
+          onToggleCloset={toggleCloset} />
+      )}
+      <div className="scene" style={{ aspectRatio: `${cam.width} / ${cam.height}`, display: edit?.plan ? "none" : undefined }}>
         <canvas
           ref={canvas}
           className={edit ? "editing" : ""}

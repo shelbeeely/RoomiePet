@@ -72,6 +72,17 @@ export function floorColor(floor, x, y) {
     if (Math.floor((x + offset) * PX) % (4 * PX) === 0) return mul(base, 0.8);
     return mul(base, 0.94 + hash(row, board) * 0.1);
   }
+  if (f.pattern === "weathered") {
+    // Long grey planks, each its own shade, with lighter and darker streaks along the grain.
+    const row = Math.floor(y * 2);
+    const offset = (row * 2.3) % 5;
+    const board = Math.floor((x + offset) / 5);
+    if (py % 8 === 0) return mul(base, 0.72);
+    if (Math.floor((x + offset) * PX) % (5 * PX) === 0) return mul(base, 0.74);
+    const tone = 0.86 + hash(row, board) * 0.26;
+    const grain = hash(py, Math.floor(px / 6) + board * 31);
+    return mul(base, tone * (grain > 0.9 ? 1.12 : grain < 0.08 ? 0.86 : 1));
+  }
   if (f.pattern === "check") {
     if (px % PX === 0 || py % PX === 0) return mul(base, 0.86);
     return (Math.floor(x) + Math.floor(y)) % 2 ? mul(base, 0.9) : base;
@@ -434,7 +445,9 @@ export function closetInside(bi) {
   return boxes;
 }
 
-export function closetDoors(bi) {
+/** The closet's doors: shut, two leaves across its front; open, swung out into the room on
+ * their hinges at each end (the 3 ft kept clear in front is where they go). */
+export function closetDoors(bi, open = false) {
   const along = bi.doors === "n" || bi.doors === "s";
   const a0 = along ? bi.x0 : bi.y0;
   const len = along ? bi.x1 - bi.x0 : bi.y1 - bi.y0;
@@ -448,13 +461,23 @@ export function closetDoors(bi) {
       ? { x0: a0 + u, x1: a0 + u + w, y0: p0, y1: p1, z0: z, z1: z + h, color }
       : { x0: p0, x1: p1, y0: a0 + u, y1: a0 + u + w, z0: z, z1: z + h, color });
   };
+  if (open) {
+    // Jambs at each end, and each leaf standing out from its hinge, square to the wall.
+    part(0, 0.1, 0, 6.8, 0.1, "#e6e3dc");
+    part(len - 0.1, 0.1, 0, 6.8, 0.1, "#e6e3dc");
+    part(0.1, 0.06, 0, 6.67, leaf, "#f4f2ed");
+    part(len - 0.16, 0.06, 0, 6.67, leaf, "#f4f2ed");
+    return boxes;
+  }
+  // Each leaf is boards standing side by side (white, as in the photo), the seams between
+  // them a shade darker, a small knob each side of where the leaves meet.
   for (const u of [0.1, 0.2 + leaf]) {
     part(u, leaf, 0, 6.67, 0.05, "#f4f2ed");
-    part(u + 0.3, leaf - 0.6, 3.7, 2.6, 0.06, "#e6e3dc");
-    part(u + 0.3, leaf - 0.6, 0.5, 2.8, 0.06, "#e6e3dc");
+    const boards = Math.round(leaf / 0.45);
+    for (let k = 1; k < boards; k++) part(u + (leaf * k) / boards - 0.02, 0.04, 0.05, 6.55, 0.06, "#d9d5cc");
   }
-  part(len / 2 - 0.25, 0.12, 3, 0.5, 0.1, MATERIALS.gold);
-  part(len / 2 + 0.13, 0.12, 3, 0.5, 0.1, MATERIALS.gold);
+  part(len / 2 - 0.2, 0.08, 3.2, 0.15, 0.1, "#8a8478");
+  part(len / 2 + 0.12, 0.08, 3.2, 0.15, 0.1, "#8a8478");
   return boxes;
 }
 

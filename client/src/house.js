@@ -19,12 +19,20 @@ export function allLayouts(saved) {
 }
 
 /** The walkable grid: which room each cell is in, and whether furniture stands on it. */
-export function gridOf(layouts) {
+export function gridOf(layouts, open = []) {
   const room = new Array(GW * GH).fill(null);
   const blocked = new Uint8Array(GW * GH);
+  // Open closets (their doors opened with a tap) are somewhere a pet can go and hide: their
+  // floor is its own little space, reached only through the doors.
+  const closets = [];
+  for (const [r, def] of Object.entries(ROOMS)) {
+    for (const bi of def.builtins || []) if (open.includes(`${r}:${bi.kind}`)) closets.push({ ...bi, room: r, id: `${r}:${bi.kind}` });
+  }
   for (let j = 0; j < GH; j++) {
     for (let i = 0; i < GW; i++) {
-      room[j * GW + i] = roomAt((i + 0.5) * CELL, (j + 0.5) * CELL);
+      const x = (i + 0.5) * CELL;
+      const y = (j + 0.5) * CELL;
+      room[j * GW + i] = roomAt(x, y) || closets.find((c) => x >= c.x0 && x < c.x1 && y >= c.y0 && y < c.y1)?.id || null;
       if (!room[j * GW + i]) blocked[j * GW + i] = 1;
     }
   }
@@ -39,7 +47,7 @@ export function gridOf(layouts) {
       }
     }
   }
-  return { room, blocked };
+  return { room, blocked, closets };
 }
 
 const cellOf = (x, y) => [Math.min(GW - 1, Math.max(0, Math.floor(x / CELL))), Math.min(GH - 1, Math.max(0, Math.floor(y / CELL)))];
@@ -55,8 +63,23 @@ function step(g, i, j, di, dj) {
   const b = nj * GW + ni;
   if (di && dj) return step(g, i, j, di, 0) && step(g, i + di, j, 0, dj) && step(g, i, j, 0, dj) && step(g, i, j + dj, di, 0);
   if (g.room[a] === g.room[b]) return true;
+  if (throughCloset(g, g.room[a], g.room[b], i, j, di, dj)) return true;
   if (di) return !!doorAt("x", Math.max(i, ni) * CELL, (j + 0.5) * CELL);
   return !!doorAt("y", Math.max(j, nj) * CELL, (i + 0.5) * CELL);
+}
+
+/** Between an open closet and its room: only through its doors, not its side walls. */
+function throughCloset(g, ra, rb, i, j, di, dj) {
+  const c = g.closets.find((k) => (k.id === ra && k.room === rb) || (k.id === rb && k.room === ra));
+  if (!c) return false;
+  if (c.doors === "n" || c.doors === "s") {
+    const line = c.doors === "n" ? c.y0 : c.y1;
+    const x = (i + 0.5) * CELL;
+    return !di && Math.abs(Math.max(j, j + dj) * CELL - line) < 1e-9 && x > c.x0 && x < c.x1;
+  }
+  const line = c.doors === "w" ? c.x0 : c.x1;
+  const y = (j + 0.5) * CELL;
+  return !dj && Math.abs(Math.max(i, i + di) * CELL - line) < 1e-9 && y > c.y0 && y < c.y1;
 }
 
 /** The nearest free cell to a point, keeping to its room when it can. */
@@ -276,6 +299,12 @@ export function destination(layouts, g, cond, effect, index, rand = Math.random)
   if (cond.state === "sad" || cond.state === "poorly") return wanderSpot(g, bedroomOf(index), rand);
   const r = rand();
   const room = r < 0.6 ? "main" : r < 0.85 ? bedroomOf(index) : r < 0.93 ? bedroomOf(index + 1) : "bath";
+  // An open closet is a place to hide: now and then a pet in that room goes in.
+  const closet = g.closets?.find((c) => c.room === room);
+  if (closet && rand() < 0.3) {
+    const k = rand();
+    return { room, x: closet.x0 + 1 + k * (closet.x1 - closet.x0 - 2), y: (closet.y0 + closet.y1) / 2 };
+  }
   if (rand() < 0.2) {
     const comfy = comfySpot(layouts, room, rand);
     if (comfy) return comfy;

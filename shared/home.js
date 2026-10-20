@@ -350,9 +350,13 @@ export const CATALOG = {
     boxes: [[0, 0, 1.2, 3, 0.12, 2.6, "main"], [0.2, 0.12, 1.4, 1.2, 0.03, 2.2, "sky"], [1.6, 0.12, 1.4, 1.2, 0.03, 2.2, "sky"], [-0.1, 0, 1.1, 3.2, 0.3, 0.12, "main"]],
   },
   basement_window: {
-    // Small and up high, with a deep sill: a basement room's window, above a headboard.
+    // Small and up high, with a deep sill and a curtain rod above: a basement room's window,
+    // as in the photo of the real Bedroom 2 (above a headboard, and one on the side wall).
     label: "Small window", group: "wall", w: 2.5, d: 0.4, layer: "wall", outer: true, colors: ["white", "oak", "teal"],
-    boxes: [[0, 0, 3, 2.5, 0.12, 0.95, "main"], [0.15, 0.12, 3.1, 2.2, 0.03, 0.75, "sky"], [0, 0, 2.88, 2.5, 0.4, 0.12, "main_"]],
+    boxes: [
+      [0, 0, 2.97, 2.5, 0.12, 0.85, "main"], [0.15, 0.12, 3.05, 2.2, 0.03, 0.68, "sky"], [0, 0, 2.85, 2.5, 0.4, 0.12, "main_"],
+      [-0.4, 0.15, 3.88, 3.3, 0.06, 0.06, "dark"], [-0.45, 0.13, 3.84, 0.1, 0.1, 0.14, "dark"], [2.85, 0.13, 3.84, 0.1, 0.1, 0.14, "dark"],
+    ],
   },
   picture: {
     label: "Picture", group: "wall", w: 2, d: 0.1, layer: "wall", colors: ["blue", "pink", "sage", "sun"],
@@ -426,6 +430,8 @@ export const FLOORS = {
   carpet: { label: "Blue carpet", base: "#8ea6c8", pattern: "carpet" },
   rosecarpet: { label: "Pink carpet", base: "#e2a9b9", pattern: "carpet" },
   check: { label: "Check tiles", base: "#f4efe6", pattern: "check" },
+  // Bedroom 2's, from a photo of the real room: grey weathered wood-look vinyl planks.
+  greywood: { label: "Grey planks", base: "#857c71", pattern: "weathered" },
   aqua: { label: "Aqua tiles", base: "#bfe6e2", pattern: "check" },
 };
 
@@ -621,10 +627,11 @@ export const DEFAULT_LAYOUTS = {
     // in each corner, a small high window above each, and the closet (part of the walls, see
     // ROOMS) between them, a tight fit flush with both; the desk, dresser
     // and pet bed along the back, the doorway on the right kept clear.
-    wall: "white", floor: "oak",
+    wall: "white", floor: "greywood",
     items: [
       W("basement_window", "white", "s", 25, 0.5), W("basement_window", "white", "s", 25, 10.25),
-      W("picture", "blue", "w", 0, 14), W("clock", "white", "w", 0, 20),
+      W("basement_window", "white", "w", 0, 15.75),
+      W("picture", "blue", "n", 13, 4.5), W("clock", "white", "w", 0, 20.5),
       F("small_rug", "sage", 5, 18, 3), F("bed", "blue", 0, 18.5, 2), F("bed", "pink", 9.75, 18.5, 2),
       F("desk", "white", 0, 13, 3), F("chair", "white", 1.75, 14, 1), F("dresser", "white", 4, 13),
       F("pet_bed", "pink", 7.5, 13), F("plant", "white", 11.75, 13, 3),
@@ -668,6 +675,26 @@ export function turned(item) {
   const shift = Math.trunc((c.w - c.d) / 2 / GRID) * GRID;
   const sign = item.rot % 2 === 0 ? 1 : -1;
   return { ...item, rot: (item.rot + 1) % 4, x: item.x + sign * shift, y: item.y - sign * shift };
+}
+
+/**
+ * A wall piece slid to the wall nearest a point (x, y) on the floor plan: onto that wall,
+ * centred on the point along it, kept within it. accept(wall) limits which walls (the
+ * dollhouse only offers the ones that stand); outside-only pieces (windows) need outer walls.
+ */
+export function wallSpotNear(room, item, x, y, accept = () => true) {
+  const c = CATALOG[item.kind];
+  let best = null;
+  for (const wl of wallsOf(room)) {
+    if (wl.inside || !accept(wl) || (c.outer && !wl.outer) || wl.to - wl.from < c.w - EPS) continue;
+    const ns = wl.side === "n" || wl.side === "s";
+    const along = ns ? x : y;
+    const across = ns ? y : x;
+    const at = Math.max(wl.from, Math.min(wl.to - c.w, snap(along - c.w / 2)));
+    const d = Math.abs(across - wl.line) + Math.max(0, wl.from - along, along - wl.to);
+    if (!best || d < best.d) best = { d, at, side: wl.side, line: wl.line };
+  }
+  return best ? { ...item, side: best.side, line: best.line, at: best.at } : item;
 }
 
 /** Somewhere a new piece fits in a room, nearest its middle (and on a wall for wall pieces), or null. */

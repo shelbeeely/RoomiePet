@@ -78,3 +78,32 @@ describe("where pets go", () => {
     expect(destination(layouts, grid, cond("egg"), null, 0)).toBe(null);
   });
 });
+
+describe("the closet's doors", () => {
+  const inCloset = { x: 6.5, y: 23.75 };
+
+  test("shut, the closet is wall: no pet can get in", () => {
+    const g = gridOf(allLayouts({}));
+    expect(free(g, Math.floor(inCloset.x / 0.5), Math.floor(inCloset.y / 0.5))).toBe(false);
+  });
+
+  test("open, a pet can go in to hide -- through the doors, never through its side walls", () => {
+    const g = gridOf(allLayouts({}), ["bedB:closet"]);
+    const from = { x: 6, y: 15 };
+    const steps = walk(findPath(g, from, inCloset), from);
+    const last = steps[steps.length - 1];
+    expect(Math.hypot(last.x - inCloset.x, last.y - inCloset.y)).toBeLessThan(0.1);
+    for (let k = 1; k < steps.length; k++) {
+      const [a, b] = [steps[k - 1], steps[k]];
+      const inside = (p) => p.x > 3.25 && p.x < 9.75 && p.y > 22.5;
+      if (inside(a) !== inside(b)) expect(Math.abs(b.y - 22.5) < 0.3 && b.x > 3.25 && b.x < 9.75, JSON.stringify([a, b])).toBe(true);
+    }
+    // And now and then a pet in Bedroom 2 heads in there of its own accord.
+    let hid = 0;
+    for (let k = 0; k < 200; k++) {
+      const d = destination(allLayouts({}), g, { state: "ok", flags: {} }, null, 1, Math.random);
+      if (d.room === "bedB" && d.y > 22.5 && d.x > 3.25 && d.x < 9.75) hid += 1;
+    }
+    expect(hid).toBeGreaterThan(0);
+  });
+});

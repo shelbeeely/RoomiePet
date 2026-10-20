@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import {
   CATALOG, DEFAULT_LAYOUTS, DOORS, FLAT, FLOORS, GRID, MATERIALS, MAX_ITEMS, ROOMS, WALLPAPERS,
-  bounds, cleanLayout, footprint, freeSpot, layoutProblem, place, roomAt, turned, wallsOf,
+  bounds, cleanLayout, footprint, freeSpot, layoutProblem, place, roomAt, turned, wallSpotNear, wallsOf,
 } from "./home.js";
 
 const rect = (a) => (a.x1 - a.x0) * (a.y1 - a.y0);
@@ -130,8 +130,11 @@ describe("room to live in", () => {
     expect(left.x0).toBe(0);
     expect(right.x1).toBe(13);
     // A small high window over each headboard.
-    const windows = l.items.filter((i) => i.kind === "basement_window").sort((p, q) => p.at - q.at);
+    const windows = l.items.filter((i) => i.kind === "basement_window" && i.side === "s").sort((p, q) => p.at - q.at);
     expect(windows.length).toBe(2);
+    // As in the photo of the real room: one more on the side wall, grey planks underfoot.
+    expect(l.items.some((i) => i.kind === "basement_window" && i.side === "w")).toBe(true);
+    expect(l.floor).toBe("greywood");
     for (const [w, bed] of [[windows[0], left], [windows[1], right]]) {
       expect([w.side, w.line]).toEqual(["s", 25]);
       expect(w.at >= bed.x0 && w.at + CATALOG.basement_window.w <= bed.x1).toBe(true);
@@ -197,5 +200,18 @@ describe("the builder's moves", () => {
     expect(freeSpot("bedB", layout, "picture")).not.toBe(null);
     const window = freeSpot("bedB", bedB, "window");
     expect(wallsOf("bedB").find((w) => w.side === window.side && w.line === window.line).outer).toBe(true);
+  });
+});
+
+describe("wall pieces dragged about", () => {
+  test("go to the nearest wall they can hang on, centred on the pointer", () => {
+    const picture = { kind: "picture", color: "sun", side: "w", line: 0, at: 14 };
+    expect(wallSpotNear("bedB", picture, 6, 13.3)).toEqual({ ...picture, side: "n", line: 13, at: 5 });
+    // A window only goes on an outside wall: by the back wall (Bedroom 1 behind) it finds the left.
+    const window = { kind: "basement_window", color: "white", side: "s", line: 25, at: 0.5 };
+    expect(wallSpotNear("bedB", window, 1, 13.4).side).toBe("w");
+    // Never inside the closet.
+    expect(wallSpotNear("bedB", picture, 6.5, 24.8).inside).toBeUndefined();
+    expect(layoutProblem("bedB", withItems([wallSpotNear("bedB", picture, 6.5, 24.8)]))).toBe(null);
   });
 });

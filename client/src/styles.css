@@ -62,6 +62,14 @@ main > * + * { margin-top: 12px; }
 .room-row { justify-content: space-between; }
 
 /* The room builder */
+.view-seg { max-width: 360px; }
+.blueprint { background: #f6f4ef; border-radius: var(--radius); padding: 6px; touch-action: none; }
+.blueprint svg { display: block; width: 100%; height: auto; }
+.blueprint .bp-piece { cursor: grab; }
+.blueprint .bp-closet { cursor: pointer; }
+.bp-label { font: 600 0.42px system-ui, sans-serif; fill: #2b2238; text-anchor: middle; pointer-events: none; }
+.bp-label.tiny { font-size: 0.3px; }
+.bp-dim { font: 700 0.5px system-ui, sans-serif; fill: #2b2238; text-anchor: middle; }
 .builder { display: grid; gap: 10px; }
 .builder-head { display: grid; gap: 8px; }
 .builder-head strong { font-size: 15px; }

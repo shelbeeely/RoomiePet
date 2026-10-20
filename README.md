@@ -144,6 +144,12 @@ per household (`PUT /api/rooms/:room`, the `room_layouts` table) and checked
 on the server by the same code the builder uses: in the room, off the
 doorways, nothing solid overlapping, windows on outside walls only.
 
+The builder shows the room as a dollhouse or as a 📐 blueprint: the room
+straight down, to scale, every piece a labelled footprint with the doors'
+swings, where pieces can be dragged just the same. Bedroom 2's closet is
+built into its walls (`builtins` in `ROOMS`): tap its doors to open them, and
+pets will now and then go in to hide.
+
 Pets find their way round the furniture and through the doors
 (`client/src/house.js`, A* on a half-foot grid). They sleep in their bedroom
 (roommates alternate between the two) -- in a pet bed if there is one, else

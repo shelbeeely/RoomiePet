@@ -10,7 +10,8 @@ Roommates' chores with a tamagotchi pet each (README.md has the whole picture).
   in-memory SQLite, a clock the test moves).
 - `client/src/` is React with Vite; `HouseScene.jsx` draws the shared flat on
   a canvas (a dollhouse, whole or one room, turnable) with `dollhouse.js`, and
-  `RoomBuilder.jsx` arranges a room; `house.js` is how pets get about.
+  `RoomBuilder.jsx` arranges a room (and `Blueprint.jsx` shows it from above);
+  `house.js` is how pets get about.
   `components.jsx` the rest, `integrations.jsx` install /
   notifications / Siri & Shortcuts / NFC tags, `pwa.js` the browser APIs.
 - Push: `server/src/push.js`; who is told what is `shared/notify.js`, sent by
