@@ -4,7 +4,10 @@
 // Every change is checked as shared/home.js checks it on the server, so what
 // can be saved is what the room shows.
 import { useEffect, useRef, useState } from "react";
-import { CATALOG, COLORWAYS, FLOORS, PILLOWS, GRID, ROOMS, WALLPAPERS, freeSpot, layoutProblem, turned } from "@shared/home.js";
+import {
+  CATALOG, COLORWAYS, FLOORS, PILLOWS, GRID, ROOMS, TAPES_PER_CUBE, TAPE_COLORS, TAPE_TITLE_MAX, WALLPAPERS,
+  PALE_SPINES, freeSpot, layoutProblem, moveTape, tapesOf, turned,
+} from "@shared/home.js";
 import { dollCamera, pieceSprite } from "./dollhouse.js";
 
 const GROUPS = [
@@ -50,6 +53,80 @@ function turnIn(room, draft, index) {
     }
   }
   return null;
+}
+
+/**
+ * The wall cubes' VHS tapes, spine out as on the shelf: tap one to pick it up, then tap another
+ * to put it there (or a cube's end to put it last in that cube); ◀ ▶ nudge it along, across into
+ * the next cube at the ends; rename it, recolour its spine, take it out or add another.
+ */
+function TapeShelf({ tapes, onChange }) {
+  const [held, setHeld] = useState(null);
+  const [note, setNote] = useState(null);
+  const tape = held && tapes[held.cube]?.[held.i];
+  const put = (to) => {
+    const next = moveTape(tapes, held, to);
+    if (!next) return setNote(`That cube is full: it holds ${TAPES_PER_CUBE}.`);
+    setNote(null);
+    onChange(next);
+    setHeld({ cube: to.cube, i: Math.min(to.i, next[to.cube].length - 1) });
+  };
+  const nudge = (dir) => {
+    const { cube, i } = held;
+    if (dir < 0 && i > 0) return put({ cube, i: i - 1 });
+    if (dir > 0 && i < tapes[cube].length - 1) return put({ cube, i: i + 1 });
+    const next = cube + dir;
+    if (next < 0 || next >= tapes.length) return;
+    put({ cube: next, i: dir > 0 ? 0 : tapes[next].length });
+  };
+  const edit = (patch) => onChange(tapes.map((c, k) => (k === held.cube ? c.map((t, j) => (j === held.i ? { ...t, ...patch } : t)) : c)));
+  const add = (cube) => {
+    if (tapes[cube].length >= TAPES_PER_CUBE) return setNote(`That cube is full: it holds ${TAPES_PER_CUBE}.`);
+    onChange(tapes.map((c, k) => (k === cube ? [...c, { t: "New tape", c: "black" }] : c)));
+    setHeld({ cube, i: tapes[cube].length });
+  };
+  return (
+    <div className="tape-shelf">
+      <div className="cubes">
+        {tapes.map((cube, k) => (
+          <div key={k} className="cube" aria-label={`Cube ${k + 1}`}>
+            {cube.map((t, i) => {
+              const on = held && held.cube === k && held.i === i;
+              return (
+                <button key={i} className={`tape${on ? " on" : ""}`} style={{ "--spine": TAPE_COLORS[t.c], "--ink": PALE_SPINES.has(t.c) ? "#1f1c26" : "#f6f3ec" }} aria-pressed={on}
+                  aria-label={`${t.t}, cube ${k + 1}, ${i + 1} of ${cube.length}`}
+                  onClick={() => (on ? setHeld(null) : held ? put({ cube: k, i }) : setHeld({ cube: k, i }))}>
+                  <span>{t.t}</span>
+                </button>
+              );
+            })}
+            <button className="tape-end" aria-label={held ? `Put it last in cube ${k + 1}` : `Add a tape to cube ${k + 1}`}
+              onClick={() => (held ? put({ cube: k, i: tapes[k].length }) : add(k))}>{held ? "↓" : "＋"}</button>
+          </div>
+        ))}
+      </div>
+      {tape ? (
+        <div className="tape-edit">
+          <button className="ghost small" aria-label="Move it left" onClick={() => nudge(-1)}>◀</button>
+          <button className="ghost small" aria-label="Move it right" onClick={() => nudge(1)}>▶</button>
+          <input value={tape.t} maxLength={TAPE_TITLE_MAX} aria-label="Title" onChange={(e) => edit({ t: e.target.value })} />
+          <div className="swatches" role="radiogroup" aria-label="Spine colour">
+            {Object.entries(TAPE_COLORS).map(([c, hex]) => (
+              <button key={c} role="radio" aria-checked={tape.c === c} aria-label={c} title={c}
+                className={`swatch${tape.c === c ? " on" : ""}`} style={{ background: hex }} onClick={() => edit({ c })} />
+            ))}
+          </div>
+          <button className="ghost small" onClick={() => {
+            onChange(tapes.map((c, k) => (k === held.cube ? c.filter((_, j) => j !== held.i) : c)));
+            setHeld(null);
+          }}>🗑 Take out</button>
+        </div>
+      ) : (
+        <p className="hint">Tap a tape to pick it up, then tap where it goes. ＋ adds one to a cube.</p>
+      )}
+      {note && <p className="hint warn">{note}</p>}
+    </div>
+  );
 }
 
 export default function RoomBuilder({ edit, saving, onChange, onSelect, onUndo, onCancel, onSave }) {
@@ -106,6 +183,10 @@ export default function RoomBuilder({ edit, saving, onChange, onSelect, onUndo, 
           {pc.layer !== "wall" && <button className="ghost small" onClick={turn}>↻ Turn</button>}
           <button className="ghost small" onClick={() => onChange({ ...draft, items: draft.items.filter((_, k) => k !== sel) }, null)}>🗑 Remove</button>
           <button className="ghost small" aria-label="Put it down" onClick={() => onSelect(null)}>✓</button>
+          {pc.shelves && (
+            <TapeShelf tapes={tapesOf(picked)}
+              onChange={(tapes) => onChange({ ...draft, items: draft.items.map((it, k) => (k === sel ? { ...it, tapes } : it)) })} />
+          )}
         </div>
       ) : (
         <p className="hint">Drag furniture to move it, tap a piece to recolour, turn or remove it. ⟲ ⟳ turn the room.</p>

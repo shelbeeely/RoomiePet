@@ -310,6 +310,94 @@ function imacG3(u, v, z, px = PIX) {
   return out;
 }
 
+// -- VHS tapes ---------------------------------------------------------------------------
+
+// The wall cubes hold VHS tapes: each a title and the colour of its spine, in order, up to
+// TAPES_PER_CUBE in a cube (a tape is an inch thick; seven fill a cube, as in the photo of hers).
+export const TAPE_COLORS = {
+  black: "#1f1c26", silver: "#8e96a3", teal: "#2f8f8a", red: "#c8323c", orange: "#e8894a", peach: "#f2b3a0",
+  yellow: "#efc23a", green: "#3f8a4a", blue: "#2f5fb8", purple: "#7a4fb0", pink: "#f08cb8", white: "#ece8e0",
+};
+// Spines are printed: the title in white on a dark one, in black on a pale one.
+export const PALE_SPINES = new Set(["silver", "peach", "orange", "yellow", "pink", "white"]);
+for (const [k, v] of Object.entries(TAPE_COLORS)) MATERIALS[`tape_${k}`] = v;
+MATERIALS.tape_case = "#15131a";
+export const TAPES_PER_CUBE = 7;
+export const TAPE_TITLE_MAX = 24;
+const TAPE = (t, c) => ({ t, c });
+// Hers, as in the photo of the shelf: all in the raised middle cube, the other two empty --
+// Independence Day twice, the three Matrix films, an orange one and a Memorex blank.
+export const DEFAULT_TAPES = [
+  [],
+  [
+    TAPE("Independence Day", "black"), TAPE("Independence Day", "black"), TAPE("The Matrix", "silver"),
+    TAPE("Matrix Reloaded", "black"), TAPE("Matrix Revolutions", "teal"), TAPE("Orange one", "orange"), TAPE("Memorex blank", "peach"),
+  ],
+  [],
+];
+
+/** The tapes in a piece with shelves: its own, or the default shelf-full. */
+export function tapesOf(item) {
+  return Array.isArray(item.tapes) ? item.tapes : DEFAULT_TAPES;
+}
+
+/** What's wrong with a set of tapes for so many cubes, or null. */
+export function tapeProblem(tapes, cubes) {
+  if (!Array.isArray(tapes) || tapes.length !== cubes) return `The tapes go in ${cubes} cubes`;
+  for (const cube of tapes) {
+    if (!Array.isArray(cube)) return "The tapes go in cubes";
+    if (cube.length > TAPES_PER_CUBE) return `A cube holds ${TAPES_PER_CUBE} tapes`;
+    for (const tape of cube) {
+      if (!tape || typeof tape.t !== "string" || tape.t.length > TAPE_TITLE_MAX) return `A tape's title is up to ${TAPE_TITLE_MAX} letters`;
+      if (!Object.hasOwn(TAPE_COLORS, tape.c)) return "A tape doesn't come in that colour";
+    }
+  }
+  return null;
+}
+
+/** The tapes with the one at from moved to sit at to ({cube, i}), or null if that cube is full. */
+export function moveTape(tapes, from, to) {
+  const out = tapes.map((cube) => [...cube]);
+  if (from.cube !== to.cube && out[to.cube].length >= TAPES_PER_CUBE) return null;
+  const [tape] = out[from.cube].splice(from.i, 1);
+  out[to.cube].splice(Math.min(to.i, out[to.cube].length), 0, tape);
+  return out;
+}
+
+const CUBES = [[0, 2.5], [0.76, 3.0], [1.52, 2.5]];
+
+/**
+ * The wall cubes and the tapes in them. Each tape: its case, the spine printed in its colour, the
+ * studio's mark at the top and the title down it -- drawn sharp, a mark a letter and a gap a
+ * space, so a long title and a short one, or two tapes, look different.
+ */
+function cubeBoxes(item, hd) {
+  const px = hd ? PIX / 2 : PIX;
+  const out = [];
+  tapesOf(item).forEach((cube, k) => {
+    const [x, z] = CUBES[k];
+    out.push(
+      [x, 0, z, 0.72, 0.8, 0.06, "main"], [x, 0, z + 0.66, 0.72, 0.8, 0.06, "main"],
+      [x, 0, z, 0.06, 0.8, 0.72, "main"], [x + 0.66, 0, z, 0.06, 0.8, 0.72, "main"], [x, 0, z, 0.72, 0.04, 0.72, "main_"],
+    );
+    cube.forEach((tape, i) => {
+      const tx = x + 0.07 + i * 0.084;
+      const ink = PALE_SPINES.has(tape.c) ? "ink" : "white";
+      out.push([tx, 0.12, z + 0.06, 0.078, 0.62, 0.58, "tape_case"], [tx + 0.004, 0.74, z + 0.07, 0.07, 0.01, 0.56, `tape_${tape.c}`]);
+      if (!hd) {
+        out.push([tx + 0.025, 0.75, z + 0.2, 0.03, 0.01, 0.3, ink]);
+        return;
+      }
+      out.push([tx + 0.02, 0.75, z + 0.53, 0.035, 0.004, px, "candy"]);            // the studio's mark
+      const letters = tape.t.slice(0, 13);
+      for (let j = 0; j < letters.length; j += 1) {
+        if (letters[j] !== " ") out.push([tx + 0.024, 0.755, z + 0.49 - j * px, 0.028, 0.003, px * 0.8, ink]);
+      }
+    });
+  });
+  return out;
+}
+
 const legs = (w, d, h, inset = 0.1, s = 0.25, mat = "wood") => [
   [inset, inset, 0, s, s, h, mat], [w - inset - s, inset, 0, s, s, h, mat],
   [inset, d - inset - s, 0, s, s, h, mat], [w - inset - s, d - inset - s, 0, s, s, h, mat],
@@ -503,18 +591,14 @@ export const CATALOG = {
     ],
   },
   cube_shelf: {
-    // A set of three small black cubes on the wall by the twin by the door, stepped up one after another,
-    // full of VHS tapes standing on end: black cases, white labels on their spines.
+    // A set of three small cubes on the wall by the twin by the door, stepped up one after
+    // another, her VHS tapes standing on end in them. Which tapes, in what order in which cube,
+    // is the item's own (tapes: see TAPES), moved about in the room builder. Drawn sharp, so
+    // each spine shows its colour, its white label and the title's marks on it.
     label: "Wall cubes", group: "wall", w: 2.25, d: 0.8, layer: "wall", colors: ["black", "white", "lilac", "pink"],
-    boxes: [
-      ...[[0, 2.5], [0.76, 3.0], [1.52, 2.5]].flatMap(([x, z]) => [
-        [x, 0, z, 0.72, 0.8, 0.06, "main"], [x, 0, z + 0.66, 0.72, 0.8, 0.06, "main"],
-        [x, 0, z, 0.06, 0.8, 0.72, "main"], [x + 0.66, 0, z, 0.06, 0.8, 0.72, "main"], [x, 0, z, 0.72, 0.04, 0.72, "main_"],
-        ...[0.07, 0.17, 0.27, 0.37, 0.47, 0.57].flatMap((u) => [
-          [x + u, 0.12, z + 0.06, 0.09, 0.62, 0.58, "dark"], [x + u + 0.01, 0.74, z + 0.2, 0.07, 0.01, 0.3, "white"],
-        ]),
-      ]),
-    ],
+    shelves: 3,
+    boxesFor: (item, hd) => cubeBoxes(item, hd),
+    hd: true,
   },
   robot_vacuum: {
     // The robot vacuum that does the rounds of the floor.
@@ -895,6 +979,7 @@ const REAL = {
   mat: [2.5, 1.75],
   vanity: [2.5, 1.75],        // the real bathroom's, 30 in
 };
+for (const c of Object.values(CATALOG)) if (c.boxesFor && !c.boxes) c.boxes = c.boxesFor({}, false);
 for (const [kind, [w, d]] of Object.entries(REAL)) {
   const c = CATALOG[kind];
   const kx = w / c.w;
@@ -990,7 +1075,8 @@ function wallBox(item, out = CATALOG[item.kind].d) {
 export function boxesOf(item, hd = false) {
   const c = CATALOG[item.kind];
   const at = c.layer === "wall" ? wallPlace : place;
-  return (hd && c.hd ? c.hd : c.boxes).map(([x, y, z, w, d, h, mat]) => {
+  const src = c.boxesFor ? c.boxesFor(item, hd && !!c.hd) : hd && c.hd ? c.hd : c.boxes;
+  return src.map(([x, y, z, w, d, h, mat]) => {
     const [ax, ay] = at(item, x, y);
     const [bx, by] = at(item, x + w, y + d);
     return { x0: Math.min(ax, bx), x1: Math.max(ax, bx), y0: Math.min(ay, by), y1: Math.max(ay, by), z0: z, z1: z + h, mat };
@@ -1070,6 +1156,10 @@ export function layoutProblem(room, layout) {
     if (c.layer === "wall") {
       if (!["n", "e", "s", "w"].includes(item.side) || !onGrid(item.at) || !onGrid(item.line)) return `${c.label} must hang on a wall`;
       if (!onWall(room, item)) return c.outer ? `${c.label} must go on an outside wall` : `${c.label} must hang on one of the room's walls`;
+      if (c.shelves && item.tapes !== undefined) {
+        const bad = tapeProblem(item.tapes, c.shelves);
+        if (bad) return bad;
+      }
       const span = { side: item.side, line: item.line, from: item.at, to: item.at + c.w };
       if (placed.some((p) => p.span && p.span.side === span.side && p.span.line === span.line && p.span.from < span.to - EPS && span.from < p.span.to - EPS)) {
         return `${c.label} overlaps something on the wall`;
@@ -1117,7 +1207,10 @@ export function cleanLayout(layout) {
     wall: layout.wall,
     floor: layout.floor,
     items: layout.items.map((i) => (CATALOG[i.kind].layer === "wall"
-      ? { kind: i.kind, color: i.color, side: i.side, line: i.line, at: i.at }
+      ? {
+        kind: i.kind, color: i.color, side: i.side, line: i.line, at: i.at,
+        ...(CATALOG[i.kind].shelves && Array.isArray(i.tapes) ? { tapes: i.tapes.map((cube) => cube.map(({ t, c }) => ({ t, c }))) } : {}),
+      }
       : { kind: i.kind, color: i.color, x: i.x, y: i.y, rot: i.rot })),
   };
 }
@@ -1156,7 +1249,7 @@ export const DEFAULT_LAYOUTS = {
       F("l_desk", "walnut", 0, 12), F("office_chair", "white", 2.25, 13.75, 2), F("shelf_3tier", "black", 7, 12), F("imac_g3", "white", 4.75, 12),
       F("desk_tv", "black", 9, 12), F("tall_chest", "white", 0, 15, 3), F("clothes_rack", "white", 4.75, 14),
       F("twin_xl", "lilac", 0, 18, 2), F("platform_bed", "kitty", 9.75, 18.5, 2), F("storage_chest", "black", 10.25, 17, 2),
-      W("cube_shelf", "black", "e", 13, 17), F("robot_vacuum", "black", 8.25, 19),
+      { ...W("cube_shelf", "black", "e", 13, 17), tapes: DEFAULT_TAPES }, F("robot_vacuum", "black", 8.25, 19),
       W("corkboard", "oak", "e", 13, 12.25), W("cards", "white", "w", 0, 22.75),
       // The twin by the door and its half of the room, done up dark pastel with Kuromi about the place.
       F("skull_rug", "lilac", 6.75, 16),

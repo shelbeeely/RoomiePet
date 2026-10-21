@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import {
   CATALOG, DEFAULT_LAYOUTS, DOORS, FLAT, FLOORS, GRID, MATERIALS, MAX_ITEMS, PILLOWS, ROOMS, WALLPAPERS,
+  DEFAULT_TAPES, TAPES_PER_CUBE, boxesOf, moveTape,
   bounds, cleanLayout, footprint, freeSpot, layoutProblem, place, roomAt, turned, wallSpotNear, wallsOf,
 } from "./home.js";
 
@@ -293,3 +294,43 @@ describe("the real flat, from its photos", () => {
     for (const kind of ["washer", "dryer", "vanity", "toilet", "tub_shower"]) expect(DEFAULT_LAYOUTS.bath.items.some((i) => i.kind === kind), kind).toBe(true);
   });
 });
+
+describe("the VHS tapes in the wall cubes", () => {
+  const shelf = () => DEFAULT_LAYOUTS.bedB.items.find((i) => i.kind === "cube_shelf");
+  const withTapes = (tapes) => ({ ...DEFAULT_LAYOUTS.bedB, items: DEFAULT_LAYOUTS.bedB.items.map((i) => (i.kind === "cube_shelf" ? { ...i, tapes } : i)) });
+
+  test("start as hers do on the shelf: all seven in the raised middle cube", () => {
+    expect(DEFAULT_TAPES.map((c) => c.length)).toEqual([0, 7, 0]);
+    expect(DEFAULT_TAPES[1].filter((t) => t.t.includes("Matrix"))).toHaveLength(3);
+  });
+
+  test("are moved about one at a time: along a cube, or into another that has room", () => {
+    const t = [[{ t: "A", c: "red" }, { t: "B", c: "blue" }, { t: "C", c: "teal" }], [{ t: "D", c: "black" }], []];
+    expect(moveTape(t, { cube: 0, i: 0 }, { cube: 0, i: 2 })[0].map((x) => x.t)).toEqual(["B", "C", "A"]);
+    const across = moveTape(t, { cube: 0, i: 1 }, { cube: 2, i: 0 });
+    expect(across.map((c) => c.map((x) => x.t))).toEqual([["A", "C"], ["D"], ["B"]]);
+    const full = [Array.from({ length: TAPES_PER_CUBE }, () => ({ t: "x", c: "black" })), [{ t: "y", c: "red" }], []];
+    expect(moveTape(full, { cube: 1, i: 0 }, { cube: 0, i: 0 })).toBe(null);
+    expect(t[0][0].t).toBe("A");                                          // the original is left as it was
+  });
+
+  test("are saved with the room, checked as anything else is", () => {
+    expect(layoutProblem("bedB", withTapes(moveTape(DEFAULT_TAPES, { cube: 1, i: 6 }, { cube: 0, i: 0 })))).toBe(null);
+    expect(layoutProblem("bedB", withTapes([[], []]))).toMatch(/3 cubes/);
+    expect(layoutProblem("bedB", withTapes([Array.from({ length: TAPES_PER_CUBE + 1 }, () => ({ t: "x", c: "black" })), [], []]))).toMatch(/holds/);
+    expect(layoutProblem("bedB", withTapes([[{ t: "x".repeat(40), c: "black" }], [], []]))).toMatch(/title/);
+    expect(layoutProblem("bedB", withTapes([[{ t: "x", c: "plaid" }], [], []]))).toMatch(/colour/);
+    const saved = cleanLayout(withTapes([[{ t: "Coraline", c: "purple", sneaky: 1 }], [], []]));
+    expect(saved.items.find((i) => i.kind === "cube_shelf").tapes).toEqual([[{ t: "Coraline", c: "purple" }], [], []]);
+  });
+
+  test("are drawn as they stand: a spine for each, the title's marks on it when sharp", () => {
+    const spines = (item, hd) => boxesOf(item, hd).filter((b) => b.mat.startsWith("tape_") && b.mat !== "tape_case");
+    expect(spines(shelf(), false)).toHaveLength(DEFAULT_TAPES.flat().length);
+    const one = { ...shelf(), tapes: [[{ t: "Up", c: "red" }], [], []] };
+    expect(spines(one, false).map((b) => b.mat)).toEqual(["tape_red"]);
+    const marks = (item) => boxesOf(item, true).filter((b) => b.mat === "ink" || b.mat === "white").length;
+    expect(marks({ ...one, tapes: [[{ t: "Jaws 2", c: "red" }], [], []] })).toBe(5);   // a mark a letter, none for the space
+  });
+});
+

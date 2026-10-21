@@ -151,6 +151,11 @@ swings, where pieces can be dragged just the same. Bedroom 2's closet is
 built into its walls (`builtins` in `ROOMS`): tap its doors to open them, and
 pets will now and then go in to hide.
 
+The wall cubes in Bedroom 2 hold her VHS tapes, each with a title and a spine
+colour, in order (`tapes` on the item, checked by `tapeProblem`). Pick the cubes
+up in the builder to move tapes along a cube or into another, rename and
+recolour them, take them out or add more.
+
 The flat is drawn at 16 pixels to the foot. A few pieces are drawn sharp, at
 twice that (a catalog entry's `hd`): the teal iMac G3, built in half-pixel
 slices to its real egg-backed shape. They sit
