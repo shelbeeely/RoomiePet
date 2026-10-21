@@ -331,7 +331,9 @@ export const TAPE_TITLE_MAX = 24;
 export const COVER_URL_MAX = 500;
 export const coverOk = (url) => typeof url === "string" && url.length <= COVER_URL_MAX && /^https:\/\/[^\s"'<>]+$/.test(url);
 // a is the tape's spine artwork, if it has its own (TAPE_ART: cut from the photo of her shelf).
-const TAPE = (t, c, a) => (a ? { t, c, a } : { t, c });
+const TAPE = (t, c, a, cover) => ({ t, c, ...(a ? { a } : {}), ...(cover ? { cover } : {}) });
+// Box art for hers, from VHSCollector.com's scans of the same releases (linked, not copied).
+const VC = (file) => `https://vhscollector.com/sites/default/files/styles/250_height_full_page/public/vhsimages/${file}.jpg`;
 export { TAPE_ART };
 // Hers, as in the photo of the shelf, in the raised middle cube -- Independence Day twice, the
 // three Matrix films, an Indiana Jones and a Memorex blank -- and either side, the shelf filled
@@ -341,9 +343,12 @@ const archived = (...ids) => ids.map((id) => ({ ...ARCHIVE_TAPES[id] }));
 export const DEFAULT_TAPES = [
   archived("care_bears", "rugrats", "ducktales", "grinch_night", "dinosaurs", "turtles", "sonic"),
   [
-    TAPE("Independence Day", "black", "independence_day_1"), TAPE("Independence Day", "black", "independence_day_2"),
-    TAPE("The Matrix", "silver", "the_matrix"), TAPE("Matrix Reloaded", "black", "matrix_reloaded"),
-    TAPE("Matrix Revolutions", "teal", "matrix_revolutions"), TAPE("Indiana Jones", "orange", "indiana_jones"),
+    TAPE("Independence Day", "black", "independence_day_1", VC("19992_Independence%2520Day%25201")),
+    TAPE("Independence Day", "black", "independence_day_2", VC("19992_Independence%2520Day%25201")),
+    TAPE("The Matrix", "silver", "the_matrix", VC("20892_Matrix%25201")),
+    TAPE("Matrix Reloaded", "black", "matrix_reloaded", VC("30312_The%2520Matrix%2520Reloaded")),
+    TAPE("Matrix Revolutions", "teal", "matrix_revolutions"),
+    TAPE("Indiana Jones", "orange", "indiana_jones", VC("18612_244-Untitled-108%2520copy")),
     TAPE("Memorex blank", "peach", "memorex_blank"),
   ],
   archived("twelve_monkeys", "beetlejuice", "godzilla", "death_wish", "masters_universe", "starchaser", "wizards"),

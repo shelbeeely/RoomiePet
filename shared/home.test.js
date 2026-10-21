@@ -301,7 +301,10 @@ describe("the VHS tapes in the wall cubes", () => {
 
   test("start as hers do on the shelf, the raised middle cube, and the rest filled from the archive", () => {
     expect(DEFAULT_TAPES.map((c) => c.length)).toEqual([7, 7, 7]);
-    expect(DEFAULT_TAPES[1].every((t) => !t.cover)).toBe(true);                 // hers: spines from her photo
+    for (const t of DEFAULT_TAPES[1].filter((x) => x.cover)) {                 // hers: box art from VHSCollector
+      expect(t.cover, t.t).toMatch(/^https:\/\/vhscollector\.com\//);
+      expect(layoutProblem("bedB", withTapes([[t], [], []])), t.t).toBe(null);
+    }
     for (const t of [...DEFAULT_TAPES[0], ...DEFAULT_TAPES[2]]) {
       expect(t.cover, t.t).toMatch(/^https:\/\/archive\.org\/download\/retro-daze/);    // linked, not copied
       expect(layoutProblem("bedB", withTapes([[t], [], []])), t.t).toBe(null);
