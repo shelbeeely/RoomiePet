@@ -334,13 +334,13 @@ export const coverOk = (url) => typeof url === "string" && url.length <= COVER_U
 const TAPE = (t, c, a) => (a ? { t, c, a } : { t, c });
 export { TAPE_ART };
 // Hers, as in the photo of the shelf: all in the raised middle cube, the other two empty --
-// Independence Day twice, the three Matrix films, an orange one and a Memorex blank.
+// Independence Day twice, the three Matrix films, an Indiana Jones and a Memorex blank.
 export const DEFAULT_TAPES = [
   [],
   [
     TAPE("Independence Day", "black", "independence_day_1"), TAPE("Independence Day", "black", "independence_day_2"),
     TAPE("The Matrix", "silver", "the_matrix"), TAPE("Matrix Reloaded", "black", "matrix_reloaded"),
-    TAPE("Matrix Revolutions", "teal", "matrix_revolutions"), TAPE("Orange one", "orange", "orange_one"),
+    TAPE("Matrix Revolutions", "teal", "matrix_revolutions"), TAPE("Indiana Jones", "orange", "indiana_jones"),
     TAPE("Memorex blank", "peach", "memorex_blank"),
   ],
   [],

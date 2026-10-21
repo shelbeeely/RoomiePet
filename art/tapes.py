@@ -24,7 +24,7 @@ SPINES = {
     "the_matrix": ("The Matrix", [[461, 716], [401, 1113], [456, 1108], [510, 708]]),
     "matrix_reloaded": ("Matrix Reloaded", [[513, 706], [457, 1108], [515, 1102], [572, 698]]),
     "matrix_revolutions": ("Matrix Revolutions", [[576, 698], [517, 1102], [578, 1096], [636, 690]]),
-    "orange_one": ("Orange one", [[641, 682], [582, 1094], [640, 1088], [697, 676]]),
+    "indiana_jones": ("Indiana Jones", [[641, 682], [582, 1094], [640, 1088], [697, 676]]),
     "memorex_blank": ("Memorex blank", [[852, 642], [838, 862], [970, 860], [978, 640]]),   # its box, cover out
 }
 
