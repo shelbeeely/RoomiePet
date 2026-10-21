@@ -27,7 +27,7 @@ describe("the flat", () => {
   test("walls go round each room, with gaps where the doors are", () => {
     const walls = wallsOf("bedB");
     const east = walls.filter((w) => w.side === "e" && !w.builtin);
-    expect(east.map((w) => [w.from, w.to, w.line])).toEqual([[13, 15, 13], [18, 25, 13]]);
+    expect(east.map((w) => [w.from, w.to, w.line])).toEqual([[12, 14, 13], [17, 25, 13]]);
     expect(walls.find((w) => w.side === "n").outer).toBe(false);   // bedroom 1 is behind it
     expect(walls.filter((w) => w.side === "s" && w.line === 25).every((w) => w.outer)).toBe(true);
   });
@@ -53,11 +53,11 @@ describe("the catalog", () => {
 });
 
 describe("what a layout may be", () => {
-  const bed = { kind: "bed", color: "blue", x: 0.5, y: 13, rot: 0 };
+  const bed = { kind: "bed", color: "blue", x: 0.5, y: 12, rot: 0 };
 
   test("furniture stays in the room and off the doorways, and solid pieces don't overlap", () => {
     expect(layoutProblem("bedB", withItems([{ ...bed, x: 10 }]))).toMatch(/doesn't fit/);
-    expect(layoutProblem("bedB", withItems([{ ...bed, y: 12 }]))).toMatch(/doesn't fit/);             // into bedroom 1
+    expect(layoutProblem("bedB", withItems([{ ...bed, y: 11 }]))).toMatch(/doesn't fit/);             // into bedroom 1
     expect(layoutProblem("bedB", withItems([{ ...bed, x: 9.5 }]))).toMatch(/blocks a doorway/);
     expect(layoutProblem("bedB", withItems([bed, { ...bed, x: 3 }]))).toMatch(/overlaps/);
     expect(layoutProblem("bedB", withItems([bed, { ...bed, x: 4 }]))).toBe(null);
@@ -76,8 +76,8 @@ describe("what a layout may be", () => {
   test("wall pieces hang on the room's own walls; windows only on outside ones", () => {
     const window = { kind: "window", color: "white", side: "w", line: 0, at: 14 };
     expect(layoutProblem("bedB", withItems([window]))).toBe(null);
-    expect(layoutProblem("bedB", withItems([{ ...window, side: "n", line: 13, at: 2 }]))).toMatch(/outside wall/);
-    expect(layoutProblem("bedB", withItems([{ ...window, kind: "picture", color: "sun", side: "n", line: 13, at: 2 }]))).toBe(null);
+    expect(layoutProblem("bedB", withItems([{ ...window, side: "n", line: 12, at: 2 }]))).toMatch(/outside wall/);
+    expect(layoutProblem("bedB", withItems([{ ...window, kind: "picture", color: "sun", side: "n", line: 12, at: 2 }]))).toBe(null);
     expect(layoutProblem("bedB", withItems([{ ...window, kind: "picture", color: "sun", side: "e", line: 13, at: 16 }]))).toMatch(/walls/); // the doorway
     expect(layoutProblem("bedB", withItems([window, { ...window, at: 15 }]))).toMatch(/overlaps/);
     expect(layoutProblem("bedB", withItems([{ ...window, line: 3 }]))).toMatch(/outside wall/);
@@ -89,14 +89,14 @@ describe("what a layout may be", () => {
     expect(layoutProblem("bedB", withItems([{ ...bed, color: "plaid" }]))).toMatch(/colour/);
     expect(layoutProblem("bedB", withItems([null]))).toMatch(/catalog/);
     expect(layoutProblem("bedB", { ...bedB, wall: "toString" })).toMatch(/wallpaper/);
-    const many = Array.from({ length: MAX_ITEMS + 1 }, () => ({ kind: "picture", color: "sun", side: "n", line: 13, at: 0 }));
+    const many = Array.from({ length: MAX_ITEMS + 1 }, () => ({ kind: "picture", color: "sun", side: "n", line: 12, at: 0 }));
     expect(layoutProblem("bedB", withItems(many))).toMatch(/40/);
     expect(layoutProblem("attic", bedB)).toMatch(/no such room/);
   });
 
   test("what is kept is only what the catalog knows", () => {
-    const l = cleanLayout(withItems([{ ...bed, sneaky: true }, { kind: "clock", color: "white", side: "n", line: 13, at: 1, x: 3 }]));
-    expect(l.items).toEqual([bed, { kind: "clock", color: "white", side: "n", line: 13, at: 1 }]);
+    const l = cleanLayout(withItems([{ ...bed, sneaky: true }, { kind: "clock", color: "white", side: "n", line: 12, at: 1, x: 3 }]));
+    expect(l.items).toEqual([bed, { kind: "clock", color: "white", side: "n", line: 12, at: 1 }]);
   });
 });
 
@@ -114,17 +114,18 @@ describe("room to live in", () => {
     }
   });
 
-  test("Bedroom 2: white, 13 x 12, two twin beds with headboards on the front wall, small windows above them, a built-in closet between", () => {
+  test("Bedroom 2, as sketched: white, 13 x 13, a Twin XL and a twin with headboards on the front wall, small windows above them, a built-in closet between", () => {
     const l = DEFAULT_LAYOUTS.bedB;
     expect(layoutProblem("bedB", l)).toBe(null);
     expect(l.wall).toBe("white");
     const room = bounds("bedB");
-    expect([room.x1 - room.x0, room.y1 - room.y0]).toEqual([13, 12]);     // turned a quarter: wide, not deep
-    const beds = l.items.filter((i) => i.kind === "bed");
+    expect([room.x1 - room.x0, room.y1 - room.y0]).toEqual([13, 13]);     // the L-desk, dresser and Twin XL end to end down the left wall
+    const beds = l.items.filter((i) => CATALOG[i.kind].bed);
+    expect(beds.map((b) => b.kind).sort()).toEqual(["bed", "twin_xl"]);
     expect(beds.length).toBe(2);
     for (const bed of beds) {
       expect(footprint(bed).y1).toBe(25);
-      expect(place(bed, CATALOG.bed.w / 2, 0)[1]).toBe(25);          // the headboard's middle is at the front wall
+      expect(place(bed, CATALOG[bed.kind].w / 2, 0)[1]).toBe(25);          // the headboard's middle is at the front wall
     }
     const [left, right] = beds.map(footprint).sort((p, q) => p.x0 - q.x0);
     expect(left.x0).toBe(0);
@@ -165,7 +166,18 @@ describe("room to live in", () => {
     expect([door.axis, door.at]).toEqual(["x", room.x1]);
     expect(door.from - room.y0).toBe(2);                               // 2 ft from the back (top) corner
     expect(door.to - door.from).toBe(3);
-    for (const kind of ["desk", "dresser", "pet_bed"]) expect(l.items.some((i) => i.kind === kind), kind).toBe(true);
+    // The rest as sketched: the L-desk in the back left corner, the shelf and the TV desk along
+    // the back wall, the dresser on the left one, the two-drawer chest at the foot of the twin.
+    const at = (kind) => footprint(l.items.find((i) => i.kind === kind));
+    expect([at("l_desk").x0, at("l_desk").y0]).toEqual([0, room.y0]);
+    for (const [x, y] of CATALOG.l_desk.plan) expect(x <= CATALOG.l_desk.w && y <= CATALOG.l_desk.d).toBe(true);   // the L inside its box
+    for (const kind of ["shelf_3tier", "desk_tv"]) expect(at(kind).y0, kind).toBe(room.y0);
+    expect(at("shelf_3tier").x0).toBeGreaterThanOrEqual(at("l_desk").x1);
+    expect(at("desk_tv").x0).toBeGreaterThanOrEqual(at("shelf_3tier").x1);
+    expect(at("dresser").x0).toBe(0);
+    expect([at("dresser").y0, at("dresser").y1]).toEqual([at("l_desk").y1, left.y0]);   // the left wall end to end
+    expect(left.y1 - left.y0).toBe(CATALOG.twin_xl.d);
+    expect(at("chest_2").y1).toBe(right.y0);
     // And there is still room to add things.
     for (const kind of ["beanbag", "bookshelf", "lamp"]) expect(freeSpot("bedB", l, kind), kind).not.toBe(null);
   });
@@ -206,10 +218,10 @@ describe("the builder's moves", () => {
 describe("wall pieces dragged about", () => {
   test("go to the nearest wall they can hang on, centred on the pointer", () => {
     const picture = { kind: "picture", color: "sun", side: "w", line: 0, at: 14 };
-    expect(wallSpotNear("bedB", picture, 6, 13.3)).toEqual({ ...picture, side: "n", line: 13, at: 5 });
+    expect(wallSpotNear("bedB", picture, 6, 12.3)).toEqual({ ...picture, side: "n", line: 12, at: 5 });
     // A window only goes on an outside wall: by the back wall (Bedroom 1 behind) it finds the left.
     const window = { kind: "basement_window", color: "white", side: "s", line: 25, at: 0.5 };
-    expect(wallSpotNear("bedB", window, 1, 13.4).side).toBe("w");
+    expect(wallSpotNear("bedB", window, 1, 12.4).side).toBe("w");
     // Never inside the closet.
     expect(wallSpotNear("bedB", picture, 6.5, 24.8).inside).toBeUndefined();
     expect(layoutProblem("bedB", withItems([wallSpotNear("bedB", picture, 6.5, 24.8)]))).toBe(null);

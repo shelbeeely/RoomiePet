@@ -33,7 +33,7 @@ describe("getting about", () => {
     for (let k = 1; k < steps.length; k++) {
       const [a, b] = [steps[k - 1], steps[k]];
       if (roomAt(a.x, a.y) === roomAt(b.x, b.y)) continue;
-      const atDoor = (b.y > 15 && b.y < 18 && Math.abs(b.x - 13) < 0.3) || (b.x > 22 && b.x < 25 && Math.abs(b.y - 9) < 0.3);
+      const atDoor = (b.y > 14 && b.y < 17 && Math.abs(b.x - 13) < 0.3) || (b.x > 22 && b.x < 25 && Math.abs(b.y - 9) < 0.3);
       expect(atDoor, JSON.stringify([a, b])).toBe(true);
     }
   });
@@ -53,11 +53,15 @@ describe("where pets go", () => {
   test("asleep: their own bedroom, the pet bed first, then the bed", () => {
     expect(bedroomOf(0)).toBe("bedA");
     expect(bedroomOf(1)).toBe("bedB");
-    const spots = sleepSpots(layouts, "bedB");
+    // Bedroom 2 as sketched has no pet bed: they sleep on the beds.
+    expect(sleepSpots(layouts, "bedB").every((s) => s.z > 1)).toBe(true);
+    const bedB = { ...DEFAULT_LAYOUTS.bedB, items: [...DEFAULT_LAYOUTS.bedB.items, { kind: "pet_bed", color: "pink", x: 5, y: 16, rot: 0 }] };
+    const withPetBed = allLayouts({ bedB });
+    const spots = sleepSpots(withPetBed, "bedB");
     expect(spots[0].z).toBeLessThan(1);         // in the pet bed, on the floor
     expect(spots[1].z).toBeGreaterThan(1);      // then up on the bed
-    expect(bedSpot(layouts, grid, 1)).toEqual(spots[0]);
-    expect(bedSpot(layouts, grid, 3)).toEqual(spots[1]);
+    expect(bedSpot(withPetBed, gridOf(withPetBed), 1)).toEqual(spots[0]);
+    expect(bedSpot(withPetBed, gridOf(withPetBed), 3)).toEqual(spots[1]);
     expect(destination(layouts, grid, cond("asleep"), null, 2).room).toBe("bedA");
   });
 

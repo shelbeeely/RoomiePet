@@ -13,19 +13,20 @@ export const FLAT = { w: 30, d: 25 };
 export const ROOMS = {
   // The real flat (from the listing's photos): a basement, the two bedrooms on the left, each
   // opening onto the open kitchen and living room, the bathroom with the laundry in the back
-  // right corner. Bedrooms 13 ft wide, Bedroom 2 13 x 12.
+  // right corner. Bedrooms 13 ft wide: Bedroom 2 13 x 13, as deep as its left wall's L-desk,
+  // dresser and Twin XL need end to end (from the sketch of it), Bedroom 1 13 x 12.
   // Bedroom 1: its reach-in closet, two sliding doors, stands in the front right corner.
   bedA: {
     label: "Bedroom 1",
-    areas: [{ x0: 0, x1: 13, y0: 0, y1: 10.5 }, { x0: 0, x1: 8, y0: 10.5, y1: 13 }],
-    builtins: [{ kind: "closet", style: "sliding", x0: 8, x1: 13, y0: 10.5, y1: 13, doors: "n", clear: 1 }],
+    areas: [{ x0: 0, x1: 13, y0: 0, y1: 10 }, { x0: 0, x1: 8, y0: 10, y1: 12 }],
+    builtins: [{ kind: "closet", style: "sliding", x0: 8, x1: 13, y0: 10, y1: 12, doors: "n", clear: 1 }],
   },
   // Bedroom 2's closet is part of its walls: the room steps round it, walls along both its
   // sides and across its front, where its two full-size doors are (facing into the room).
   // It fills the front wall between the beds and stands 2 ft 6 into the room.
   bedB: {
     label: "Bedroom 2",
-    areas: [{ x0: 0, x1: 13, y0: 13, y1: 22.5 }, { x0: 0, x1: 3.25, y0: 22.5, y1: 25 }, { x0: 9.75, x1: 13, y0: 22.5, y1: 25 }],
+    areas: [{ x0: 0, x1: 13, y0: 12, y1: 22.5 }, { x0: 0, x1: 3.25, y0: 22.5, y1: 25 }, { x0: 9.75, x1: 13, y0: 22.5, y1: 25 }],
     builtins: [{ kind: "closet", style: "boards", x0: 3.25, x1: 9.75, y0: 22.5, y1: 25, doors: "n", clear: 3 }],
   },
   // The open kitchen and living room: an L of kitchen in the back left corner, white posts
@@ -47,9 +48,9 @@ export const postBox = (p) => ({ x0: p.x - 0.25, x1: p.x + 0.25, y0: p.y - 0.25,
 
 // A door is a gap in the wall on a line: x = at (axis "x") or y = at (axis "y"), from..to along it.
 export const DOORS = [
-  { rooms: ["bedA", "main"], axis: "x", at: 13, from: 7.5, to: 10.5 },   // just past the fridge
+  { rooms: ["bedA", "main"], axis: "x", at: 13, from: 7, to: 10 },   // just past the fridge
   // Bedroom 2's: on its right wall, 2 ft from the top (back) corner, as the real one is.
-  { rooms: ["bedB", "main"], axis: "x", at: 13, from: 15, to: 18 },
+  { rooms: ["bedB", "main"], axis: "x", at: 13, from: 14, to: 17 },
   { rooms: ["bath", "main"], axis: "y", at: 9, from: 22, to: 25 },
 ];
 
@@ -195,6 +196,17 @@ export const CATALOG = {
     spots: [[1.2, 4.2, 1.8], [2.4, 4.8, 1.8], [1.75, 3.2, 1.8]],
     bed: true,
   },
+  twin_xl: {
+    // A college-length twin, 80 in: the one on the left in Bedroom 2.
+    label: "Twin XL bed", group: "bedroom", w: 3.5, d: 6.5, layer: "solid", colors: ["sage", "blue", "pink", "lilac", "sun"],
+    boxes: [
+      [0, 0, 0, 3.5, 0.3, 2.8, "wood"], [0, 0.3, 0, 3.5, 6.2, 1.1, "wood"],
+      [0.1, 0.3, 1.1, 3.3, 1.9, 0.6, "white"], [0.5, 0.45, 1.7, 2.5, 1.0, 0.35, "pillow"],
+      [0.05, 2.2, 1.1, 3.4, 4.25, 0.7, "main"], [0.05, 2.2, 1.8, 3.4, 0.45, 0.08, "main^"],
+    ],
+    spots: [[1.2, 4.2, 1.8], [2.4, 4.8, 1.8], [1.75, 3.2, 1.8]],
+    bed: true,
+  },
   double_bed: {
     label: "Double bed", group: "bedroom", w: 5, d: 6.5, layer: "solid", colors: ["sage", "blue", "pink", "lilac", "sun"],
     boxes: [
@@ -253,6 +265,45 @@ export const CATALOG = {
       ...legs(4, 2, 2.3, 0.1, 0.25, "main_"), [2.8, 0.1, 0, 1.1, 1.8, 2.3, "main"], [2.9, 1.9, 1.4, 0.9, 0.04, 0.6, "main_"],
       [0, 0, 2.3, 4, 2, 0.2, "main"], [0.8, 0.5, 2.5, 1.4, 0.9, 0.06, "metal"], [0.8, 0.45, 2.5, 1.4, 0.08, 0.9, "dark"],
       [3.1, 0.4, 2.5, 0.4, 0.4, 0.5, "red"],
+    ],
+  },
+  l_desk: {
+    // A corner desk: its long top along the back wall, the short arm down the left one, the
+    // monitor where they meet the chair's side.
+    label: "L-desk", group: "bedroom", w: 4.5, d: 3, layer: "solid", colors: ["black", "oak", "white", "walnut"],
+    plan: [[0, 0], [4.5, 0], [4.5, 1.75], [1.75, 1.75], [1.75, 3], [0, 3]],   // its outline from above
+    boxes: [
+      [0.1, 0.1, 0, 0.2, 0.2, 2.3, "main_"], [4.2, 0.1, 0, 0.2, 0.2, 2.3, "main_"], [4.2, 1.45, 0, 0.2, 0.2, 2.3, "main_"],
+      [0.1, 2.7, 0, 0.2, 0.2, 2.3, "main_"], [1.45, 2.7, 0, 0.2, 0.2, 2.3, "main_"],
+      [0, 0, 2.3, 4.5, 1.75, 0.15, "main"], [0, 1.75, 2.3, 1.75, 1.25, 0.15, "main"],
+      [2.1, 0.3, 2.45, 0.5, 0.35, 0.06, "metal"], [1.6, 0.35, 2.5, 1.5, 0.08, 0.95, "dark"], [1.7, 0.43, 2.6, 1.3, 0.02, 0.75, "screen"],
+      [1.85, 0.9, 2.45, 1.0, 0.35, 0.04, "dark"], [3.8, 0.4, 2.45, 0.3, 0.3, 0.35, "red"],
+    ],
+  },
+  shelf_3tier: {
+    label: "3-tier shelf", group: "bedroom", w: 2, d: 1.25, layer: "solid", colors: ["white", "black", "oak", "walnut"],
+    boxes: [
+      [0, 0, 0, 0.1, 1.25, 3, "main"], [1.9, 0, 0, 0.1, 1.25, 3, "main"],
+      ...[0.15, 1.45, 2.9].map((z) => [0.1, 0, z, 1.8, 1.25, 0.1, "main_"]),
+      [0.25, 0.3, 0.25, 0.5, 0.7, 0.85, "book1"], [0.8, 0.3, 0.25, 0.3, 0.7, 0.75, "book3"], [1.15, 0.3, 0.25, 0.5, 0.7, 0.8, "book2"],
+      [0.3, 0.2, 1.55, 1.4, 0.9, 0.6, "cream"], [1.2, 0.4, 3.0, 0.45, 0.45, 0.35, "pot"], [1.15, 0.35, 3.35, 0.55, 0.55, 0.4, "leaf"],
+    ],
+  },
+  desk_tv: {
+    // The desk on the back wall by the door, a TV standing on it.
+    label: "Desk with TV", group: "bedroom", w: 4, d: 2, layer: "solid", colors: ["white", "black", "oak", "walnut"],
+    boxes: [
+      ...legs(4, 2, 2.3, 0.1, 0.25, "main_"), [0, 0, 2.3, 4, 2, 0.15, "main"],
+      [1.6, 0.5, 2.45, 0.8, 0.45, 0.12, "dark"], [1.9, 0.6, 2.57, 0.2, 0.15, 0.3, "dark"],
+      [0.4, 0.5, 2.85, 3.2, 0.15, 1.75, "dark"], [0.5, 0.65, 2.95, 3.0, 0.03, 1.55, "screen"],
+    ],
+  },
+  chest_2: {
+    label: "Two-drawer chest", group: "bedroom", w: 2, d: 1.5, layer: "solid", colors: ["white", "oak", "walnut", "black"],
+    boxes: [
+      [0, 0, 0, 2, 1.5, 2.05, "main"], [0, 0, 2.05, 2, 1.5, 0.15, "main_"],
+      [0.15, 1.5, 0.2, 1.7, 0.04, 0.8, "main_"], [0.15, 1.5, 1.1, 1.7, 0.04, 0.8, "main_"],
+      [0.9, 1.54, 0.55, 0.2, 0.06, 0.1, "gold"], [0.9, 1.54, 1.45, 0.2, 0.06, 0.1, "gold"],
     ],
   },
   chair: {
@@ -473,6 +524,7 @@ export const CATALOG = {
 // a desk, a dresser and a pet bed (shared/home.test.js).
 const REAL = {
   bed: [3.25, 6.5],           // twin: 39 x 75 in mattress, and its headboard
+  twin_xl: [3.25, 7],         // 39 x 80 in
   double_bed: [4.5, 6.5],     // full: 54 in
   nightstand: [1.5, 1.25],
   wardrobe: [3, 2],
@@ -718,18 +770,18 @@ export const DEFAULT_LAYOUTS = {
     ],
   },
   bedB: {
-    // A white basement bedroom: two twin beds with their headboards against the front wall, one
-    // in each corner, a small high window above each, and the closet (part of the walls, see
-    // ROOMS) between them, a tight fit flush with both; the desk, dresser
-    // and pet bed along the back, the doorway on the right kept clear.
+    // As sketched: an L-desk in the back left corner, a 3-tier shelf and a desk with the TV along
+    // the back wall to the door, the dresser on the left wall, and along the front the Twin XL
+    // and the twin with the closet (part of the walls, see ROOMS) a tight fit between them, a
+    // small high window above each, a two-drawer chest at the foot of the twin. The sizes are
+    // guesses until the room is measured.
     wall: "white", floor: "greywood",
     items: [
       W("basement_window", "white", "s", 25, 0.5), W("basement_window", "white", "s", 25, 10.25),
       W("basement_window", "white", "w", 0, 15.75),
-      W("picture", "blue", "n", 13, 4.5), W("clock", "white", "w", 0, 20.5),
-      F("small_rug", "sage", 5, 18, 3), F("bed", "blue", 0, 18.5, 2), F("bed", "pink", 9.75, 18.5, 2),
-      F("desk", "white", 0, 13, 3), F("chair", "white", 1.75, 14, 1), F("dresser", "white", 4, 13),
-      F("pet_bed", "pink", 7.5, 13), F("plant", "white", 11.75, 13, 3),
+      F("l_desk", "black", 0, 12), F("chair", "black", 2.25, 15, 2), F("shelf_3tier", "white", 5, 12),
+      F("desk_tv", "white", 7.5, 12), F("dresser", "white", 0, 15, 3),
+      F("twin_xl", "sage", 0, 18, 2), F("bed", "blue", 9.75, 18.5, 2), F("chest_2", "white", 10.25, 17, 2),
     ],
   },
   main: {

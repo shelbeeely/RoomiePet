@@ -8,7 +8,7 @@ import { CATALOG, COLORWAYS, DOORS, ROOMS, bounds, footprint, layoutProblem, pla
 const INK = "#2b2238";
 const DOOR = "#c0564a";
 
-const short = (label) => label.replace(" (built in)", "").replace("Kitchen counter", "counter").replace("Laundry basket", "basket").toLowerCase();
+const short = (label) => label.replace(" (built in)", "").replace("Kitchen counter", "counter").replace("Laundry basket", "basket").toLowerCase().replace("l-desk", "L-desk");
 
 /** A quarter-circle swing: hinge at h, leaf from a (shut) to b (open), radius r. */
 function swing(h, a, b, r) {
@@ -139,8 +139,16 @@ export default function Blueprint({ room, draft, sel, open, onSelect, onMove, on
           const picked = k === sel;
           return (
             <g key={k} className="bp-piece" onPointerDown={(e) => down(e, k)}>
-              {rect(f, { fill: c.layer === "rug" ? "none" : fill(it), stroke: picked ? "#f0a030" : c.layer === "rug" ? "#9fc49a" : "#5a5468",
-                strokeWidth: picked ? 0.14 : 0.06, strokeDasharray: c.layer === "rug" ? "0.25 0.15" : "", rx: 0.08 })}
+              {c.plan
+                // A piece that isn't a plain box (the L-desk) is drawn its shape; the box round it,
+                // which is what it keeps clear, faintly.
+                ? <>
+                    {rect(f, { fill: "none", stroke: picked ? "#f0a030" : "#5a5468", strokeWidth: picked ? 0.14 : 0.04, strokeDasharray: "0.2 0.15" })}
+                    <polygon points={c.plan.map(([x, y]) => place(it, x, y).join(",")).join(" ")} fill={fill(it)}
+                      stroke={picked ? "#f0a030" : "#5a5468"} strokeWidth={picked ? 0.14 : 0.06} strokeLinejoin="round" />
+                  </>
+                : rect(f, { fill: c.layer === "rug" ? "none" : fill(it), stroke: picked ? "#f0a030" : c.layer === "rug" ? "#9fc49a" : "#5a5468",
+                  strokeWidth: picked ? 0.14 : 0.06, strokeDasharray: c.layer === "rug" ? "0.25 0.15" : "", rx: 0.08 })}
               {c.bed && (() => {
                 const [ax, ay] = place(it, 0, 0);
                 const [bx, by] = place(it, c.w, 0.3);

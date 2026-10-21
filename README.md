@@ -128,7 +128,8 @@ npm run art        # -> client/public/sprites/sheet.png + sheet.json, art/previe
 The apartment is a model, not a picture: `shared/home.js` has its rooms in
 feet, laid out after the real basement flat's listing photos -- about 750 sq
 ft: the two bedrooms on the left (Bedroom 1 with a sliding-door closet,
-Bedroom 2 with its board-door closet built into the wall between the beds),
+Bedroom 2, furnished from a sketch of it, with its board-door closet built
+into the wall between the beds; the sizes are estimates until it's measured),
 each opening onto the open kitchen and living room, where an L of oak-and-
 granite kitchen fills the back left corner and white posts holding the beam
 stand in a row; the front door and a louvered bifold closet in its walls; and
