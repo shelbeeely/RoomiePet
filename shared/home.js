@@ -178,7 +178,7 @@ export const MATERIALS = {
   granite: "#cfc9bf",
   // Dark pastel, for her half of Bedroom 2 and its Kuromi-style pieces.
   kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e",
-  bondi: "#3fb6c4", bondiDark: "#24808e", ice: "#e8eef0",
+  bondi: "#3fb6c4", bondiDark: "#24808e", bondiLight: "#8fe0e8", ice: "#e8eef0",
   sheet: "#8f8c98", cork: "#c9a27a", graniteDark: "#a39d94", hob: "#2f2b36", led: "#4f6bff",
 };
 
@@ -189,6 +189,96 @@ export const MATERIALS = {
 // (the bowl) don't block the way but can't sit on furniture. bed and pets mark where pets sleep.
 // clear keeps that much floor free in front of a piece's doors. Wall pieces hang on a wall: w along
 // it, z up it, d out from it. spots are where pets curl up on a piece: [x, y, z].
+// One scene pixel, in feet: the dollhouse draws 16 to the foot.
+const PIX = 1 / 16;
+
+/**
+ * Pixel art on the face of a piece: rows of letters, the top row highest, each letter a material
+ * from the palette (a letter not in it is left out), every letter one scene pixel square. at is
+ * the top left corner [u, v, z]; the art stands across u and z, depth thick at v. Runs of one
+ * letter in a row become one box, so a 28-pixel row is a handful of boxes, not 28.
+ */
+function pixelArt(rows, palette, [u, v, z], depth = 0.01) {
+  const out = [];
+  rows.forEach((row, r) => {
+    for (let c = 0; c < row.length;) {
+      let e = c;
+      while (e < row.length && row[e] === row[c]) e += 1;
+      if (palette[row[c]]) out.push([u + c * PIX, v, z - (r + 1) * PIX, (e - c) * PIX, depth, PIX, palette[row[c]]]);
+      c = e;
+    }
+  });
+  return out;
+}
+
+/**
+ * A teal iMac G3, as near its real shape as the pixels allow: built in slices a pixel thick
+ * from front to back, each a rounded rectangle, square-faced at the front and swelling into the
+ * egg-shaped back that tapers away and slopes down from the handle. At [u, v, z], its front at
+ * v + 1.35 ft; 15 in wide, 15 in tall, the keyboard and puck mouse in front of it.
+ */
+function imacG3(u, v, z) {
+  const W = 1.25, H = 1.25, D = 1.35, FRONT = 0.45, FOOT = 0.12;
+  const snap = (x) => Math.round(x / PIX) * PIX;
+  const shape = (vr) => {
+    if (vr >= D - FRONT) return { hw: W / 2, top: H, bot: FOOT, r: 0.28 };
+    const t = (D - FRONT - vr) / (D - FRONT);
+    const hw = (W / 2) * Math.sqrt(1 - (0.82 * t) ** 2);
+    return { hw, top: H * (1 - 0.38 * t * t), bot: FOOT + 0.22 * t * t, r: Math.min(hw, 0.28 + 0.12 * t) };
+  };
+  const out = [];
+  for (let vr = PIX / 2; vr < D; vr += PIX) {
+    const { hw, top, bot, r } = shape(vr);
+    const mat = vr > D - 0.12 ? "ice" : "bondi";
+    for (let zr = bot + PIX / 2; zr < top; zr += PIX) {
+      const dz = Math.min(zr - bot, top - zr);
+      const inset = dz < r ? r - Math.sqrt(r * r - (r - dz) ** 2) : 0;
+      const half = snap(hw - inset);
+      if (half <= 0) continue;
+      // The top pixel of every slice catches the light: the clear case's glossy rim.
+      const m = top - zr < PIX && mat === "bondi" ? "bondiLight" : mat;
+      out.push([u + W / 2 - half, v + vr - PIX / 2, z + zr - PIX / 2, half * 2, PIX, PIX, m]);
+    }
+  }
+  const f = v + D;
+  const zt = (vr) => z + shape(vr).top;
+  out.push(
+    // The handle, a dark slot across the top at the back.
+    [u + W / 2 - 0.22, v + 0.3, zt(0.42) - 0.02, 0.44, 0.18, 0.05, "bondiDark"],
+    // The foot under the front.
+    [u + 0.4, f - 0.5, z, 0.45, 0.35, FOOT, "bondiDark"],
+    // The screen, rounded at its corners, a glint in the glass.
+    ...pixelArt([
+      ".ssssssssssss.",
+      "sgsssssssssss",
+      "sgsssssssssssS",
+      "ssssssssssssss",
+      "ssssssssssssss",
+      "ssssssssssssss",
+      "ssssssssssssss",
+      "ssssssssssssss",
+      "ssssssssssssss",
+      "ssssssssssssss",
+      ".ssssssssssss.",
+    ].map((r) => r.padEnd(14, "s").slice(0, 14)), { s: "screen", S: "screen", g: "glass" }, [u + W / 2 - 7 * PIX, f, z + FOOT + 1.06]),
+    // Under the screen: the teal band, the slot of the CD tray, the speakers either side and
+    // the apple in the middle.
+    ...pixelArt([
+      "bbbbbbbbbbbbbbbb",
+      "bbbbbddddddbbbbb",
+      "bdbdbbbbbbbbdbdb",
+      "bbdbbbbaabbbbdbb",
+      "bdbdbbbaabbbbdbd",
+    ].map((r) => r.padEnd(16, "b").slice(0, 16)), { b: "bondi", d: "bondiDark", a: "white" }, [u + W / 2 - 8 * PIX, f + 0.005, z + FOOT + 0.38]),
+    // The keyboard, clear teal with white keys, and the round puck mouse.
+    [u + 0.12, f + 0.06, z, 1.0, 0.32, 0.05, "bondi"],
+    ...[0, 2, 4].flatMap((row) => [0, 3, 6, 9, 12].map((c) => [u + 0.15 + c * PIX, f + 0.08 + row * PIX, z + 0.05, 2 * PIX, PIX, 0.02, "ice"])),
+    [u + 1.2 + PIX, f + 0.08, z, PIX, 3 * PIX, 0.07, "bondi"], [u + 1.2, f + 0.08 + PIX, z, 3 * PIX, PIX, 0.07, "bondi"],
+    [u + 1.2 + PIX, f + 0.08 + PIX, z + 0.07, PIX, PIX, 0.01, "ice"],
+  );
+  return out;
+}
+
 const legs = (w, d, h, inset = 0.1, s = 0.25, mat = "wood") => [
   [inset, inset, 0, s, s, h, mat], [w - inset - s, inset, 0, s, s, h, mat],
   [inset, d - inset - s, 0, s, s, h, mat], [w - inset - s, d - inset - s, 0, s, s, h, mat],
@@ -365,15 +455,9 @@ export const CATALOG = {
     ],
   },
   imac_g3: {
-    // A teal (Bondi blue) iMac G3 on a little side table: the see-through rounded back, the
-    // white-rimmed screen, its handle on top, the round puck mouse and the matching keyboard.
+    // A teal (Bondi blue) iMac G3 on a little side table, built to its real shape (see imacG3).
     label: "iMac G3 on a side table", group: "bedroom", w: 2, d: 1.75, layer: "solid", colors: ["white", "black", "lilac", "pink"],
-    boxes: [
-      ...legs(2, 1.75, 2.3, 0.08, 0.15, "main_"), [0, 0, 2.3, 2, 1.75, 0.1, "main"],
-      [0.45, 0.2, 2.4, 1.1, 1.0, 0.12, "bondi"], [0.55, 0.12, 2.55, 0.9, 0.5, 0.95, "bondi"], [0.65, 0.08, 2.7, 0.7, 0.12, 0.65, "bondiDark"],
-      [0.4, 0.6, 2.5, 1.2, 0.55, 1.2, "bondi"], [0.42, 1.15, 2.52, 1.16, 0.04, 1.15, "ice"], [0.55, 1.19, 2.72, 0.9, 0.01, 0.78, "screen"],
-      [0.75, 0.35, 3.7, 0.5, 0.15, 0.08, "bondiDark"], [0.5, 1.3, 2.4, 1.0, 0.35, 0.06, "bondi"], [1.62, 1.38, 2.4, 0.16, 0.16, 0.08, "bondi"],
-    ],
+    boxes: [...legs(2, 1.75, 2.3, 0.08, 0.15, "main_"), [0, 0, 2.3, 2, 1.75, 0.1, "main"], ...imacG3(0.375, 0.02, 2.4)],
   },
   storage_chest: {
     // The lift-lid storage ottoman at the foot of her bed: black faux leather, a padded top that
@@ -697,13 +781,43 @@ export const CATALOG = {
     ],
   },
   kuromi_poster: {
-    // Kuromi: her white face in the black jester hood, the long ears up, the pink skull on it.
+    // Kuromi, pixel by pixel: the long ears of her black jester hood standing up, the pink skull
+    // on its front, her white face with its big dark eyes, pink cheeks and nose, on a pastel
+    // ground with a few stars, framed in black.
     label: "Kuromi poster", group: "wall", w: 2, d: 0.08, layer: "wall", colors: ["lilac", "pink", "black"],
     boxes: [
-      [0, 0, 2.0, 2, 0.05, 1.9, "main"],
-      [0.45, 0.05, 2.25, 1.1, 0.01, 1.0, "kuromi"], [0.45, 0.05, 3.2, 0.28, 0.01, 0.6, "kuromi"], [1.27, 0.05, 3.2, 0.28, 0.01, 0.6, "kuromi"],
-      [0.6, 0.06, 2.3, 0.8, 0.01, 0.6, "white"], [0.9, 0.06, 3.0, 0.2, 0.01, 0.18, "candy"],
-      [0.75, 0.07, 2.62, 0.1, 0.01, 0.12, "kuromi"], [1.15, 0.07, 2.62, 0.1, 0.01, 0.12, "kuromi"], [0.95, 0.07, 2.5, 0.1, 0.01, 0.06, "candy"],
+      [-0.04, 0, 1.96, 2.08, 0.04, 1.98, "kuromi"], [0, 0.04, 2.0, 2, 0.02, 1.9, "main"],
+      ...pixelArt([
+        "....kk..............kk....",
+        "...kkkk............kkkk...",
+        "...kkkk............kkkk...",
+        "..kkkkkk..........kkkkkk..",
+        "..kkkkkk..........kkkkkk..",
+        "..kkkkkkk........kkkkkkk..",
+        "..kkkkkkk........kkkkkkk..",
+        "...kkkkkkk......kkkkkkk...",
+        "...kkkkkkkkkkkkkkkkkkkk...",
+        "..kkkkkkkkkkppkkkkkkkkkk..",
+        "..kkkkkkkkkppppkkkkkkkkk..",
+        "..kkkkkkkkkpkkpkkkkkkkkk..",
+        "..kkkkkkkkkppppkkkkkkkkk..",
+        "..kkkkkkkkkkppkkkkkkkkkk..",
+        "..kkkwwwwwwwwwwwwwwwwkkk..",
+        ".kkkwwwwwwwwwwwwwwwwwwkkk.",
+        ".kkwwwwwwwwwwwwwwwwwwwwkk.",
+        ".kkwwwwkkwwwwwwwwkkwwwwkk.",
+        ".kkwwwkkkkwwwwwwkkkkwwwkk.",
+        ".kkwwwkkkkwwwwwwkkkkwwwkk.",
+        ".kkwwppkkwwwwwwwwkkppwwkk.",
+        ".kkwwwwwwwwwppwwwwwwwwwkk.",
+        ".kkkwwwwwwwwwwwwwwwwwwkkk.",
+        "..kkkwwwwwwwwwwwwwwwwkkk..",
+        "..kkkkwwwwwwwwwwwwwwkkkk..",
+        "...kkkkkkwwwwwwwwkkkkkk...",
+        "....kkkkkkkkkkkkkkkkkk....",
+        "......kkkkkkkkkkkkkk......",
+      ], { k: "kuromi", w: "white", p: "candy" }, [3 * PIX, 0.06, 3.84]),
+      ...pixelArt(["p.........................l", "...........................", ".l........................p"], { p: "candy", l: "lavender" }, [2 * PIX, 0.06, 2.3]),
     ],
   },
   string_lights: {
