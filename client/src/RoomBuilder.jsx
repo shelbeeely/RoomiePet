@@ -6,7 +6,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   CATALOG, COLORWAYS, FLOORS, PILLOWS, GRID, ROOMS, TAPES_PER_CUBE, TAPE_COLORS, TAPE_TITLE_MAX, WALLPAPERS,
-  PALE_SPINES, TAPE_ART, freeSpot, layoutProblem, moveTape, tapesOf, turned,
+  COVER_URL_MAX, PALE_SPINES, TAPE_ART, coverOk, freeSpot, layoutProblem, moveTape, tapesOf, turned,
 } from "@shared/home.js";
 import { dollCamera, pieceSprite } from "./dollhouse.js";
 
@@ -81,8 +81,8 @@ function TapeShelf({ tapes, onChange }) {
   };
   const edit = (patch) => onChange(tapes.map((c, k) => (k === held.cube ? c.map((t, j) => {
     if (j !== held.i) return t;
-    const { a, ...rest } = { ...t, ...patch };
-    return a ? { ...rest, a } : rest;
+    const { a, cover, ...rest } = { ...t, ...patch };
+    return { ...rest, ...(a ? { a } : {}), ...(cover ? { cover } : {}) };
   }) : c)));
   const add = (cube) => {
     if (tapes[cube].length >= TAPES_PER_CUBE) return setNote(`That cube is full: it holds ${TAPES_PER_CUBE}.`);
@@ -120,6 +120,14 @@ function TapeShelf({ tapes, onChange }) {
               <button key={c} role="radio" aria-checked={tape.c === c} aria-label={c} title={c}
                 className={`swatch${tape.c === c ? " on" : ""}`} style={{ background: hex }} onClick={() => edit({ c })} />
             ))}
+          </div>
+          <div className="cover">
+            {tape.cover && coverOk(tape.cover)
+              ? <img src={tape.cover} alt={`The box of ${tape.t}`} referrerPolicy="no-referrer" />
+              : <span className="hint">No box art yet</span>}
+            <input type="url" inputMode="url" placeholder="Paste a link to a picture of its box" maxLength={COVER_URL_MAX}
+              aria-label="Box art link" value={tape.cover || ""} onChange={(e) => edit({ cover: e.target.value.trim() || undefined })} />
+            {tape.cover && !coverOk(tape.cover) && <span className="hint warn">That needs to be an https:// link.</span>}
           </div>
           <div className="spine-art" role="radiogroup" aria-label="Spine art">
             <button role="radio" aria-checked={!tape.a} className={`plain${!tape.a ? " on" : ""}`} onClick={() => edit({ a: undefined })}>Plain</button>

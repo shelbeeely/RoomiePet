@@ -323,6 +323,12 @@ describe("the VHS tapes in the wall cubes", () => {
     const saved = cleanLayout(withTapes([[{ t: "Coraline", c: "purple", sneaky: 1 }], [], []]));
     expect(saved.items.find((i) => i.kind === "cube_shelf").tapes).toEqual([[{ t: "Coraline", c: "purple" }], [], []]);
     expect(layoutProblem("bedB", withTapes([[{ t: "x", c: "black", a: "jaws" }], [], []]))).toMatch(/spine art/);
+    // A link to a picture of its box art: https only, kept when saved.
+    expect(layoutProblem("bedB", withTapes([[{ t: "x", c: "black", cover: "javascript:alert(1)" }], [], []]))).toMatch(/https/);
+    expect(layoutProblem("bedB", withTapes([[{ t: "x", c: "black", cover: "https://example.com/a b.jpg" }], [], []]))).toMatch(/https/);
+    const cover = "https://example.com/matrix-vhs.jpg";
+    expect(layoutProblem("bedB", withTapes([[{ t: "x", c: "black", cover }], [], []]))).toBe(null);
+    expect(cleanLayout(withTapes([[{ t: "x", c: "black", cover }], [], []])).items.find((i) => i.kind === "cube_shelf").tapes[0][0].cover).toBe(cover);
     const kept = cleanLayout(withTapes([[{ t: "The Matrix", c: "silver", a: "the_matrix" }], [], []]));
     expect(kept.items.find((i) => i.kind === "cube_shelf").tapes[0][0]).toEqual({ t: "The Matrix", c: "silver", a: "the_matrix" });
   });

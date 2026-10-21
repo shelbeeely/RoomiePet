@@ -179,7 +179,7 @@ export const MATERIALS = {
   book1: "#d8645a", book2: "#5a8ad8", book3: "#f0c75e", book4: "#6fbf8a", frame: "#7a4f2e", sky: "#bfe3f5", pink: "#f4a6b8",
   granite: "#cfc9bf",
   // Dark pastel, for the door half of Bedroom 2 and its Kuromi-style pieces.
-  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", fabric: "#c9c6c2", clockScreen: "#0d0f18", clockTime: "#8fd4ff", hood: "#57516a", ink: "#0e0c12", inkHood: "#2a2630", blush: "#eda9cb",
+  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", fabric: "#c9c6c2", fabricDark: "#b3afab", dockPad: "#9d9995", clockScreen: "#0d0f18", clockTime: "#8fd4ff", hood: "#57516a", ink: "#0e0c12", inkHood: "#2a2630", blush: "#eda9cb",
   bondi: "#3fb6c4", bondiDark: "#24808e", bondiLight: "#8fe0e8", ice: "#e8eef0",
   sheet: "#8f8c98", cork: "#c9a27a", graniteDark: "#a39d94", hob: "#2f2b36", led: "#4f6bff",
 };
@@ -326,6 +326,10 @@ for (const [k, v] of Object.entries(TAPE_COLORS)) MATERIALS[`tape_${k}`] = v;
 MATERIALS.tape_case = "#15131a";
 export const TAPES_PER_CUBE = 7;
 export const TAPE_TITLE_MAX = 24;
+// A tape can also have a link to a picture of its box art (cover), shown in the room builder.
+// Only a link: scans of studio box art aren't ours to copy into the app.
+export const COVER_URL_MAX = 500;
+export const coverOk = (url) => typeof url === "string" && url.length <= COVER_URL_MAX && /^https:\/\/[^\s"'<>]+$/.test(url);
 // a is the tape's spine artwork, if it has its own (TAPE_ART: cut from the photo of her shelf).
 const TAPE = (t, c, a) => (a ? { t, c, a } : { t, c });
 export { TAPE_ART };
@@ -357,6 +361,7 @@ export function tapeProblem(tapes, cubes) {
       if (!tape || typeof tape.t !== "string" || tape.t.length > TAPE_TITLE_MAX) return `A tape's title is up to ${TAPE_TITLE_MAX} letters`;
       if (!Object.hasOwn(TAPE_COLORS, tape.c)) return "A tape doesn't come in that colour";
       if (tape.a !== undefined && !Object.hasOwn(TAPE_ART, tape.a)) return "There's no such spine art";
+      if (tape.cover !== undefined && !coverOk(tape.cover)) return "A cover has to be an https:// link to a picture";
     }
   }
   return null;
@@ -416,20 +421,25 @@ function cubeBoxes(item, hd) {
 }
 
 /**
- * A Lenovo Smart Clock 2 on its dock, at [u, v, z] (v out from the wall): 4.4 in wide, a soft
- * grey fabric wedge whose front leans back, the screen on it, sitting on the round-cornered
- * white charging dock. Drawn sharp, the screen shows the time in blue (2:47, as in the photo).
+ * A Lenovo Smart Clock 2 on its charging dock, at [u, v, z] (v out from the wall): 4.4 in wide,
+ * a soft grey fabric wedge whose front leans back, the screen on it. The dock it sits in is the
+ * same grey and reaches out in front of it: a pad to lay a phone on to charge, and a little
+ * night light along its front edge. Drawn sharp, the screen shows the time in blue (2:47, as in
+ * the photo).
  */
 function smartClock(u, v, z, px = PIX) {
   const W = 0.375;
+  const D = 0.06;                                                                // the dock's height
   const out = [
-    [u - 0.03, v, z, W + 0.06, 0.3, 0.03, "white"],                              // the dock
-    [u, v + 0.02, z + 0.03, W, 0.1, 0.27, "fabric"],                             // the back, tallest
-    [u, v + 0.12, z + 0.03, W, 0.06, 0.24, "fabric"],                            // the front leaning back
-    [u + 0.02, v + 0.18, z + 0.03, W - 0.04, 0.02, 0.21, "fabric"],
-    [u + 0.03, v + 0.2, z + 0.07, W - 0.06, 0.005, 0.15, "clockScreen"],
+    [u - 0.03, v, z, W + 0.06, 0.4, D, "fabricDark"],                            // the dock
+    [u + 0.06, v + 0.25, z + D, W - 0.12, 0.12, 0.004, "dockPad"],               // its charging pad
+    [u + 0.1, v + 0.4, z + 0.015, W - 0.2, 0.004, 0.02, "clockTime"],            // the night light
+    [u, v + 0.02, z + D, W, 0.1, 0.27, "fabric"],                                // the clock: its back, tallest
+    [u, v + 0.12, z + D, W, 0.06, 0.24, "fabric"],                               // the front leaning back
+    [u + 0.02, v + 0.18, z + D, W - 0.04, 0.02, 0.21, "fabric"],
+    [u + 0.03, v + 0.2, z + D + 0.03, W - 0.06, 0.005, 0.18, "clockScreen"],
   ];
-  if (px === PIX) return [...out, [u + 0.08, v + 0.206, z + 0.12, W - 0.16, 0.003, 0.05, "clockTime"]];
+  if (px === PIX) return [...out, [u + 0.08, v + 0.206, z + D + 0.09, W - 0.16, 0.003, 0.05, "clockTime"]];
   const time = [
     "11..1.1.11",
     ".1.11.1..1",
@@ -437,7 +447,7 @@ function smartClock(u, v, z, px = PIX) {
     "1.....1..1",
     "11.1..1..1",
   ];
-  return [...out, ...pixelArt(time, { 1: "clockTime" }, [u + W / 2 - 5 * px, v + 0.206, z + 0.2], 0.003, px)];
+  return [...out, ...pixelArt(time, { 1: "clockTime" }, [u + W / 2 - 5 * px, v + 0.206, z + D + 0.195], 0.003, px)];
 }
 
 const legs = (w, d, h, inset = 0.1, s = 0.25, mat = "wood") => [
@@ -1252,7 +1262,7 @@ export function cleanLayout(layout) {
     items: layout.items.map((i) => (CATALOG[i.kind].layer === "wall"
       ? {
         kind: i.kind, color: i.color, side: i.side, line: i.line, at: i.at,
-        ...(CATALOG[i.kind].shelves && Array.isArray(i.tapes) ? { tapes: i.tapes.map((cube) => cube.map(({ t, c, a }) => (a ? { t, c, a } : { t, c }))) } : {}),
+        ...(CATALOG[i.kind].shelves && Array.isArray(i.tapes) ? { tapes: i.tapes.map((cube) => cube.map(({ t, c, a, cover }) => ({ t, c, ...(a ? { a } : {}), ...(cover ? { cover } : {}) }))) } : {}),
       }
       : { kind: i.kind, color: i.color, x: i.x, y: i.y, rot: i.rot })),
   };
