@@ -177,7 +177,7 @@ export const MATERIALS = {
   book1: "#d8645a", book2: "#5a8ad8", book3: "#f0c75e", book4: "#6fbf8a", frame: "#7a4f2e", sky: "#bfe3f5", pink: "#f4a6b8",
   granite: "#cfc9bf",
   // Dark pastel, for the door half of Bedroom 2 and its Kuromi-style pieces.
-  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", hood: "#57516a", ink: "#0e0c12", inkHood: "#2a2630", blush: "#eda9cb",
+  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", fabric: "#c9c6c2", clockScreen: "#0d0f18", clockTime: "#8fd4ff", hood: "#57516a", ink: "#0e0c12", inkHood: "#2a2630", blush: "#eda9cb",
   bondi: "#3fb6c4", bondiDark: "#24808e", bondiLight: "#8fe0e8", ice: "#e8eef0",
   sheet: "#8f8c98", cork: "#c9a27a", graniteDark: "#a39d94", hob: "#2f2b36", led: "#4f6bff",
 };
@@ -396,6 +396,31 @@ function cubeBoxes(item, hd) {
     });
   });
   return out;
+}
+
+/**
+ * A Lenovo Smart Clock 2 on its dock, at [u, v, z] (v out from the wall): 4.4 in wide, a soft
+ * grey fabric wedge whose front leans back, the screen on it, sitting on the round-cornered
+ * white charging dock. Drawn sharp, the screen shows the time in blue (2:47, as in the photo).
+ */
+function smartClock(u, v, z, px = PIX) {
+  const W = 0.375;
+  const out = [
+    [u - 0.03, v, z, W + 0.06, 0.3, 0.03, "white"],                              // the dock
+    [u, v + 0.02, z + 0.03, W, 0.1, 0.27, "fabric"],                             // the back, tallest
+    [u, v + 0.12, z + 0.03, W, 0.06, 0.24, "fabric"],                            // the front leaning back
+    [u + 0.02, v + 0.18, z + 0.03, W - 0.04, 0.02, 0.21, "fabric"],
+    [u + 0.03, v + 0.2, z + 0.07, W - 0.06, 0.005, 0.15, "clockScreen"],
+  ];
+  if (px === PIX) return [...out, [u + 0.08, v + 0.206, z + 0.12, W - 0.16, 0.003, 0.05, "clockTime"]];
+  const time = [
+    "11..1.1.11",
+    ".1.11.1..1",
+    "11...111.1",
+    "1.....1..1",
+    "11.1..1..1",
+  ];
+  return [...out, ...pixelArt(time, { 1: "clockTime" }, [u + W / 2 - 5 * px, v + 0.206, z + 0.2], 0.003, px)];
 }
 
 const legs = (w, d, h, inset = 0.1, s = 0.25, mat = "wood") => [
@@ -880,10 +905,11 @@ export const CATALOG = {
     ],
   },
   floating_shelf: {
-    // The little black shelf by the head of the twin, with an alarm clock and a book or two on it.
+    // The little black shelf by the head of the twin by the door: a book or two, and her Lenovo
+    // Smart Clock 2 on its white charging dock (see smartClock), drawn sharp so the time shows.
     label: "Floating shelf", group: "wall", w: 1.75, d: 0.75, layer: "wall", colors: ["black", "white", "oak"],
-    boxes: [[0, 0, 2.9, 1.75, 0.75, 0.1, "main"], [0.15, 0.15, 3.0, 0.7, 0.5, 0.15, "book3"], [0.95, 0.2, 3.0, 0.45, 0.35, 0.4, "dark"],
-      [1.02, 0.55, 3.08, 0.32, 0.01, 0.22, "led"]],
+    boxes: [[0, 0, 2.9, 1.75, 0.75, 0.1, "main"], [0.15, 0.15, 3.0, 0.7, 0.5, 0.15, "book3"], ...smartClock(0.95, 0.12, 3.0)],
+    hd: [[0, 0, 2.9, 1.75, 0.75, 0.1, "main"], [0.15, 0.15, 3.0, 0.7, 0.5, 0.15, "book3"], ...smartClock(0.95, 0.12, 3.0, PIX / 2)],
   },
   deep_window: {
     // The bigger window in Bedroom 2's side wall, over the Twin XL: set deep in the wall with a
