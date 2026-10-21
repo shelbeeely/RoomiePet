@@ -123,7 +123,7 @@ describe("room to live in", () => {
     const room = bounds("bedB");
     expect([room.x1 - room.x0, room.y1 - room.y0]).toEqual([13, 13]);     // the L-desk, tall chest and Twin XL down the left wall
     const beds = l.items.filter((i) => CATALOG[i.kind].bed);
-    expect(beds.map((b) => b.kind).sort()).toEqual(["bed", "twin_xl"]);
+    expect(beds.map((b) => b.kind).sort()).toEqual(["platform_bed", "twin_xl"]);
     expect(beds.length).toBe(2);
     for (const bed of beds) {
       expect(footprint(bed).y1).toBe(25);
@@ -171,7 +171,7 @@ describe("room to live in", () => {
     expect(door.from - room.y0).toBe(2);                               // 2 ft from the back (top) corner
     expect(door.to - door.from).toBe(3);
     // The rest as sketched: the L-desk in the back left corner, the shelf and the TV desk along
-    // the back wall, the tall chest on the left one, the two-drawer chest at the foot of the twin.
+    // the back wall, the tall chest on the left one, the lift-lid chest at the foot of the twin.
     // From the photos: the Twin XL lies along the left wall, the side window above it, the chest
     // between it and the desk.
     const at = (kind) => footprint(l.items.find((i) => i.kind === kind));
@@ -184,8 +184,8 @@ describe("room to live in", () => {
     expect(overlapping(footprint(chair), footprint(desk))).toBe(true);
     expect(layoutProblem("bedB", { ...l, items: l.items.map((i) => (i === chair ? { ...i, x: 0.25 } : i)) })).toMatch(/overlaps the l-desk/);
     expect(layoutProblem("bedB", { ...l, items: l.items.map((i) => (i === chair ? { ...i, y: 12.5 } : i)) })).toMatch(/overlaps the l-desk/);
-    // The twin by the door: grey comforter, pink Hello Kitty pillowcases.
-    expect(beds.find((b) => b.kind === "bed").color).toBe("kitty");
+    // The twin by the door: a black steel platform frame, no headboard; pink Hello Kitty pillowcases.
+    expect(beds.find((b) => b.kind === "platform_bed").color).toBe("kitty");
     expect(PILLOWS.kitty.case).toMatch(/^#/);
     // Her half (the twin by the door) is dark pastel, with Kuromi about it.
     for (const kind of ["kuromi_bed", "skull_rug"]) expect(at(kind).x1, kind).toBeGreaterThan(6.5);
@@ -205,7 +205,8 @@ describe("room to live in", () => {
     expect([side.side, side.line]).toEqual(["w", 0]);
     expect(side.at >= left.y0 && side.at + CATALOG.deep_window.w <= left.y1).toBe(true);
     expect(left.y1 - left.y0).toBe(CATALOG.twin_xl.d);
-    expect(at("chest_2").y1).toBe(right.y0);
+    expect(at("storage_chest").y1).toBe(right.y0);                    // the lift-lid chest at its foot
+    expect(CATALOG.platform_bed.boxes.every((b) => b[2] + b[5] <= 2.1)).toBe(true);   // no headboard
     // And there is still room to add things.
     for (const kind of ["beanbag", "bookshelf", "lamp"]) expect(freeSpot("bedB", l, kind), kind).not.toBe(null);
   });

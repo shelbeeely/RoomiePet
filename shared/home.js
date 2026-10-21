@@ -177,7 +177,7 @@ export const MATERIALS = {
   book1: "#d8645a", book2: "#5a8ad8", book3: "#f0c75e", book4: "#6fbf8a", frame: "#7a4f2e", sky: "#bfe3f5", pink: "#f4a6b8",
   granite: "#cfc9bf",
   // Dark pastel, for her half of Bedroom 2 and its Kuromi-style pieces.
-  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", graniteDark: "#a39d94", hob: "#2f2b36", led: "#4f6bff",
+  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", graniteDark: "#a39d94", hob: "#2f2b36", led: "#4f6bff",
 };
 
 // Boxes: [x, y, z, w, d, h, material], in feet, x across the piece and y from its back (y = 0)
@@ -202,6 +202,21 @@ export const CATALOG = {
       [0.05, 2.2, 1.1, 3.4, 4.25, 0.7, "main"], [0.05, 2.2, 1.8, 3.4, 0.45, 0.08, "main^"],
     ],
     spots: [[1.2, 4.2, 1.8], [2.4, 4.8, 1.8], [1.75, 3.2, 1.8]],
+    bed: true,
+  },
+  platform_bed: {
+    // Her twin: a black steel platform frame on thin legs, no headboard, the mattress on top and
+    // the floor showing underneath.
+    label: "Platform bed", group: "bedroom", w: 3.5, d: 6.5, layer: "solid", colors: ["kitty", "grey", "lilac", "pink", "blue", "sage"],
+    boxes: [
+      ...[[0, 0], [3.38, 0], [0, 3.19], [3.38, 3.19], [0, 6.38], [3.38, 6.38]].map(([x, y]) => [x, y, 0, 0.12, 0.12, 0.9, "steel"]),
+      [0, 0, 0.9, 3.5, 0.12, 0.15, "steel"], [0, 6.38, 0.9, 3.5, 0.12, 0.15, "steel"],
+      [0, 0.12, 0.9, 0.12, 6.26, 0.15, "steel"], [3.38, 0.12, 0.9, 0.12, 6.26, 0.15, "steel"],
+      [0.05, 0.05, 1.05, 3.4, 6.4, 0.65, "white"], [0.4, 0.2, 1.7, 2.7, 1.0, 0.35, "pillow"],
+      ...[[0.7, 0.35], [1.4, 0.7], [2.2, 0.35], [1.05, 1.0], [2.45, 0.9]].map(([x, y]) => [x, y, 2.05, 0.18, 0.15, 0.01, "pillowPrint"]),
+      [0.02, 1.5, 1.35, 3.46, 4.95, 0.42, "main"], [0.02, 1.5, 1.77, 3.46, 0.45, 0.06, "main^"],
+    ],
+    spots: [[1.2, 3.8, 1.8], [2.4, 4.6, 1.8], [1.75, 2.9, 1.8]],
     bed: true,
   },
   twin_xl: {
@@ -337,6 +352,15 @@ export const CATALOG = {
       ...legs(4, 2, 2.3, 0.1, 0.25, "main_"), [0.1, 0.1, 1.0, 3.8, 1.8, 0.1, "main_"], [0, 0, 2.3, 4, 2, 0.15, "main"],
       [1.6, 0.5, 2.45, 0.8, 0.45, 0.12, "dark"], [1.9, 0.6, 2.57, 0.2, 0.15, 0.3, "dark"],
       [0.4, 0.5, 2.85, 3.2, 0.15, 1.75, "dark"], [0.5, 0.65, 2.95, 3.0, 0.03, 1.55, "screen"],
+    ],
+  },
+  storage_chest: {
+    // The small chest at the foot of her bed: its lid lifts up, no drawers.
+    label: "Storage chest", group: "bedroom", w: 2.5, d: 1.25, layer: "solid", colors: ["lilac", "black", "pink", "white", "oak"],
+    boxes: [
+      [0.05, 0.05, 0, 2.4, 1.15, 1.3, "main"], [0, 0, 1.3, 2.5, 1.25, 0.2, "main_"],
+      [0.05, 1.2, 1.25, 2.4, 0.02, 0.05, "kuromi"], [1.1, 1.25, 1.0, 0.3, 0.04, 0.3, "candy"],
+      [-0.03, 0.45, 0.75, 0.05, 0.35, 0.12, "kuromi"], [2.48, 0.45, 0.75, 0.05, 0.35, 0.12, "kuromi"],
     ],
   },
   chest_2: {
@@ -634,7 +658,8 @@ export const CATALOG = {
 // a desk, a dresser and a pet bed (shared/home.test.js).
 const REAL = {
   bed: [3.25, 6.5],           // twin: 39 x 75 in mattress, and its headboard
-  twin_xl: [3.25, 7],         // 39 x 80 in
+  twin_xl: [3.25, 7],
+  platform_bed: [3.25, 6.5],  // a twin too         // 39 x 80 in
   double_bed: [4.5, 6.5],     // full: 54 in
   nightstand: [1.5, 1.25],
   wardrobe: [3, 2],
@@ -900,7 +925,7 @@ export const DEFAULT_LAYOUTS = {
     // L-desk in the back left corner, a 3-tier shelf and the TV on its stand along the back
     // wall to the door, the tall chest on the left wall, and along the front the Twin XL and
     // the twin with the closet (part of the walls, see ROOMS) a tight fit between them, a small
-    // high window above each, a two-drawer chest at the foot of the twin. Each bed is in its
+    // high window above each, a lift-lid chest at the foot of the twin. Each bed is in its
     // own nook between the closet and the wall: the Twin XL's with the deep-silled window in the
     // left wall, the twin's with a little shelf on the right wall by its head and a tapestry hung
     // over it, in front of its window. The sizes are guesses until the room is measured.
@@ -910,7 +935,7 @@ export const DEFAULT_LAYOUTS = {
       W("deep_window", "white", "w", 0, 18), W("floating_shelf", "black", "e", 13, 22.75),
       F("l_desk", "black", 0, 12), F("chair", "white", 2.5, 13.75, 2), F("shelf_3tier", "black", 5, 12),
       F("desk_tv", "black", 7.5, 12), F("tall_chest", "white", 0, 15, 3), F("clothes_rack", "white", 4.75, 14),
-      F("twin_xl", "lilac", 0, 18, 2), F("bed", "kitty", 9.75, 18.5, 2), F("chest_2", "lilac", 10.25, 17, 2),
+      F("twin_xl", "lilac", 0, 18, 2), F("platform_bed", "kitty", 9.75, 18.5, 2), F("storage_chest", "lilac", 10.25, 17.25, 2),
       // Her half, the twin by the door, done up dark pastel with Kuromi about the place.
       F("skull_rug", "lilac", 5.5, 16.75), F("kuromi_bed", "black", 8, 16.5),
       W("kuromi_poster", "lilac", "e", 13, 19.25), W("string_lights", "pink", "w", 9.75, 22.5),
