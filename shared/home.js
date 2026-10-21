@@ -375,13 +375,16 @@ export const CATALOG = {
     ],
   },
   cube_shelf: {
-    // The small black cube shelf beside the ottoman, DVDs in it.
-    label: "Cube shelf", group: "bedroom", w: 1.25, d: 1, layer: "solid", colors: ["black", "white", "oak"],
+    // A set of three small black cubes on the wall by her bed, stepped up one after another,
+    // DVDs and little things in them.
+    label: "Wall cubes", group: "wall", w: 2.25, d: 0.8, layer: "wall", colors: ["black", "white", "lilac", "pink"],
     boxes: [
-      [0, 0, 0, 1.25, 1, 0.08, "main"], [0, 0, 0.72, 1.25, 1, 0.06, "main"], [0, 0, 1.42, 1.25, 1, 0.08, "main"],
-      [0, 0, 0, 0.08, 1, 1.5, "main"], [1.17, 0, 0, 0.08, 1, 1.5, "main"], [0.08, 0, 0.08, 1.09, 0.06, 1.34, "main_"],
-      ...[0.12, 0.27, 0.42, 0.57, 0.72, 0.87].map((x, k) => [x, 0.25, 0.08, 0.12, 0.6, 0.6, `book${(k % 4) + 1}`]),
-      ...[0.12, 0.3, 0.48].map((x, k) => [x, 0.25, 0.78, 0.15, 0.6, 0.55, `book${((k + 2) % 4) + 1}`]),
+      ...[[0, 2.6], [0.8, 3.1], [1.6, 2.6]].flatMap(([x, z]) => [
+        [x, 0, z, 0.65, 0.8, 0.06, "main"], [x, 0, z + 0.59, 0.65, 0.8, 0.06, "main"],
+        [x, 0, z, 0.06, 0.8, 0.65, "main"], [x + 0.59, 0, z, 0.06, 0.8, 0.65, "main"], [x, 0, z, 0.65, 0.04, 0.65, "main_"],
+      ]),
+      ...[0.08, 0.2, 0.32, 0.44].map((x, k) => [x, 0.15, 2.66, 0.1, 0.55, 0.45, `book${(k % 4) + 1}`]),
+      [0.95, 0.2, 3.16, 0.35, 0.4, 0.35, "candy"], [1.7, 0.2, 2.66, 0.4, 0.4, 0.3, "lavender"],
     ],
   },
   robot_vacuum: {
@@ -975,24 +978,24 @@ export const DEFAULT_LAYOUTS = {
   },
   bedB: {
     // As sketched, and as the photos taken from the foot of the twin by the door show it: an
-    // L-desk in the back left corner, a 3-tier shelf and the TV on its stand along the back
-    // wall to the door, the tall chest on the left wall, and along the front the Twin XL and
+    // L-desk in the back left corner, the TV on its stand in the back right corner by the door
+    // with the 3-tier shelf beside it, the tall chest on the left wall, and along the front the Twin XL and
     // the twin with the closet (part of the walls, see ROOMS) a tight fit between them, a small
     // high window above each, a lift-lid chest at the foot of the twin. Each bed is in its
     // own nook between the closet and the wall: the Twin XL's with the deep-silled window in the
     // left wall, the twin's with a little shelf on the right wall by its head and a tapestry hung
     // over it, in front of its window. Neither bed has a headboard. A black leather storage
-    // ottoman with a bamboo tray and a little cube shelf of DVDs at the foot of hers, a corkboard
+    // ottoman with a bamboo tray at the foot of hers, wall cubes of DVDs above it, a corkboard
     // by the door, cards pinned up by the Twin XL. The sizes are guesses until the room is
     // measured.
     wall: "white", floor: "greywood",
     items: [
       W("basement_window", "white", "s", 25, 0.5), W("tapestry", "black", "s", 25, 9.75),
       W("deep_window", "white", "w", 0, 18), W("floating_shelf", "black", "e", 13, 22.75),
-      F("l_desk", "walnut", 0, 12), F("office_chair", "white", 2.25, 13.75, 2), F("shelf_3tier", "black", 5, 12),
-      F("desk_tv", "black", 7.5, 12), F("tall_chest", "white", 0, 15, 3), F("clothes_rack", "white", 4.75, 14),
+      F("l_desk", "walnut", 0, 12), F("office_chair", "white", 2.25, 13.75, 2), F("shelf_3tier", "black", 7, 12),
+      F("desk_tv", "black", 9, 12), F("tall_chest", "white", 0, 15, 3), F("clothes_rack", "white", 4.75, 14),
       F("twin_xl", "lilac", 0, 18, 2), F("platform_bed", "kitty", 9.75, 18.5, 2), F("storage_chest", "black", 10.25, 17, 2),
-      F("cube_shelf", "black", 8.75, 17.25, 2), F("robot_vacuum", "black", 8.25, 19),
+      W("cube_shelf", "black", "e", 13, 17), F("robot_vacuum", "black", 8.25, 19),
       W("corkboard", "oak", "e", 13, 12.25), W("cards", "white", "w", 0, 22.75),
       // Her half, the twin by the door, done up dark pastel with Kuromi about the place.
       F("skull_rug", "lilac", 6.75, 16), F("kuromi_bed", "black", 5, 16.5),

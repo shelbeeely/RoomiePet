@@ -198,6 +198,7 @@ describe("room to live in", () => {
     for (const kind of ["shelf_3tier", "desk_tv"]) expect(at(kind).y0, kind).toBe(room.y0);
     expect(at("shelf_3tier").x0).toBeGreaterThanOrEqual(at("l_desk").x1);
     expect(at("desk_tv").x0).toBeGreaterThanOrEqual(at("shelf_3tier").x1);
+    expect(at("desk_tv").x1).toBe(room.x1);                           // the TV stand in the corner by the door
     expect(at("tall_chest").x0).toBe(0);
     expect(at("tall_chest").y0).toBe(at("l_desk").y1);
     expect(at("tall_chest").y1).toBeLessThanOrEqual(left.y0);
