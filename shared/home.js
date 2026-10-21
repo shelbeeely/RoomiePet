@@ -8,7 +8,7 @@
 // builder. The server keeps each household's layouts and checks them here,
 // so a phone can't save a bed through a wall or across a doorway.
 
-import { TAPE_ART } from "./tapeArt.js";
+import { ARCHIVE_TAPES, TAPE_ART } from "./tapeArt.js";
 
 export const FLAT = { w: 30, d: 25 };
 
@@ -333,17 +333,20 @@ export const coverOk = (url) => typeof url === "string" && url.length <= COVER_U
 // a is the tape's spine artwork, if it has its own (TAPE_ART: cut from the photo of her shelf).
 const TAPE = (t, c, a) => (a ? { t, c, a } : { t, c });
 export { TAPE_ART };
-// Hers, as in the photo of the shelf: all in the raised middle cube, the other two empty --
-// Independence Day twice, the three Matrix films, an Indiana Jones and a Memorex blank.
+// Hers, as in the photo of the shelf, in the raised middle cube -- Independence Day twice, the
+// three Matrix films, an Indiana Jones and a Memorex blank -- and either side, the shelf filled
+// out from the Retro-Daze collection on archive.org (ARCHIVE_TAPES): cartoons on the left, the
+// spookier ones on the right.
+const archived = (...ids) => ids.map((id) => ({ ...ARCHIVE_TAPES[id] }));
 export const DEFAULT_TAPES = [
-  [],
+  archived("care_bears", "rugrats", "ducktales", "grinch_night", "dinosaurs", "turtles", "sonic"),
   [
     TAPE("Independence Day", "black", "independence_day_1"), TAPE("Independence Day", "black", "independence_day_2"),
     TAPE("The Matrix", "silver", "the_matrix"), TAPE("Matrix Reloaded", "black", "matrix_reloaded"),
     TAPE("Matrix Revolutions", "teal", "matrix_revolutions"), TAPE("Indiana Jones", "orange", "indiana_jones"),
     TAPE("Memorex blank", "peach", "memorex_blank"),
   ],
-  [],
+  archived("twelve_monkeys", "beetlejuice", "godzilla", "death_wish", "masters_universe", "starchaser", "wizards"),
 ];
 
 /** The tapes in a piece with shelves: its own, or the default shelf-full. */

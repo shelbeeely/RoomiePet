@@ -299,8 +299,13 @@ describe("the VHS tapes in the wall cubes", () => {
   const shelf = () => DEFAULT_LAYOUTS.bedB.items.find((i) => i.kind === "cube_shelf");
   const withTapes = (tapes) => ({ ...DEFAULT_LAYOUTS.bedB, items: DEFAULT_LAYOUTS.bedB.items.map((i) => (i.kind === "cube_shelf" ? { ...i, tapes } : i)) });
 
-  test("start as hers do on the shelf: all seven in the raised middle cube", () => {
-    expect(DEFAULT_TAPES.map((c) => c.length)).toEqual([0, 7, 0]);
+  test("start as hers do on the shelf, the raised middle cube, and the rest filled from the archive", () => {
+    expect(DEFAULT_TAPES.map((c) => c.length)).toEqual([7, 7, 7]);
+    expect(DEFAULT_TAPES[1].every((t) => !t.cover)).toBe(true);                 // hers: spines from her photo
+    for (const t of [...DEFAULT_TAPES[0], ...DEFAULT_TAPES[2]]) {
+      expect(t.cover, t.t).toMatch(/^https:\/\/archive\.org\/download\/retro-daze/);    // linked, not copied
+      expect(layoutProblem("bedB", withTapes([[t], [], []])), t.t).toBe(null);
+    }
     expect(DEFAULT_TAPES[1].filter((t) => t.t.includes("Matrix"))).toHaveLength(3);
   });
 
@@ -315,7 +320,7 @@ describe("the VHS tapes in the wall cubes", () => {
   });
 
   test("are saved with the room, checked as anything else is", () => {
-    expect(layoutProblem("bedB", withTapes(moveTape(DEFAULT_TAPES, { cube: 1, i: 6 }, { cube: 0, i: 0 })))).toBe(null);
+    expect(layoutProblem("bedB", withTapes(moveTape(DEFAULT_TAPES, { cube: 1, i: 6 }, { cube: 1, i: 0 })))).toBe(null);
     expect(layoutProblem("bedB", withTapes([[], []]))).toMatch(/3 cubes/);
     expect(layoutProblem("bedB", withTapes([Array.from({ length: TAPES_PER_CUBE + 1 }, () => ({ t: "x", c: "black" })), [], []]))).toMatch(/holds/);
     expect(layoutProblem("bedB", withTapes([[{ t: "x".repeat(40), c: "black" }], [], []]))).toMatch(/title/);
@@ -337,8 +342,8 @@ describe("the VHS tapes in the wall cubes", () => {
     const spines = (item, hd) => boxesOf(item, hd).filter((b) => b.mat.startsWith("tape_") && b.mat !== "tape_case");
     // Hers have their own spines, from the photo: their colours a pixel at a time, finer when sharp.
     const art = (item, hd) => boxesOf(item, hd).filter((b) => b.mat.startsWith("#")).length;
-    expect(art(shelf(), false)).toBe(7 * 9);
-    expect(art(shelf(), true)).toBe(7 * 2 * 18);
+    expect(art(shelf(), false)).toBe(21 * 9);
+    expect(art(shelf(), true)).toBe(21 * 2 * 18);
     expect(spines(shelf(), false)).toHaveLength(0);
     const one = { ...shelf(), tapes: [[{ t: "Up", c: "red" }], [], []] };
     expect(spines(one, false).map((b) => b.mat)).toEqual(["tape_red"]);

@@ -157,7 +157,10 @@ up in the builder to move tapes along a cube or into another, rename and
 recolour them, take them out or add more. Hers have their own spines: cut out of
 a photo of the shelf and straightened by `art/tapes.py` (the photo stays out of
 the repo) into `client/public/tapes/`, shown whole in the builder and boiled down
-to a spine's few pixels in the room (`shared/tapeArt.js`).
+to a spine's few pixels in the room (`shared/tapeArt.js`). The other two cubes
+are filled from the Retro-Daze VHS Tape Cover Collection on archive.org: those
+tapes link to the scan of their sleeve there (cover, and spine cropped from it),
+nothing of it copied into the app but the spine's averaged colours.
 
 The flat is drawn at 16 pixels to the foot. A few pieces are drawn sharp, at
 twice that (a catalog entry's `hd`): the teal iMac G3, built in half-pixel

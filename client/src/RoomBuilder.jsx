@@ -98,7 +98,7 @@ function TapeShelf({ tapes, onChange }) {
               const on = held && held.cube === k && held.i === i;
               return (
                 <button key={i} className={`tape${on ? " on" : ""}${t.a ? " art" : ""}`} aria-pressed={on}
-                  style={{ "--spine": TAPE_COLORS[t.c], "--ink": PALE_SPINES.has(t.c) ? "#1f1c26" : "#f6f3ec", ...(t.a ? { backgroundImage: `url(/tapes/${t.a}.png)` } : {}) }}
+                  style={{ "--spine": TAPE_COLORS[t.c], "--ink": PALE_SPINES.has(t.c) ? "#1f1c26" : "#f6f3ec", ...spineBg(t.a) }}
                   aria-label={`${t.t}, cube ${k + 1}, ${i + 1} of ${cube.length}`}
                   onClick={() => (on ? setHeld(null) : held ? put({ cube: k, i }) : setHeld({ cube: k, i }))}>
                   {!t.a && <span>{t.t}</span>}
@@ -133,7 +133,7 @@ function TapeShelf({ tapes, onChange }) {
             <button role="radio" aria-checked={!tape.a} className={`plain${!tape.a ? " on" : ""}`} onClick={() => edit({ a: undefined })}>Plain</button>
             {Object.entries(TAPE_ART).map(([id, art]) => (
               <button key={id} role="radio" aria-checked={tape.a === id} aria-label={art.label} title={art.label}
-                className={tape.a === id ? "on" : ""} style={{ backgroundImage: `url(/tapes/${id}.png)` }} onClick={() => edit({ a: id })} />
+                className={tape.a === id ? "on" : ""} style={spineBg(id)} onClick={() => edit({ a: id })} />
             ))}
           </div>
           <button className="ghost small" onClick={() => {
@@ -147,6 +147,15 @@ function TapeShelf({ tapes, onChange }) {
       {note && <p className="hint warn">{note}</p>}
     </div>
   );
+}
+
+/** A spine's picture as a CSS background: her photo's spine, or the spine strip of an archive sleeve. */
+function spineBg(id) {
+  const art = TAPE_ART[id];
+  if (!art) return {};
+  if (!art.spine) return { backgroundImage: `url(${art.img})`, backgroundSize: "100% 100%" };
+  const [x, w] = art.spine;
+  return { backgroundImage: `url(${art.img})`, backgroundSize: `${100 / w}% 100%`, backgroundPosition: `${(x / (1 - w)) * 100}% 0` };
 }
 
 export default function RoomBuilder({ edit, saving, onChange, onSelect, onUndo, onCancel, onSave }) {
