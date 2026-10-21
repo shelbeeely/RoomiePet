@@ -119,7 +119,7 @@ describe("room to live in", () => {
     expect(layoutProblem("bedB", l)).toBe(null);
     expect(l.wall).toBe("white");
     const room = bounds("bedB");
-    expect([room.x1 - room.x0, room.y1 - room.y0]).toEqual([13, 13]);     // the L-desk, dresser and Twin XL end to end down the left wall
+    expect([room.x1 - room.x0, room.y1 - room.y0]).toEqual([13, 13]);     // the L-desk, tall chest and Twin XL down the left wall
     const beds = l.items.filter((i) => CATALOG[i.kind].bed);
     expect(beds.map((b) => b.kind).sort()).toEqual(["bed", "twin_xl"]);
     expect(beds.length).toBe(2);
@@ -167,15 +167,20 @@ describe("room to live in", () => {
     expect(door.from - room.y0).toBe(2);                               // 2 ft from the back (top) corner
     expect(door.to - door.from).toBe(3);
     // The rest as sketched: the L-desk in the back left corner, the shelf and the TV desk along
-    // the back wall, the dresser on the left one, the two-drawer chest at the foot of the twin.
+    // the back wall, the tall chest on the left one, the two-drawer chest at the foot of the twin.
+    // From the photos: the Twin XL lies along the left wall, the side window above it, the chest
+    // between it and the desk.
     const at = (kind) => footprint(l.items.find((i) => i.kind === kind));
     expect([at("l_desk").x0, at("l_desk").y0]).toEqual([0, room.y0]);
     for (const [x, y] of CATALOG.l_desk.plan) expect(x <= CATALOG.l_desk.w && y <= CATALOG.l_desk.d).toBe(true);   // the L inside its box
     for (const kind of ["shelf_3tier", "desk_tv"]) expect(at(kind).y0, kind).toBe(room.y0);
     expect(at("shelf_3tier").x0).toBeGreaterThanOrEqual(at("l_desk").x1);
     expect(at("desk_tv").x0).toBeGreaterThanOrEqual(at("shelf_3tier").x1);
-    expect(at("dresser").x0).toBe(0);
-    expect([at("dresser").y0, at("dresser").y1]).toEqual([at("l_desk").y1, left.y0]);   // the left wall end to end
+    expect(at("tall_chest").x0).toBe(0);
+    expect(at("tall_chest").y0).toBe(at("l_desk").y1);
+    expect(at("tall_chest").y1).toBeLessThanOrEqual(left.y0);
+    const side = l.items.find((i) => i.kind === "basement_window" && i.side === "w");
+    expect(side.at >= left.y0 && side.at + CATALOG.basement_window.w <= left.y1).toBe(true);
     expect(left.y1 - left.y0).toBe(CATALOG.twin_xl.d);
     expect(at("chest_2").y1).toBe(right.y0);
     // And there is still room to add things.

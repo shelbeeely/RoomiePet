@@ -281,19 +281,34 @@ export const CATALOG = {
     ],
   },
   shelf_3tier: {
-    label: "3-tier shelf", group: "bedroom", w: 2, d: 1.25, layer: "solid", colors: ["white", "black", "oak", "walnut"],
+    // As in the photo of Bedroom 2: three dark shelves on four silver poles, as tall as the TV
+    // beside it, a bag on top.
+    label: "3-tier shelf", group: "bedroom", w: 2, d: 1.25, layer: "solid", colors: ["black", "white", "oak", "walnut"],
     boxes: [
-      [0, 0, 0, 0.1, 1.25, 3, "main"], [1.9, 0, 0, 0.1, 1.25, 3, "main"],
-      ...[0.15, 1.45, 2.9].map((z) => [0.1, 0, z, 1.8, 1.25, 0.1, "main_"]),
-      [0.25, 0.3, 0.25, 0.5, 0.7, 0.85, "book1"], [0.8, 0.3, 0.25, 0.3, 0.7, 0.75, "book3"], [1.15, 0.3, 0.25, 0.5, 0.7, 0.8, "book2"],
-      [0.3, 0.2, 1.55, 1.4, 0.9, 0.6, "cream"], [1.2, 0.4, 3.0, 0.45, 0.45, 0.35, "pot"], [1.15, 0.35, 3.35, 0.55, 0.55, 0.4, "leaf"],
+      ...[[0.05, 0.05], [1.8, 0.05], [0.05, 1.05], [1.8, 1.05]].map(([x, y]) => [x, y, 0, 0.15, 0.15, 4.2, "metal"]),
+      ...[0.4, 2.0, 3.6].map((z) => [0, 0, z, 2, 1.25, 0.08, "main"]),
+      [0.25, 0.3, 0.48, 0.5, 0.7, 0.85, "book1"], [0.8, 0.3, 0.48, 0.3, 0.7, 0.75, "book3"], [1.15, 0.3, 0.48, 0.5, 0.7, 0.8, "book2"],
+      [0.3, 0.2, 2.08, 1.4, 0.9, 0.5, "cream"], [0.3, 0.3, 3.68, 0.9, 0.6, 0.8, "leaf"],
+    ],
+  },
+  tall_chest: {
+    // The chest of drawers in the photo of Bedroom 2: five drawers, black knobs, nearly as tall
+    // as the window beside it.
+    label: "Tall chest", group: "bedroom", w: 2.75, d: 1.5, layer: "solid", colors: ["white", "oak", "walnut", "black"],
+    boxes: [
+      [0.05, 0, 0, 2.65, 1.5, 4.05, "main"], [0, 0, 4.05, 2.75, 1.5, 0.15, "main_"],
+      ...[0.3, 1.05, 1.8, 2.55, 3.3].flatMap((z) => [
+        [0.2, 1.5, z, 2.35, 0.04, 0.65, "main^"], [0.45, 1.54, z + 0.28, 0.12, 0.06, 0.12, "dark"], [2.18, 1.54, z + 0.28, 0.12, 0.06, 0.12, "dark"],
+      ]),
+      [1.6, 0.4, 4.2, 0.45, 0.45, 0.5, "white"], [0.4, 0.3, 4.2, 0.9, 0.5, 0.35, "book2"],
     ],
   },
   desk_tv: {
-    // The desk on the back wall by the door, a TV standing on it.
-    label: "Desk with TV", group: "bedroom", w: 4, d: 2, layer: "solid", colors: ["white", "black", "oak", "walnut"],
+    // The stand on the back wall by the door, as in the photo: dark, a shelf below its top, a
+    // big TV standing on it.
+    label: "Desk with TV", group: "bedroom", w: 4, d: 2, layer: "solid", colors: ["black", "white", "oak", "walnut"],
     boxes: [
-      ...legs(4, 2, 2.3, 0.1, 0.25, "main_"), [0, 0, 2.3, 4, 2, 0.15, "main"],
+      ...legs(4, 2, 2.3, 0.1, 0.25, "main_"), [0.1, 0.1, 1.0, 3.8, 1.8, 0.1, "main_"], [0, 0, 2.3, 4, 2, 0.15, "main"],
       [1.6, 0.5, 2.45, 0.8, 0.45, 0.12, "dark"], [1.9, 0.6, 2.57, 0.2, 0.15, 0.3, "dark"],
       [0.4, 0.5, 2.85, 3.2, 0.15, 1.75, "dark"], [0.5, 0.65, 2.95, 3.0, 0.03, 1.55, "screen"],
     ],
@@ -770,17 +785,19 @@ export const DEFAULT_LAYOUTS = {
     ],
   },
   bedB: {
-    // As sketched: an L-desk in the back left corner, a 3-tier shelf and a desk with the TV along
-    // the back wall to the door, the dresser on the left wall, and along the front the Twin XL
-    // and the twin with the closet (part of the walls, see ROOMS) a tight fit between them, a
-    // small high window above each, a two-drawer chest at the foot of the twin. The sizes are
-    // guesses until the room is measured.
+    // As sketched, and as the photos taken from the foot of the twin by the door show it: an
+    // L-desk in the back left corner, a 3-tier shelf and the TV on its stand along the back
+    // wall to the door, the tall chest on the left wall, and along the front the Twin XL and
+    // the twin with the closet (part of the walls, see ROOMS) a tight fit between them, a small
+    // high window above each, a two-drawer chest at the foot of the twin. The Twin XL lies
+    // along the left wall under the third window. The sizes are guesses until the room is
+    // measured.
     wall: "white", floor: "greywood",
     items: [
       W("basement_window", "white", "s", 25, 0.5), W("basement_window", "white", "s", 25, 10.25),
-      W("basement_window", "white", "w", 0, 15.75),
-      F("l_desk", "black", 0, 12), F("chair", "black", 2.25, 15, 2), F("shelf_3tier", "white", 5, 12),
-      F("desk_tv", "white", 7.5, 12), F("dresser", "white", 0, 15, 3),
+      W("basement_window", "white", "w", 0, 18.5),
+      F("l_desk", "black", 0, 12), F("chair", "white", 2.25, 15, 2), F("shelf_3tier", "black", 5, 12),
+      F("desk_tv", "black", 7.5, 12), F("tall_chest", "white", 0, 15, 3),
       F("twin_xl", "sage", 0, 18, 2), F("bed", "blue", 9.75, 18.5, 2), F("chest_2", "white", 10.25, 17, 2),
     ],
   },
