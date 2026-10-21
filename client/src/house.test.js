@@ -47,6 +47,17 @@ describe("getting about", () => {
   });
 });
 
+describe("the L-desk", () => {
+  test("a pet can go into the crook of the L, but not under either arm", () => {
+    const desk = DEFAULT_LAYOUTS.bedB.items.find((i) => i.kind === "l_desk");
+    const g = gridOf(allLayouts({ bedB: { ...DEFAULT_LAYOUTS.bedB, items: [desk] } }));
+    const cell = (x, y) => free(g, Math.floor(x / 0.5), Math.floor(y / 0.5));
+    expect(cell(desk.x + 3, desk.y + 2.5)).toBe(true);     // the crook
+    expect(cell(desk.x + 3, desk.y + 1)).toBe(false);      // the arm along the back wall
+    expect(cell(desk.x + 1, desk.y + 2.5)).toBe(false);    // the arm along the left wall
+  });
+});
+
 describe("where pets go", () => {
   const cond = (state, flags = {}) => ({ state, flags });
 

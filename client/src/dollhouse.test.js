@@ -21,6 +21,21 @@ describe("the dollhouse's drawing order", () => {
   });
 });
 
+describe("an L-desk, its arms in order on their own", () => {
+  test("the chair in its crook goes in front of the arm behind it and behind the arm in front", () => {
+    const desk = { kind: "l_desk", color: "black", x: 0, y: 12, rot: 0 };
+    const chair = { name: "chair", box: pieceBox({ kind: "chair", color: "white", x: 2.5, y: 13.75, rot: 2 }) };
+    const arms = [{ name: "back arm", box: pieceBox(desk, 0) }, { name: "left arm", box: pieceBox(desk, 1) }];
+    const names = (rot) => order([chair, ...arms], dollCamera("bedB", rot), (u) => u.box).map((u) => u.name);
+    // Seen from the front, the arm along the back wall is behind the chair.
+    expect(names(0).indexOf("back arm")).toBeLessThan(names(0).indexOf("chair"));
+    // Seen from the right (from the door's side), the arm along the left wall is behind it too;
+    // seen from the left, that arm is in front of it.
+    const sides = [1, 3].map((rot) => names(rot).indexOf("left arm") < names(rot).indexOf("chair"));
+    expect(sides.sort()).toEqual([false, true]);
+  });
+});
+
 describe("the cutaway", () => {
   test("tall furniture is cut off where the walls are, so it doesn't stand up over what's behind it", () => {
     expect(pieceBox({ kind: "wardrobe", color: "white", x: 0, y: 0, rot: 0 }).z1).toBe(CUTAWAY);

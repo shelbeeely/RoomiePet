@@ -9,7 +9,7 @@
 //
 // Everything is in scene pixels, 16 to the foot; the canvas scales them up.
 import {
-  CATALOG, COLORWAYS, DOORS, FLAT, FLOORS, MATERIALS, ROOMS, WALLPAPERS, boxesOf, bounds, roomAt, wallsOf,
+  CATALOG, COLORWAYS, DOORS, FLAT, FLOORS, MATERIALS, ROOMS, WALLPAPERS, boxesOf, bounds, partsOf, roomAt, wallsOf,
 } from "@shared/home.js";
 
 export const PX = 16;
@@ -24,10 +24,18 @@ export const CUTAWAY = WALL + 0.5;
 
 /** A piece's boxes as drawn: anything above the cutaway is cut off -- for things on a wall,
  * or built in like a closet, where the walls are cut. */
-function cutBoxes(item) {
+function cutBoxes(item, part = null) {
   const c = CATALOG[item.kind];
   const top = c.layer === "wall" || c.builtin ? WALL : CUTAWAY;
-  return boxesOf(item).filter((b) => b.z0 < top).map((b) => (b.z1 > top ? { ...b, z1: top } : b));
+  let boxes = boxesOf(item);
+  if (part !== null) {
+    // One arm of an L-desk: the boxes standing on it, drawn and put in order on their own, so a
+    // chair in the crook of the L goes in front of one arm and behind the other.
+    const r = partsOf(item)[part];
+    const on = (b) => (b.x0 + b.x1) / 2 > r.x0 && (b.x0 + b.x1) / 2 < r.x1 && (b.y0 + b.y1) / 2 > r.y0 && (b.y0 + b.y1) / 2 < r.y1;
+    boxes = boxes.filter(on);
+  }
+  return boxes.filter((b) => b.z0 < top).map((b) => (b.z1 > top ? { ...b, z1: top } : b));
 }
 const THICK = 0.25;       // ft: walls
 const OUTLINE = [43, 34, 56];
@@ -343,10 +351,10 @@ function cached(key, make) {
 }
 
 /** A piece of furniture as a sprite: {canvas, ox, oy, w, h, data} at scene pixels. */
-export function pieceSprite(item, cam, tint = null) {
-  const key = `${cam.key}|${JSON.stringify(item)}|${tint || ""}`;
+export function pieceSprite(item, cam, tint = null, part = null) {
+  const key = `${cam.key}|${JSON.stringify(item)}|${tint || ""}|${part ?? ""}`;
   return cached(key, () => {
-    const boxes = cutBoxes(item);
+    const boxes = cutBoxes(item, part);
     const r = new Raster(...screenBounds(boxes, cam));
     drawBoxes(r, boxes, cam, (box) => {
       const c = colorOf(box.mat, item);
@@ -358,8 +366,8 @@ export function pieceSprite(item, cam, tint = null) {
 }
 
 /** The world box a piece takes up, for putting it in order with everything else. */
-export function pieceBox(item) {
-  const boxes = cutBoxes(item);
+export function pieceBox(item, part = null) {
+  const boxes = cutBoxes(item, part);
   return {
     x0: Math.min(...boxes.map((b) => b.x0)), x1: Math.max(...boxes.map((b) => b.x1)),
     y0: Math.min(...boxes.map((b) => b.y0)), y1: Math.max(...boxes.map((b) => b.y1)),

@@ -9,6 +9,8 @@ const area = (id) => ROOMS[id].areas.reduce((s, a) => s + rect(a), 0) + (ROOMS[i
 const bedB = DEFAULT_LAYOUTS.bedB;
 const withItems = (items, base = bedB) => ({ ...base, items });
 
+const overlapping = (a, b) => a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
+
 describe("the flat", () => {
   test("about 750 sq ft: two bedrooms on the left opening onto the main area, the bathroom in the back right corner", () => {
     const total = Object.keys(ROOMS).reduce((s, id) => s + area(id), 0);
@@ -131,14 +133,16 @@ describe("room to live in", () => {
     expect(left.x0).toBe(0);
     expect(right.x1).toBe(13);
     // A small high window over each headboard.
-    const windows = l.items.filter((i) => i.kind === "basement_window" && i.side === "s").sort((p, q) => p.at - q.at);
-    expect(windows.length).toBe(2);
+    // A small high window over each headboard; over the twin's, a tapestry hung on a rod in front
+    // of it (from the photo of that bed).
+    const over = l.items.filter((i) => ["basement_window", "tapestry"].includes(i.kind) && i.side === "s").sort((p, q) => p.at - q.at);
+    expect(over.map((i) => i.kind)).toEqual(["basement_window", "tapestry"]);
     // As in the photo of the real room: one more on the side wall, grey planks underfoot.
-    expect(l.items.some((i) => i.kind === "basement_window" && i.side === "w")).toBe(true);
+    expect(l.items.some((i) => CATALOG[i.kind].outer && i.kind.endsWith("window") && i.side === "w")).toBe(true);
     expect(l.floor).toBe("greywood");
-    for (const [w, bed] of [[windows[0], left], [windows[1], right]]) {
+    for (const [w, bed] of [[over[0], left], [over[1], right]]) {
       expect([w.side, w.line]).toEqual(["s", 25]);
-      expect(w.at >= bed.x0 && w.at + CATALOG.basement_window.w <= bed.x1).toBe(true);
+      expect(w.at >= bed.x0 - 0.01 && w.at + CATALOG[w.kind].w <= bed.x1 + 0.01).toBe(true);
     }
     expect(Math.min(...CATALOG.basement_window.boxes.map((b) => b[2]))).toBeGreaterThan(2.8);   // above the headboards
     // The closet is part of the room's walls on the front wall between the beds: the room steps
@@ -173,14 +177,24 @@ describe("room to live in", () => {
     const at = (kind) => footprint(l.items.find((i) => i.kind === kind));
     expect([at("l_desk").x0, at("l_desk").y0]).toEqual([0, room.y0]);
     for (const [x, y] of CATALOG.l_desk.plan) expect(x <= CATALOG.l_desk.w && y <= CATALOG.l_desk.d).toBe(true);   // the L inside its box
+    // From the photo of the desk: the chair is tucked into the crook of the L, which is floor;
+    // on either arm it is not.
+    const chair = l.items.find((i) => i.kind === "chair");
+    const desk = l.items.find((i) => i.kind === "l_desk");
+    expect(overlapping(footprint(chair), footprint(desk))).toBe(true);
+    expect(layoutProblem("bedB", { ...l, items: l.items.map((i) => (i === chair ? { ...i, x: 0.25 } : i)) })).toMatch(/overlaps the l-desk/);
+    expect(layoutProblem("bedB", { ...l, items: l.items.map((i) => (i === chair ? { ...i, y: 12.5 } : i)) })).toMatch(/overlaps the l-desk/);
+    // The clothes rack rolls about: it is a piece like any other.
+    expect(l.items.some((i) => i.kind === "clothes_rack")).toBe(true);
     for (const kind of ["shelf_3tier", "desk_tv"]) expect(at(kind).y0, kind).toBe(room.y0);
     expect(at("shelf_3tier").x0).toBeGreaterThanOrEqual(at("l_desk").x1);
     expect(at("desk_tv").x0).toBeGreaterThanOrEqual(at("shelf_3tier").x1);
     expect(at("tall_chest").x0).toBe(0);
     expect(at("tall_chest").y0).toBe(at("l_desk").y1);
     expect(at("tall_chest").y1).toBeLessThanOrEqual(left.y0);
-    const side = l.items.find((i) => i.kind === "basement_window" && i.side === "w");
-    expect(side.at >= left.y0 && side.at + CATALOG.basement_window.w <= left.y1).toBe(true);
+    const side = l.items.find((i) => i.kind === "deep_window");
+    expect([side.side, side.line]).toEqual(["w", 0]);
+    expect(side.at >= left.y0 && side.at + CATALOG.deep_window.w <= left.y1).toBe(true);
     expect(left.y1 - left.y0).toBe(CATALOG.twin_xl.d);
     expect(at("chest_2").y1).toBe(right.y0);
     // And there is still room to add things.

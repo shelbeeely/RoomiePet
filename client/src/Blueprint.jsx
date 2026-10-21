@@ -140,13 +140,10 @@ export default function Blueprint({ room, draft, sel, open, onSelect, onMove, on
           return (
             <g key={k} className="bp-piece" onPointerDown={(e) => down(e, k)}>
               {c.plan
-                // A piece that isn't a plain box (the L-desk) is drawn its shape; the box round it,
-                // which is what it keeps clear, faintly.
-                ? <>
-                    {rect(f, { fill: "none", stroke: picked ? "#f0a030" : "#5a5468", strokeWidth: picked ? 0.14 : 0.04, strokeDasharray: "0.2 0.15" })}
-                    <polygon points={c.plan.map(([x, y]) => place(it, x, y).join(",")).join(" ")} fill={fill(it)}
-                      stroke={picked ? "#f0a030" : "#5a5468"} strokeWidth={picked ? 0.14 : 0.06} strokeLinejoin="round" />
-                  </>
+                // A piece that isn't a plain box (the L-desk) is drawn its shape: the crook of the L
+                // is floor, where a chair can go.
+                ? <polygon points={c.plan.map(([x, y]) => place(it, x, y).join(",")).join(" ")} fill={fill(it)}
+                    stroke={picked ? "#f0a030" : "#5a5468"} strokeWidth={picked ? 0.14 : 0.06} strokeLinejoin="round" />
                 : rect(f, { fill: c.layer === "rug" ? "none" : fill(it), stroke: picked ? "#f0a030" : c.layer === "rug" ? "#9fc49a" : "#5a5468",
                   strokeWidth: picked ? 0.14 : 0.06, strokeDasharray: c.layer === "rug" ? "0.25 0.15" : "", rx: 0.08 })}
               {c.bed && (() => {

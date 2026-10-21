@@ -126,7 +126,8 @@ function stillScene(layouts, cam, open) {
     for (const it of layouts[room].items) {
       const c = CATALOG[it.kind];
       if (c.layer === "rug" || c.layer === "wall") continue;
-      units.push({ kind: "piece", room, item: it, box: pieceBox(it), sprite: pieceSprite(it, cam) });
+      if (c.parts) c.parts.forEach((_, k) => units.push({ kind: "piece", room, item: it, box: pieceBox(it, k), sprite: pieceSprite(it, cam, null, k) }));
+      else units.push({ kind: "piece", room, item: it, box: pieceBox(it), sprite: pieceSprite(it, cam) });
       if (c.glow) glows.push(it);
     }
   }

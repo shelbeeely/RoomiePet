@@ -3,7 +3,7 @@
 // through the doors, on a half-foot grid. Rooms are rearranged in the
 // builder, so nothing here knows where a bed is -- it looks in the layouts.
 // Pure, so it is testable.
-import { CATALOG, DOORS, FLAT, ROOMS, doorAt, footprint, layoutOf, postBox, roomAt, spotsOf } from "@shared/home.js";
+import { CATALOG, DOORS, FLAT, ROOMS, doorAt, footprint, layoutOf, partsOf, postBox, roomAt, spotsOf } from "@shared/home.js";
 
 export const CELL = 0.5;
 const GW = FLAT.w / CELL;
@@ -46,10 +46,11 @@ export function gridOf(layouts, open = []) {
     }
     for (const it of layouts[r].items) {
       if (CATALOG[it.kind].layer !== "solid") continue;
-      const f = footprint(it);
-      for (let j = Math.floor(f.y0 / CELL); j < Math.ceil(f.y1 / CELL); j++) {
-        for (let i = Math.floor(f.x0 / CELL); i < Math.ceil(f.x1 / CELL); i++) {
-          if (i >= 0 && j >= 0 && i < GW && j < GH) blocked[j * GW + i] = 1;
+      for (const f of partsOf(it)) {
+        for (let j = Math.floor(f.y0 / CELL); j < Math.ceil(f.y1 / CELL); j++) {
+          for (let i = Math.floor(f.x0 / CELL); i < Math.ceil(f.x1 / CELL); i++) {
+            if (i >= 0 && j >= 0 && i < GW && j < GH) blocked[j * GW + i] = 1;
+          }
         }
       }
     }

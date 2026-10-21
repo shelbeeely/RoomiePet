@@ -170,7 +170,7 @@ export const MATERIALS = {
   glass: "#9fd3ef", leaf: "#5fae5a", leafDark: "#3f8a4a", pot: "#c8643c", screen: "#33406a", pillow: "#fffaf0",
   porcelain: "#f7f7fa", water: "#8fd0ef", shade: "#ffe6a8", gold: "#e9b64a", red: "#e05d5d", food: "#c08a50",
   book1: "#d8645a", book2: "#5a8ad8", book3: "#f0c75e", book4: "#6fbf8a", frame: "#7a4f2e", sky: "#bfe3f5", pink: "#f4a6b8",
-  granite: "#cfc9bf", graniteDark: "#a39d94", hob: "#2f2b36",
+  granite: "#cfc9bf", graniteDark: "#a39d94", hob: "#2f2b36", led: "#4f6bff",
 };
 
 // Boxes: [x, y, z, w, d, h, material], in feet, x across the piece and y from its back (y = 0)
@@ -187,7 +187,7 @@ const legs = (w, d, h, inset = 0.1, s = 0.25, mat = "wood") => [
 
 export const CATALOG = {
   bed: {
-    label: "Bed", group: "bedroom", w: 3.5, d: 6.5, layer: "solid", colors: ["blue", "pink", "sage", "lilac", "sun"],
+    label: "Bed", group: "bedroom", w: 3.5, d: 6.5, layer: "solid", colors: ["blue", "pink", "sage", "lilac", "sun", "grey"],
     boxes: [
       [0, 0, 0, 3.5, 0.3, 2.8, "wood"], [0, 0.3, 0, 3.5, 6.2, 1.1, "wood"],
       [0.1, 0.3, 1.1, 3.3, 1.9, 0.6, "white"], [0.5, 0.45, 1.7, 2.5, 1.0, 0.35, "pillow"],
@@ -268,16 +268,23 @@ export const CATALOG = {
     ],
   },
   l_desk: {
-    // A corner desk: its long top along the back wall, the short arm down the left one, the
-    // monitor where they meet the chair's side.
+    // The corner desk in the photos of Bedroom 2: the long arm along the back wall with the
+    // monitor on a riser lit blue underneath and a little two-drawer cabinet under its far end,
+    // the short arm down the left wall by the tall chest. parts are its two arms, so the floor in
+    // the crook of the L is floor: the chair tucks in there.
     label: "L-desk", group: "bedroom", w: 4.5, d: 3, layer: "solid", colors: ["black", "oak", "white", "walnut"],
+    parts: [[0, 0, 4.5, 1.75], [0, 1.75, 1.75, 1.25]],
     plan: [[0, 0], [4.5, 0], [4.5, 1.75], [1.75, 1.75], [1.75, 3], [0, 3]],   // its outline from above
     boxes: [
-      [0.1, 0.1, 0, 0.2, 0.2, 2.3, "main_"], [4.2, 0.1, 0, 0.2, 0.2, 2.3, "main_"], [4.2, 1.45, 0, 0.2, 0.2, 2.3, "main_"],
-      [0.1, 2.7, 0, 0.2, 0.2, 2.3, "main_"], [1.45, 2.7, 0, 0.2, 0.2, 2.3, "main_"],
+      [0.1, 0.1, 0, 0.15, 0.15, 2.3, "main_"], [4.25, 0.1, 0, 0.15, 0.15, 2.3, "main_"],
+      [0.1, 2.75, 0, 0.15, 0.15, 2.3, "main_"], [1.5, 2.75, 0, 0.15, 0.15, 2.3, "main_"],
+      [3.1, 0.2, 0, 1.1, 1.4, 1.6, "woodDark"], [3.2, 1.6, 0.15, 0.9, 0.04, 0.6, "wood"], [3.2, 1.6, 0.85, 0.9, 0.04, 0.6, "wood"],
       [0, 0, 2.3, 4.5, 1.75, 0.15, "main"], [0, 1.75, 2.3, 1.75, 1.25, 0.15, "main"],
-      [2.1, 0.3, 2.45, 0.5, 0.35, 0.06, "metal"], [1.6, 0.35, 2.5, 1.5, 0.08, 0.95, "dark"], [1.7, 0.43, 2.6, 1.3, 0.02, 0.75, "screen"],
-      [1.85, 0.9, 2.45, 1.0, 0.35, 0.04, "dark"], [3.8, 0.4, 2.45, 0.3, 0.3, 0.35, "red"],
+      [0.6, 0.05, 2.45, 0.08, 0.6, 0.35, "main_"], [4.2, 0.05, 2.45, 0.08, 0.6, 0.35, "main_"], [0.6, 0.05, 2.8, 3.7, 0.65, 0.06, "main"],
+      [0.6, 0.68, 2.72, 3.7, 0.03, 0.08, "led"],
+      [2.15, 0.2, 2.86, 0.5, 0.35, 0.1, "dark"], [1.55, 0.3, 2.95, 1.7, 0.08, 1.05, "dark"], [1.62, 0.38, 3.02, 1.56, 0.02, 0.9, "screen"],
+      [1.8, 0.85, 2.45, 1.2, 0.4, 0.07, "white"],
+      [0.15, 0.2, 2.45, 0.55, 0.45, 0.75, "wood"], [0.2, 2.2, 2.45, 0.9, 0.6, 0.06, "dark"], [0.3, 1.2, 2.45, 0.3, 0.3, 0.45, "red"],
     ],
   },
   shelf_3tier: {
@@ -289,6 +296,17 @@ export const CATALOG = {
       ...[0.4, 2.0, 3.6].map((z) => [0, 0, z, 2, 1.25, 0.08, "main"]),
       [0.25, 0.3, 0.48, 0.5, 0.7, 0.85, "book1"], [0.8, 0.3, 0.48, 0.3, 0.7, 0.75, "book3"], [1.15, 0.3, 0.48, 0.5, 0.7, 0.8, "book2"],
       [0.3, 0.2, 2.08, 1.4, 0.9, 0.5, "cream"], [0.3, 0.3, 3.68, 0.9, 0.6, 0.8, "leaf"],
+    ],
+  },
+  clothes_rack: {
+    // A rolling garment rail, as in the photos of Bedroom 2: it gets wheeled about the room, so
+    // it is in the catalog to move like any piece.
+    label: "Clothes rack", group: "bedroom", w: 4, d: 1.75, layer: "solid", colors: ["white", "black", "metal"],
+    boxes: [
+      [0, 0.75, 0.15, 0.15, 0.25, 5.2, "main"], [3.85, 0.75, 0.15, 0.15, 0.25, 5.2, "main"], [0, 0.8, 5.2, 4, 0.15, 0.12, "main"],
+      [0, 0.1, 0.15, 0.15, 1.55, 0.1, "main"], [3.85, 0.1, 0.15, 0.15, 1.55, 0.1, "main"],
+      ...[[0, 0.1], [0, 1.5], [3.85, 0.1], [3.85, 1.5]].map(([x, y]) => [x, y, 0, 0.15, 0.15, 0.15, "dark"]),
+      ...["dark", "cream", "dark", "book4", "white", "dark", "shade", "book1", "dark", "white"].map((m, k) => [0.25 + k * 0.35, 0.4, 2.3, 0.32, 0.95, 2.8, m]),
     ],
   },
   tall_chest: {
@@ -526,6 +544,34 @@ export const CATALOG = {
     label: "Wall shelf", group: "wall", w: 3, d: 0.8, layer: "wall", colors: ["oak", "white", "walnut"],
     boxes: [[0, 0, 2.8, 3, 0.8, 0.12, "main"], [0.3, 0.2, 2.92, 0.5, 0.4, 0.6, "pot"], [0.3, 0.15, 3.5, 0.6, 0.5, 0.4, "leaf"], [1.4, 0.15, 2.92, 1.2, 0.5, 0.7, "book2"]],
   },
+  tapestry: {
+    // The black moon-and-sun tapestry hung on a curtain rod over the head of the twin by the
+    // door (in front of the small window there).
+    label: "Tapestry", group: "wall", w: 3.25, d: 0.15, layer: "wall", colors: ["black", "blue", "lilac"],
+    boxes: [
+      [-0.1, 0.05, 3.88, 3.45, 0.06, 0.06, "dark"], [0.05, 0, 2.2, 3.15, 0.05, 1.68, "main"],
+      [1.2, 0.05, 2.75, 0.85, 0.01, 0.75, "white"], [1.42, 0.06, 2.95, 0.4, 0.01, 0.35, "main"],
+      [0.5, 0.05, 2.95, 0.4, 0.01, 0.4, "white"], [2.35, 0.05, 2.95, 0.4, 0.01, 0.4, "white"],
+      ...[[0.25, 3.5], [2.85, 3.5], [0.3, 2.4], [2.8, 2.4], [1.6, 3.65]].map(([x, z]) => [x, 0.05, z, 0.1, 0.01, 0.1, "white"]),
+    ],
+  },
+  floating_shelf: {
+    // The little black shelf by the head of the twin, with an alarm clock and a book or two on it.
+    label: "Floating shelf", group: "wall", w: 1.75, d: 0.75, layer: "wall", colors: ["black", "white", "oak"],
+    boxes: [[0, 0, 2.9, 1.75, 0.75, 0.1, "main"], [0.15, 0.15, 3.0, 0.7, 0.5, 0.15, "book3"], [0.95, 0.2, 3.0, 0.45, 0.35, 0.4, "dark"],
+      [1.02, 0.55, 3.08, 0.32, 0.01, 0.22, "led"]],
+  },
+  deep_window: {
+    // The bigger window in Bedroom 2's side wall, over the Twin XL: set deep in the wall with a
+    // wide sill, flowers and books along it.
+    label: "Window with a deep sill", group: "wall", w: 2.75, d: 0.7, layer: "wall", outer: true, colors: ["white", "oak", "black"],
+    boxes: [
+      [0, 0, 3.0, 2.75, 0.7, 0.1, "main_"], [0, 0, 3.1, 0.15, 0.15, 2.4, "main"], [2.6, 0, 3.1, 0.15, 0.15, 2.4, "main"],
+      [0.15, 0.04, 3.1, 2.45, 0.03, 2.4, "sky"],
+      [0.25, 0.2, 3.1, 0.65, 0.4, 0.25, "book1"], [0.45, 0.3, 3.35, 0.2, 0.2, 0.45, "pink"], [0.3, 0.2, 3.75, 0.55, 0.45, 0.4, "white"],
+      [1.1, 0.25, 3.1, 0.55, 0.35, 0.2, "book2"], [2.0, 0.2, 3.1, 0.4, 0.4, 0.4, "water"],
+    ],
+  },
   clock: {
     label: "Clock", group: "wall", w: 1, d: 0.1, layer: "wall", colors: ["white", "sun", "pink", "teal"],
     boxes: [[0, 0, 3, 1, 0.08, 1, "main"], [0.2, 0.08, 3.2, 0.6, 0.02, 0.6, "white"], [0.45, 0.1, 3.5, 0.1, 0.01, 0.3, "dark"]],
@@ -606,6 +652,20 @@ export function footprint(item) {
   const w = turned ? c.d : c.w;
   const d = turned ? c.w : c.d;
   return { x0: item.x, y0: item.y, x1: item.x + w, y1: item.y + d };
+}
+
+/**
+ * What a piece stands on: its footprint, or for one that isn't a plain box (the L-desk) each of
+ * its parts, so the floor in the crook of the L stays floor.
+ */
+export function partsOf(item) {
+  const c = CATALOG[item.kind];
+  if (!c.parts) return [footprint(item)];
+  return c.parts.map(([x, y, w, d]) => {
+    const [ax, ay] = place(item, x, y);
+    const [bx, by] = place(item, x + w, y + d);
+    return { x0: Math.min(ax, bx), x1: Math.max(ax, bx), y0: Math.min(ay, by), y1: Math.max(ay, by) };
+  });
 }
 
 /** Where a point of a piece (its own feet, rotation 0) lands in the flat. */
@@ -729,22 +789,24 @@ export function layoutProblem(room, layout) {
     if (![0, 1, 2, 3].includes(item.rot) || !onGrid(item.x) || !onGrid(item.y)) return `${c.label} is out of place`;
     const f = footprint(item);
     if (!insideRoom(room, f)) return `${c.label} doesn't fit there`;
+    const parts = partsOf(item);
+    const hit = (g) => parts.some((q) => overlaps(q, g));
     for (const p of placed) {
-      if (!p.f || !overlaps(f, p.f)) continue;
+      if (!p.f || !p.parts.some(hit)) continue;
       const a = c.layer;
       const b = p.c.layer;
       if (a === b || (a === "small" && b === "solid") || (a === "solid" && b === "small")) return `${c.label} overlaps the ${p.c.label.toLowerCase()}`;
     }
-    if (c.layer === "solid" && doorways(room).some((d) => overlaps(f, d))) return `${c.label} blocks a doorway`;
-    if (c.layer !== "rug" && (ROOMS[room].posts || []).some((p) => overlaps(f, postBox(p)))) return `${c.label} is where a post is`;
-    placed.push({ f, c });
+    if (c.layer === "solid" && doorways(room).some(hit)) return `${c.label} blocks a doorway`;
+    if (c.layer !== "rug" && (ROOMS[room].posts || []).some((p) => hit(postBox(p)))) return `${c.label} is where a post is`;
+    placed.push({ f, parts, c });
   }
   // A built-in's doors (Bedroom 2's closet) need room to open too.
   for (const bi of ROOMS[room].builtins || []) {
     const d = bi.clear;
     const front = { n: { x0: bi.x0, x1: bi.x1, y0: bi.y0 - d, y1: bi.y0 }, s: { x0: bi.x0, x1: bi.x1, y0: bi.y1, y1: bi.y1 + d },
       w: { x0: bi.x0 - d, x1: bi.x0, y0: bi.y0, y1: bi.y1 }, e: { x0: bi.x1, x1: bi.x1 + d, y0: bi.y0, y1: bi.y1 } }[bi.doors];
-    const blocker = placed.find((p) => p.f && p.c.layer === "solid" && overlaps(p.f, front));
+    const blocker = placed.find((p) => p.f && p.c.layer === "solid" && p.parts.some((q) => overlaps(q, front)));
     if (blocker) return `The ${blocker.c.label.toLowerCase()} is in front of the ${bi.kind}`;
   }
   // A built-in closet's doors need room to open: nothing solid on the floor in front of them.
@@ -752,7 +814,7 @@ export function layoutProblem(room, layout) {
     const c = CATALOG[item.kind];
     if (!c.clear) continue;
     const front = frontOf(item, c.clear);
-    const blocker = placed.find((p) => p.f && p.c.layer === "solid" && overlaps(p.f, front));
+    const blocker = placed.find((p) => p.f && p.c.layer === "solid" && p.parts.some((q) => overlaps(q, front)));
     if (blocker) return `The ${blocker.c.label.toLowerCase()} is in front of the ${c.label.toLowerCase()}`;
   }
   return null;
@@ -789,16 +851,17 @@ export const DEFAULT_LAYOUTS = {
     // L-desk in the back left corner, a 3-tier shelf and the TV on its stand along the back
     // wall to the door, the tall chest on the left wall, and along the front the Twin XL and
     // the twin with the closet (part of the walls, see ROOMS) a tight fit between them, a small
-    // high window above each, a two-drawer chest at the foot of the twin. The Twin XL lies
-    // along the left wall under the third window. The sizes are guesses until the room is
-    // measured.
+    // high window above each, a two-drawer chest at the foot of the twin. Each bed is in its
+    // own nook between the closet and the wall: the Twin XL's with the deep-silled window in the
+    // left wall, the twin's with a little shelf on the right wall by its head and a tapestry hung
+    // over it, in front of its window. The sizes are guesses until the room is measured.
     wall: "white", floor: "greywood",
     items: [
-      W("basement_window", "white", "s", 25, 0.5), W("basement_window", "white", "s", 25, 10.25),
-      W("basement_window", "white", "w", 0, 18.5),
-      F("l_desk", "black", 0, 12), F("chair", "white", 2.25, 15, 2), F("shelf_3tier", "black", 5, 12),
-      F("desk_tv", "black", 7.5, 12), F("tall_chest", "white", 0, 15, 3),
-      F("twin_xl", "sage", 0, 18, 2), F("bed", "blue", 9.75, 18.5, 2), F("chest_2", "white", 10.25, 17, 2),
+      W("basement_window", "white", "s", 25, 0.5), W("tapestry", "black", "s", 25, 9.75),
+      W("deep_window", "white", "w", 0, 18), W("floating_shelf", "black", "e", 13, 22.75),
+      F("l_desk", "black", 0, 12), F("chair", "white", 2.5, 13.75, 2), F("shelf_3tier", "black", 5, 12),
+      F("desk_tv", "black", 7.5, 12), F("tall_chest", "white", 0, 15, 3), F("clothes_rack", "white", 4.75, 14),
+      F("twin_xl", "lilac", 0, 18, 2), F("bed", "grey", 9.75, 18.5, 2), F("chest_2", "white", 10.25, 17, 2),
     ],
   },
   main: {
@@ -896,11 +959,10 @@ export function freeSpot(room, layout, kind, color) {
   tries.sort((a, b) => a.score - b.score);
   // Most places are plainly taken: rule those out cheaply before checking the whole layout.
   const taken = c.layer === "rug" || c.layer === "wall" ? [] : layout.items
-    .filter((i) => ["solid", "small"].includes(CATALOG[i.kind]?.layer)).map(footprint);
+    .filter((i) => ["solid", "small"].includes(CATALOG[i.kind]?.layer)).flatMap(partsOf);
   for (const { score: _score, ...item } of tries) {
     if (c.layer !== "wall") {
-      const f = footprint(item);
-      if (!insideRoom(room, f) || taken.some((t) => overlaps(f, t))) continue;
+      if (!insideRoom(room, footprint(item)) || partsOf(item).some((f) => taken.some((t) => overlaps(f, t)))) continue;
     }
     if (!layoutProblem(room, { ...layout, items: [...layout.items, item] })) return item;
   }
