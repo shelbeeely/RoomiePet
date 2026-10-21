@@ -188,7 +188,8 @@ export const MATERIALS = {
 // layer: solid pieces block the way and can't overlap; rugs lie under everything; small things
 // (the bowl) don't block the way but can't sit on furniture. bed and pets mark where pets sleep.
 // clear keeps that much floor free in front of a piece's doors. Wall pieces hang on a wall: w along
-// it, z up it, d out from it. spots are where pets curl up on a piece: [x, y, z].
+// it, z up it, d out from it. spots are where pets curl up on a piece: [x, y, z]. hd is the piece
+// again in half-pixel boxes, for the few drawn sharp, at twice the scene's resolution, over it.
 // One scene pixel, in feet: the dollhouse draws 16 to the foot.
 const PIX = 1 / 16;
 
@@ -196,86 +197,116 @@ const PIX = 1 / 16;
  * Pixel art on the face of a piece: rows of letters, the top row highest, each letter a material
  * from the palette (a letter not in it is left out), every letter one scene pixel square. at is
  * the top left corner [u, v, z]; the art stands across u and z, depth thick at v. Runs of one
- * letter in a row become one box, so a 28-pixel row is a handful of boxes, not 28.
+ * letter in a row become one box, so a 28-pixel row is a handful of boxes, not 28. px is the
+ * size of one: a scene pixel, or half one for a piece drawn sharp (see hd).
  */
-function pixelArt(rows, palette, [u, v, z], depth = 0.01) {
+function pixelArt(rows, palette, [u, v, z], depth = 0.01, px = PIX) {
   const out = [];
   rows.forEach((row, r) => {
     for (let c = 0; c < row.length;) {
       let e = c;
       while (e < row.length && row[e] === row[c]) e += 1;
-      if (palette[row[c]]) out.push([u + c * PIX, v, z - (r + 1) * PIX, (e - c) * PIX, depth, PIX, palette[row[c]]]);
+      if (palette[row[c]]) out.push([u + c * px, v, z - (r + 1) * px, (e - c) * px, depth, px, palette[row[c]]]);
       c = e;
     }
   });
   return out;
 }
 
+/** A rounded rectangle as pixel-art rows, w x h, its corners cut by about r. */
+function roundRows(w, h, r, fill = "s") {
+  return Array.from({ length: h }, (_, y) => Array.from({ length: w }, (_, x) => {
+    const dx = Math.max(0, r - x, x - (w - 1 - r));
+    const dy = Math.max(0, r - y, y - (h - 1 - r));
+    return dx * dx + dy * dy > r * r + 0.5 ? "." : fill;
+  }).join(""));
+}
+
 /**
  * A teal iMac G3, as near its real shape as the pixels allow: built in slices a pixel thick
  * from front to back, each a rounded rectangle, square-faced at the front and swelling into the
  * egg-shaped back that tapers away and slopes down from the handle. At [u, v, z], its front at
- * v + 1.35 ft; 15 in wide, 15 in tall, the keyboard and puck mouse in front of it.
+ * v + 1.35 ft; 15 in wide, 15 in tall, the keyboard and puck mouse in front of it. px is the
+ * pixel it is built in: a scene pixel, or half one drawn sharp (hd), with twice the detail.
  */
-function imacG3(u, v, z) {
+function imacG3(u, v, z, px = PIX) {
   const W = 1.25, H = 1.25, D = 1.35, FRONT = 0.45, FOOT = 0.12;
-  const snap = (x) => Math.round(x / PIX) * PIX;
+  const n = (ft) => Math.round(ft / px);
+  const snap = (x) => Math.round(x / px) * px;
   const shape = (vr) => {
     if (vr >= D - FRONT) return { hw: W / 2, top: H, bot: FOOT, r: 0.28 };
     const t = (D - FRONT - vr) / (D - FRONT);
     const hw = (W / 2) * Math.sqrt(1 - (0.82 * t) ** 2);
     return { hw, top: H * (1 - 0.38 * t * t), bot: FOOT + 0.22 * t * t, r: Math.min(hw, 0.28 + 0.12 * t) };
   };
-  const out = [];
-  for (let vr = PIX / 2; vr < D; vr += PIX) {
+  // Each slice as runs of rows of one width and colour, and runs of slices alike as one: the
+  // straight front of the case is a few boxes, not hundreds. Drawn sharp it was 1,500 boxes and
+  // took 0.4 s to put in order; merged, a few hundred.
+  const slices = [];
+  for (let vr = px / 2; vr < D; vr += px) {
     const { hw, top, bot, r } = shape(vr);
     const mat = vr > D - 0.12 ? "ice" : "bondi";
-    for (let zr = bot + PIX / 2; zr < top; zr += PIX) {
+    const runs = [];
+    for (let zr = bot + px / 2; zr < top; zr += px) {
       const dz = Math.min(zr - bot, top - zr);
       const inset = dz < r ? r - Math.sqrt(r * r - (r - dz) ** 2) : 0;
       const half = snap(hw - inset);
       if (half <= 0) continue;
       // The top pixel of every slice catches the light: the clear case's glossy rim.
-      const m = top - zr < PIX && mat === "bondi" ? "bondiLight" : mat;
-      out.push([u + W / 2 - half, v + vr - PIX / 2, z + zr - PIX / 2, half * 2, PIX, PIX, m]);
+      const m = top - zr < px && mat === "bondi" ? "bondiLight" : mat;
+      const z0 = snap(zr - px / 2);
+      const last = runs[runs.length - 1];
+      if (last && last.half === half && last.m === m && Math.abs(last.z1 - z0) < 1e-6) last.z1 = z0 + px;
+      else runs.push({ half, m, z0, z1: z0 + px });
     }
+    const sig = JSON.stringify(runs);
+    const prev = slices[slices.length - 1];
+    if (prev && prev.sig === sig) prev.v1 += px;
+    else slices.push({ sig, runs, v0: vr - px / 2, v1: vr + px / 2 });
+  }
+  const out = [];
+  for (const { runs, v0, v1 } of slices) {
+    for (const { half, m, z0, z1 } of runs) out.push([u + W / 2 - half, v + v0, z + z0, half * 2, v1 - v0, z1 - z0, m]);
   }
   const f = v + D;
   const zt = (vr) => z + shape(vr).top;
+  // The screen, rounded at its corners, a glint in the glass at its top left.
+  const sw = n(0.875), sh = n(0.6875);
+  const screen = roundRows(sw, sh, Math.max(1, n(0.06)));
+  for (let k = 1; k <= Math.max(1, n(0.12)); k += 1) {
+    const r = Math.max(1, n(0.06));
+    screen[r] = screen[r].slice(0, r + k - 1) + "g" + screen[r].slice(r + k);
+  }
+  // Under it the teal band: the CD tray's slot, a speaker grille either side, the apple.
+  const bw = n(1.0), bh = n(0.3125);
+  const band = Array.from({ length: bh }, (_, y) => Array.from({ length: bw }, (_, x) => {
+    if (y === Math.round(bh * 0.2) && x > bw * 0.3 && x < bw * 0.7) return "d";
+    const side = x < bw * 0.22 || x >= bw * 0.78;
+    if (side && y > bh * 0.35 && (x + y) % 2 === 0) return "d";
+    const ax = x - (bw / 2 - 1), ay = y - Math.round(bh * 0.45);
+    const apple = px < PIX ? ["..d.", ".aa.", "aaaa", ".aa."] : ["aa", "aa"];
+    if (ay >= 0 && ay < apple.length && ax >= 0 && ax < apple[0].length && apple[ay][ax] !== ".") return apple[ay][ax] === "a" ? "a" : "d";
+    return "b";
+  }).join(""));
   out.push(
     // The handle, a dark slot across the top at the back.
     [u + W / 2 - 0.22, v + 0.3, zt(0.42) - 0.02, 0.44, 0.18, 0.05, "bondiDark"],
     // The foot under the front.
     [u + 0.4, f - 0.5, z, 0.45, 0.35, FOOT, "bondiDark"],
-    // The screen, rounded at its corners, a glint in the glass.
-    ...pixelArt([
-      ".ssssssssssss.",
-      "sgsssssssssss",
-      "sgsssssssssssS",
-      "ssssssssssssss",
-      "ssssssssssssss",
-      "ssssssssssssss",
-      "ssssssssssssss",
-      "ssssssssssssss",
-      "ssssssssssssss",
-      "ssssssssssssss",
-      ".ssssssssssss.",
-    ].map((r) => r.padEnd(14, "s").slice(0, 14)), { s: "screen", S: "screen", g: "glass" }, [u + W / 2 - 7 * PIX, f, z + FOOT + 1.06]),
-    // Under the screen: the teal band, the slot of the CD tray, the speakers either side and
-    // the apple in the middle.
-    ...pixelArt([
-      "bbbbbbbbbbbbbbbb",
-      "bbbbbddddddbbbbb",
-      "bdbdbbbbbbbbdbdb",
-      "bbdbbbbaabbbbdbb",
-      "bdbdbbbaabbbbdbd",
-    ].map((r) => r.padEnd(16, "b").slice(0, 16)), { b: "bondi", d: "bondiDark", a: "white" }, [u + W / 2 - 8 * PIX, f + 0.005, z + FOOT + 0.38]),
-    // The keyboard, clear teal with white keys, and the round puck mouse.
+    ...pixelArt(screen, { s: "screen", g: "glass" }, [u + W / 2 - (sw / 2) * px, f, z + FOOT + 1.06], 0.01, px),
+    ...pixelArt(band, { b: "bondi", d: "bondiDark", a: "white" }, [u + W / 2 - (bw / 2) * px, f + 0.005, z + FOOT + 0.38], 0.01, px),
+    // The keyboard, clear teal with rows of white keys, and the round puck mouse.
     [u + 0.12, f + 0.06, z, 1.0, 0.32, 0.05, "bondi"],
-    ...[0, 2, 4].flatMap((row) => [0, 3, 6, 9, 12].map((c) => [u + 0.15 + c * PIX, f + 0.08 + row * PIX, z + 0.05, 2 * PIX, PIX, 0.02, "ice"])),
-    [u + 1.2 + PIX, f + 0.08, z, PIX, 3 * PIX, 0.07, "bondi"], [u + 1.2, f + 0.08 + PIX, z, 3 * PIX, PIX, 0.07, "bondi"],
-    [u + 1.2 + PIX, f + 0.08 + PIX, z + 0.07, PIX, PIX, 0.01, "ice"],
   );
+  for (let row = 0; row * 2 * px < 0.28; row += 1) {
+    for (let c = 0; c * 3 * px < 0.94; c += 1) out.push([u + 0.15 + c * 3 * px, f + 0.08 + row * 2 * px, z + 0.05, 2 * px, px, 0.02, "ice"]);
+  }
+  const mr = n(0.1);
+  for (let y = 0; y < mr * 2; y += 1) {
+    const w = Math.round(Math.sqrt(Math.max(0, mr * mr - (y + 0.5 - mr) ** 2)));
+    if (w > 0) out.push([u + 1.3 - w * px, f + 0.08 + y * px, z, w * 2 * px, px, 0.07, "bondi"]);
+  }
+  out.push([u + 1.3 - px, f + 0.08 + px, z + 0.07, px * 2, px, 0.01, "ice"]);
   return out;
 }
 
@@ -458,6 +489,7 @@ export const CATALOG = {
     // A teal (Bondi blue) iMac G3 on a little side table, built to its real shape (see imacG3).
     label: "iMac G3 on a side table", group: "bedroom", w: 2, d: 1.75, layer: "solid", colors: ["white", "black", "lilac", "pink"],
     boxes: [...legs(2, 1.75, 2.3, 0.08, 0.15, "main_"), [0, 0, 2.3, 2, 1.75, 0.1, "main"], ...imacG3(0.375, 0.02, 2.4)],
+    hd: [...legs(2, 1.75, 2.3, 0.08, 0.15, "main_"), [0, 0, 2.3, 2, 1.75, 0.1, "main"], ...imacG3(0.375, 0.02, 2.4, PIX / 2)],
   },
   storage_chest: {
     // The lift-lid storage ottoman at the foot of her bed: black faux leather, a padded top that
@@ -821,6 +853,73 @@ export const CATALOG = {
         "...........kkkkkkkk...........",
       ], { k: "kuromi", g: "hood", e: "kuromi", w: "white", s: "candy", p: "candy" }, [PIX, 0.06, 3.88]),
     ],
+    // Drawn sharp (see hd): the same Kuromi at 60 pixels, twice the detail -- her outlines, the
+    // skull's eye holes and teeth, the lash flicks, the collar's points and pom-poms.
+    hd: [
+      [-0.04, 0, 1.96, 2.08, 0.04, 1.98, "kuromi"], [0, 0.04, 2.0, 2, 0.02, 1.9, "main"],
+      ...pixelArt([
+        "............................................................",
+        ".......kk..........................................kk.......",
+        "......kggk........................................kggk......",
+        ".....kggggk......................................kggggk.....",
+        ".....kggggk......................................kggggk.....",
+        ".....kggggk.......................................kggk......",
+        "......kgggk.....................................kkkgk.......",
+        ".......kgkgkkk................................kkgggkk.......",
+        "........kgggggkk...........................kkkggggggk.......",
+        "........kgggggggkk.......................kkgggggggggk.......",
+        ".........kggggggggkk...................kkgggggggggggk.......",
+        ".........kggggggggggkkk....kkkkkkkk..kkgggggggggggggk.......",
+        ".........kgggggggggggkkkkkkggggggggkkggkkgggggggggggk.......",
+        ".........kggggggggggkggggggggggggggggggggkgggggggggk........",
+        ".........kgggggggggkggggggggggggggggggggggkggggggggk........",
+        ".........kgggggggkkggggggggggggggggggggggggkkggggggk........",
+        ".........kggggggkggggggggggggggggggggggggggggkgggggk........",
+        ".........kggggggkgggggggggggsssssggggggggggggkgggggk........",
+        ".........kgggggkgggggggggggsssssssggggggggggggkggggk........",
+        ".........kggggkgggggggggggsssssssssggggggggggggkgggk........",
+        "..........kggkgggggggggggsssssssssssggggggggggggkggk........",
+        "..........kggkgggggggggggsssggssggssggggggggggggkkkk........",
+        "..........kggkgggggggggggsssggssggssgggggggggggk...k........",
+        "..........kkkgggggggggggggsssssssssgggggggggggggk...........",
+        "..........k..kgggggggggggggsssgsssggggggggggggggk...........",
+        ".............kgggggggggggggssgssgsggggggggggggggk...........",
+        ".............kgggggggggggggssgssgsggggggggggggggk...........",
+        ".............kgggggggkkggggsssssssggggkkkgggggggk...........",
+        ".............kgggggkkwwkkgggggggggggkkwwwkkgggggk...........",
+        ".............kggggkwwewwwkgggggggggkwwwwewwkggggk...........",
+        "..............kggkwwwwewwwkkgggggkkwwwwewwwwkggk............",
+        "..............kggkwwwwwewwwwkkgkkwwwwewwwwwwkggk............",
+        "..............kgkwwwwweeeeeewwkwweeeeeewwwwwwkgk............",
+        "...............kkwwwwweeeeeewwwwweeeeeewwwwwwkk.............",
+        "................kwwwwwweeeewwpppwweeeewwwwwwwk..............",
+        ".................kwwwwwweewwpppppwweewwwwwwwk...............",
+        ".................kkwwwwwwwwwwpppwewwwwwwwwwkk...............",
+        "...................kwwwwwwwwewwwwewwwwwwwwk.................",
+        "....................kwwwwwwwweepewwwwwwwwk..................",
+        ".....................kkkkkkkkkkppkkkkkkkk...................",
+        "..................kkkggggggggggkkggggggggkkk................",
+        "..................kggggggggggggggggggggggggk................",
+        "...................kgggggggggggggggggggggkk.................",
+        "..................kpkgggggggggggggggggggkpk.................",
+        ".................kpppkgggggggggggggggggkpppk................",
+        ".................kppkkgggggggggggggggggkpppk.k..............",
+        "..................kk.kkkggkgggggggkggkkgkpk..kkkk...........",
+        ".....................kppkkwkkgggkkwkkppkkk....kggkkk........",
+        "....................kppppkkwwkgkwwwkppppkwk...kgggk.........",
+        "....................kppppkkwwwkwwwwkppppkwk..kkgggk.........",
+        "....................kkppkwkwwwwwwwwwkppkwwwkkgkkgk..........",
+        ".....................kkkwkwwwwwwwwwwwkkwwwkgggk.kk..........",
+        "......................kkkwwwwwwwwwwwwwkkkkkkkk..k...........",
+        ".......................kwkkkkwwwwkkkkwk.....................",
+        ".......................kkwwwwkwwkwwwwkk.....................",
+        "........................kwwwwwkkwwwwwk......................",
+        ".......................kwwwwwwkwwwwwwwk.....................",
+        "........................kwwwwkkkkwwwwk......................",
+        ".........................kkkk....kkkk.......................",
+        "............................................................",
+      ], { k: "kuromi", g: "hood", e: "kuromi", w: "white", s: "candy", p: "candy" }, [PIX, 0.06, 3.88], 0.01, PIX / 2),
+    ],
   },
   string_lights: {
     // A string of little lights in pink and lavender.
@@ -955,10 +1054,10 @@ function wallBox(item, out = CATALOG[item.kind].d) {
 }
 
 /** The piece's boxes in the flat, as {x0, y0, z0, x1, y1, z1, mat}. */
-export function boxesOf(item) {
+export function boxesOf(item, hd = false) {
   const c = CATALOG[item.kind];
   const at = c.layer === "wall" ? wallPlace : place;
-  return c.boxes.map(([x, y, z, w, d, h, mat]) => {
+  return (hd && c.hd ? c.hd : c.boxes).map(([x, y, z, w, d, h, mat]) => {
     const [ax, ay] = at(item, x, y);
     const [bx, by] = at(item, x + w, y + d);
     return { x0: Math.min(ax, bx), x1: Math.max(ax, bx), y0: Math.min(ay, by), y1: Math.max(ay, by), z0: z, z1: z + h, mat };

@@ -24,10 +24,10 @@ export const CUTAWAY = WALL + 0.5;
 
 /** A piece's boxes as drawn: anything above the cutaway is cut off -- for things on a wall,
  * or built in like a closet, where the walls are cut. */
-function cutBoxes(item, part = null) {
+function cutBoxes(item, part = null, hd = false) {
   const c = CATALOG[item.kind];
   const top = c.layer === "wall" || c.builtin ? WALL : CUTAWAY;
-  let boxes = boxesOf(item);
+  let boxes = boxesOf(item, hd);
   if (part !== null) {
     // One arm of an L-desk: the boxes standing on it, drawn and put in order on their own, so a
     // chair in the crook of the L goes in front of one arm and behind the other.
@@ -354,18 +354,35 @@ function cached(key, make) {
 }
 
 /** A piece of furniture as a sprite: {canvas, ox, oy, w, h, data} at scene pixels. */
-export function pieceSprite(item, cam, tint = null, part = null) {
-  const key = `${cam.key}|${JSON.stringify(item)}|${tint || ""}|${part ?? ""}`;
+export function pieceSprite(item, cam, tint = null, part = null, hd = false) {
+  const key = `${cam.key}|${JSON.stringify(item)}|${tint || ""}|${part ?? ""}|${hd ? "hd" : ""}`;
   return cached(key, () => {
-    const boxes = cutBoxes(item, part);
-    const r = new Raster(...screenBounds(boxes, cam));
-    drawBoxes(r, boxes, cam, (box) => {
+    const boxes = cutBoxes(item, part, hd);
+    const view = hd ? hdCamera(cam) : cam;
+    const r = new Raster(...screenBounds(boxes, view));
+    drawBoxes(r, boxes, view, (box) => {
       const c = colorOf(box.mat, item);
       return tint ? [c[0] * 0.5 + tint[0] * 0.5, c[1] * 0.5 + tint[1] * 0.5, c[2] * 0.5 + tint[2] * 0.5] : c;
     });
     r.outline();
     return r.toCanvas();
   });
+}
+
+// A few pieces (the iMac G3, the Kuromi poster) are drawn sharp: at HD times the scene's
+// resolution, in half-pixel boxes of their own (the catalog's hd), on a layer behind the scene
+// that shows through where they stand. Everything else stays at the scene's pixel size, which
+// is what keeps the frame rate (see HouseScene).
+export const HD = 2;
+
+/** The camera looking the same way at HD times the pixels. */
+export function hdCamera(cam) {
+  return { ...cam, key: `${cam.key}:hd`, project: (x, y, z) => cam.project(x, y, z).map((a) => a * HD) };
+}
+
+/** A piece drawn sharp, its canvas and origin in HD pixels; null for a piece without an hd. */
+export function hdSprite(item, cam) {
+  return CATALOG[item.kind].hd ? pieceSprite(item, cam, null, null, true) : null;
 }
 
 /** The world box a piece takes up, for putting it in order with everything else. */

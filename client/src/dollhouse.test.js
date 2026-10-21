@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
-import { CUTAWAY, colorOf, dollCamera, order, pieceBox, wallPieceBox } from "./dollhouse.js";
+import { CUTAWAY, HD, colorOf, dollCamera, hdCamera, order, pieceBox, wallPieceBox } from "./dollhouse.js";
+import { CATALOG, boxesOf } from "@shared/home.js";
 
 describe("the dollhouse's drawing order", () => {
   const window = { kind: "window", color: "white", side: "n", line: 0, at: 4.5 };
@@ -33,6 +34,30 @@ describe("an L-desk, its arms in order on their own", () => {
     // seen from the left, that arm is in front of it.
     const sides = [1, 3].map((rot) => names(rot).indexOf("left arm") < names(rot).indexOf("chair"));
     expect(sides.sort()).toEqual([false, true]);
+  });
+});
+
+describe("pieces drawn sharp", () => {
+  test("the sharp camera sees the same at twice the pixels", () => {
+    const cam = dollCamera("bedB", 1);
+    expect(hdCamera(cam).project(3, 14, 2)).toEqual(cam.project(3, 14, 2).map((a) => a * HD));
+    expect(hdCamera(cam).key).not.toBe(cam.key);
+  });
+
+  test("the iMac G3 and the Kuromi poster have sharp versions, in half pixels, filling the same space", () => {
+    for (const [kind, item] of [["imac_g3", { kind: "imac_g3", color: "white", x: 4.75, y: 12, rot: 0 }],
+      ["kuromi_poster", { kind: "kuromi_poster", color: "lilac", side: "e", line: 13, at: 19.25 }]]) {
+      expect(CATALOG[kind].hd, kind).toBeTruthy();
+      // Half-pixel boxes (1/32 ft) in the sharp one, none in the other.
+      const half = (bs) => bs.some((b) => [b.x1 - b.x0, b.y1 - b.y0, b.z1 - b.z0].some((t) => Math.abs(t - 1 / 32) < 1e-6));
+      expect(half(boxesOf(item, true)), kind).toBe(true);
+      expect(half(boxesOf(item)), kind).toBe(false);
+      const span = (bs) => [Math.min(...bs.map((b) => b.z0)), Math.max(...bs.map((b) => b.z1))];
+      const [lo, hi] = [span(boxesOf(item)), span(boxesOf(item, true))];
+      expect(Math.abs(lo[0] - hi[0]) + Math.abs(lo[1] - hi[1]), kind).toBeLessThan(0.15);
+    }
+    // Everything else draws as it always did.
+    expect(boxesOf({ kind: "bed", color: "blue", x: 0, y: 0, rot: 0 }, true)).toEqual(boxesOf({ kind: "bed", color: "blue", x: 0, y: 0, rot: 0 }));
   });
 });
 

@@ -51,6 +51,9 @@ main > * + * { margin-top: 12px; }
 /* The scene at its own pixel-art size, scaled up by the browser with square pixels. */
 .scene canvas { display: block; width: 100%; height: auto; cursor: pointer; touch-action: manipulation; image-rendering: pixelated; }
 .scene canvas.editing { touch-action: none; cursor: grab; }
+/* The few pieces drawn sharp (twice the pixels), behind the scene, showing through where they stand. */
+.scene canvas { position: relative; }
+.scene canvas.sharp-layer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .house-view { display: grid; gap: 8px; }
 .room-chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
 .room-chips button { background: var(--panel); color: var(--fg); font-weight: 500; font-size: 13px; min-height: 34px; padding: 6px 12px; white-space: nowrap; flex: none; }

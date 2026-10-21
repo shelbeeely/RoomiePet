@@ -10,7 +10,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CATALOG, ROOMS, footprint, layoutProblem, postBox, snap, wallSpotNear, wallsOf } from "@shared/home.js";
 import { animFor, draw, frameAt, petKey } from "./sprites.js";
-import { PX, boxesSprite, closetDoors, closetInside, dollCamera, floorSprite, order, pieceBox, pieceSprite, wallBox, wallPieceBox, wallSprite } from "./dollhouse.js";
+import { HD, PX, boxesSprite, closetDoors, closetInside, dollCamera, floorSprite, hdSprite, order, pieceBox, pieceSprite, wallBox, wallPieceBox, wallSprite } from "./dollhouse.js";
 import { allLayouts, bedroomOf, destination, findPath, gridOf, roomAt } from "./house.js";
 import RoomBuilder from "./RoomBuilder.jsx";
 import Blueprint from "./Blueprint.jsx";
@@ -49,6 +49,11 @@ function beyond(wall) {
  * together once for a layout and a view: a canvas, the pieces in drawing
  * order with where each lands on the screen (so a pet can have what stands
  * in front of it drawn over it again), what a tap can pick, and the lamps.
+ *
+ * A piece drawn sharp (the catalog's hd: the iMac G3, the Kuromi poster) is cut out of the
+ * canvas where it lands in the drawing order instead of drawn on it, and drawn at HD times the
+ * pixels on a canvas of its own (hd) that the scene's is laid over: whatever stands in front of
+ * it is drawn after, over the hole, so it still hides what it should, pets included.
  */
 function stillScene(layouts, cam, open) {
   const canvas = document.createElement("canvas");
@@ -59,6 +64,12 @@ function stillScene(layouts, cam, open) {
   ctx.fillStyle = BG;
   ctx.fillRect(0, 0, cam.width, cam.height);
   const blit = (sp) => ctx.drawImage(sp.canvas, sp.ox, sp.oy);
+  const sharp = [];
+  const punch = (sp) => {
+    ctx.globalCompositeOperation = "destination-out";
+    blit(sp);
+    ctx.globalCompositeOperation = "source-over";
+  };
   const rooms = cam.room ? [cam.room] : Object.keys(ROOMS);
   blit(floorSprite(rooms, layouts, cam));
   const units = [];
@@ -83,10 +94,14 @@ function stillScene(layouts, cam, open) {
       for (const it of layouts[room].items) {
         if (CATALOG[it.kind].layer !== "wall" || it.side !== wall.side || it.line !== wall.line || it.at < wall.from - 0.01 || it.at >= wall.to) continue;
         const sp = pieceSprite(it, cam);
+        const hd = !!CATALOG[it.kind].hd;
         if (back) {
-          blit(sp);
+          if (hd) {
+            punch(sp);
+            sharp.push({ item: it, sprite: sp });
+          } else blit(sp);
           wallHits.unshift({ room, item: it, sprite: sp });
-        } else units.push({ kind: "piece", room, item: it, box: wallPieceBox(it), sprite: sp });
+        } else units.push({ kind: "piece", room, item: it, box: wallPieceBox(it), sprite: sp, hd });
       }
     }
   }
@@ -127,13 +142,16 @@ function stillScene(layouts, cam, open) {
       const c = CATALOG[it.kind];
       if (c.layer === "rug" || c.layer === "wall") continue;
       if (c.parts) c.parts.forEach((_, k) => units.push({ kind: "piece", room, item: it, box: pieceBox(it, k), sprite: pieceSprite(it, cam, null, k) }));
-      else units.push({ kind: "piece", room, item: it, box: pieceBox(it), sprite: pieceSprite(it, cam) });
+      else units.push({ kind: "piece", room, item: it, box: pieceBox(it), sprite: pieceSprite(it, cam), hd: !!c.hd });
       if (c.glow) glows.push(it);
     }
   }
   const list = order(units, cam, (u) => u.box);
   for (const u of list) {
-    blit(u.sprite);
+    if (u.hd) {
+      punch(u.sprite);
+      sharp.push(u);
+    } else blit(u.sprite);
     Object.assign(u, { x0: u.sprite.ox, y0: u.sprite.oy, x1: u.sprite.ox + u.sprite.w, y1: u.sprite.oy + u.sprite.h });
   }
   // What a tap picks, top first: the pieces as drawn, the wall pieces behind them, then the rugs.
@@ -141,7 +159,22 @@ function stillScene(layouts, cam, open) {
     ? layouts[cam.room].items.filter((it) => CATALOG[it.kind].layer === "rug").reverse().map((it) => ({ room: cam.room, item: it, sprite: pieceSprite(it, cam) }))
     : [];
   const hits = [...list.filter((u) => u.kind === "piece").reverse(), ...wallHits, ...rugs];
-  return { layouts, cam, open, canvas, units: list, hits, glows, closets };
+  // The sharp layer: each piece first as the scene draws it, doubled, so no seam shows round
+  // its edge, then sharp over that.
+  let hd = null;
+  if (sharp.length) {
+    hd = document.createElement("canvas");
+    hd.width = cam.width * HD;
+    hd.height = cam.height * HD;
+    const h = hd.getContext("2d");
+    h.imageSmoothingEnabled = false;
+    for (const { item, sprite } of sharp) {
+      h.drawImage(sprite.canvas, sprite.ox * HD, sprite.oy * HD, sprite.w * HD, sprite.h * HD);
+      const fine = hdSprite(item, cam);
+      h.drawImage(fine.canvas, fine.ox, fine.oy);
+    }
+  }
+  return { layouts, cam, open, canvas, units: list, hits, glows, closets, hd };
 }
 
 /** Round the piece that's picked up: its footprint on the floor, or for a wall piece where it hangs. */
@@ -167,6 +200,7 @@ function outlinePath(ctx, cam, item) {
 
 export default function HouseScene({ atlas, pets, effects, selectedId, onSelect, hour, layouts: saved, onSaveRoom }) {
   const canvas = useRef(null);
+  const sharpLayer = useRef(null);
   const labels = useRef(new Map());
   const bubbles = useRef(new Map());
   const walkers = useRef(new Map());
@@ -227,6 +261,13 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
       const night = hour >= 20 || hour < 7;
       ctx.imageSmoothingEnabled = false;
       const blit = (sp) => ctx.drawImage(sp.canvas, sp.ox, sp.oy);
+      // A sharp piece in front of a pet: cut out over it again, so the sharp layer shows there.
+      const cover = (u) => {
+        if (!u.hd) return blit(u.sprite);
+        ctx.globalCompositeOperation = "destination-out";
+        blit(u.sprite);
+        ctx.globalCompositeOperation = "source-over";
+      };
 
       // Where each pet goes now (all of them, seen or not, so they are where they should be).
       const placed = pets.map((p, i) => {
@@ -274,8 +315,18 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
       });
 
       // The room(s) on show: kept, and only put together again for a new layout or view.
-      if (!still || still.layouts !== layouts || still.cam !== cam || still.open !== open) still = stillScene(layouts, cam, open);
+      if (!still || still.layouts !== layouts || still.cam !== cam || still.open !== open) {
+        still = stillScene(layouts, cam, open);
+        const sl = sharpLayer.current;
+        if (sl) {
+          sl.width = still.hd ? still.hd.width : 1;
+          sl.height = still.hd ? still.hd.height : 1;
+          if (still.hd) sl.getContext("2d").drawImage(still.hd, 0, 0);
+        }
+      }
       stillRef.current = still;
+      // Cleared first: the holes the sharp pieces leave must stay holes, frame after frame.
+      ctx.clearRect(0, 0, cam.width, cam.height);
       ctx.drawImage(still.canvas, 0, 0);
       const seen = cam.room ? placed.filter((u) => u.w.room === cam.room) : placed;
       // Labels and bubbles move by transform (no layout each frame): screen pixels per scene pixel.
@@ -313,7 +364,7 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
         const near = still.units.filter((s) => s.x0 < rect.x1 && rect.x0 < s.x1 && s.y0 < rect.y1 && rect.y0 < s.y1);
         if (near.length) {
           const mine = order([u, ...near], cam, (x) => x.box);
-          for (const s of mine.slice(mine.indexOf(u) + 1)) blit(s.sprite);
+          for (const s of mine.slice(mine.indexOf(u) + 1)) cover(s);
         }
         // What it needs, or what just happened, in a bubble over its head (sharp text, not canvas pixels).
         const top = sy - SPRITE * size;
@@ -560,6 +611,7 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
           onToggleCloset={toggleCloset} />
       )}
       <div className="scene" style={{ aspectRatio: `${cam.width} / ${cam.height}`, display: edit?.plan ? "none" : undefined }}>
+        <canvas ref={sharpLayer} className="sharp-layer" width="1" height="1" aria-hidden="true" />
         <canvas
           ref={canvas}
           className={edit ? "editing" : ""}
