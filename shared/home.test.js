@@ -187,7 +187,7 @@ describe("room to live in", () => {
     // The twin by the door: a black steel platform frame, no headboard; pink Hello Kitty pillowcases.
     expect(beds.find((b) => b.kind === "platform_bed").color).toBe("kitty");
     expect(PILLOWS.kitty.case).toMatch(/^#/);
-    // Her half (the twin by the door) is dark pastel, with Kuromi about it.
+    // The half by the door (its twin) is dark pastel, with Kuromi about it.
     expect(at("skull_rug").x0).toBeGreaterThanOrEqual(6.5);
     for (const kind of ["kuromi_poster", "string_lights"]) {
       const w = l.items.find((i) => i.kind === kind);

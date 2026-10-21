@@ -47,6 +47,7 @@ export const SPECIES = {
   raccoon: { label: "Raccoon", colors: ["grey", "cinnamon", "silver", "midnight"] },
   ferret: { label: "Ferret", colors: ["sable", "albino", "cinnamon", "silver"] },
   possum: { label: "Possum", colors: ["grey", "smoky", "cream", "blossom"] },
+  kuromi: { label: "Kuromi", colors: ["black", "violet", "pink", "midnight"] },
 };
 
 export const PAT_COOLDOWN_MS = 10 * 60 * 1000;

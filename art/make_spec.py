@@ -64,6 +64,12 @@ PETS = {
         "cream": ("#d8cfc0", {}),
         "blossom": ("#c9a3b5", {}),
     }),
+    # Kuromi: the hood is the colour that changes; her face and body stay white, the skull pink.
+    "kuromi": ("black", "#3a3442", {"w": "#ffffff", "S": "#f48fb6", "p": "#f48fb6", "c": "#f7b3cf", "n": "#f48fb6"}, {
+        "violet": ("#5b4380", {}),
+        "pink": ("#f29ac0", {"S": "#ffffff", "p": "#ffffff"}),
+        "midnight": ("#2b3150", {}),
+    }),
     "stitched": ("lilac", "#c9b6e8", {
         "x": "#4a2c4a", "u": "#2b2238", "U": "#4a3a5e", "v": "#a99bc4", "W": "#fffaf0",
         "q": {"from": "b", "hue": 70, "shade": 0.85, "sat": 1.3}, "r": "#d64560", "H": "#ff8fa8", "R": "#9a2a40",

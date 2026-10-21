@@ -44,9 +44,8 @@ describe("pieces drawn sharp", () => {
     expect(hdCamera(cam).key).not.toBe(cam.key);
   });
 
-  test("the iMac G3 and the Kuromi poster have sharp versions, in half pixels, filling the same space", () => {
-    for (const [kind, item] of [["imac_g3", { kind: "imac_g3", color: "white", x: 4.75, y: 12, rot: 0 }],
-      ["kuromi_poster", { kind: "kuromi_poster", color: "lilac", side: "e", line: 13, at: 19.25 }]]) {
+  test("the iMac G3 has a sharp version, in half pixels, filling the same space", () => {
+    for (const [kind, item] of [["imac_g3", { kind: "imac_g3", color: "white", x: 4.75, y: 12, rot: 0 }]]) {
       expect(CATALOG[kind].hd, kind).toBeTruthy();
       // Half-pixel boxes (1/32 ft) in the sharp one, none in the other.
       const half = (bs) => bs.some((b) => [b.x1 - b.x0, b.y1 - b.y0, b.z1 - b.z0].some((t) => Math.abs(t - 1 / 32) < 1e-6));

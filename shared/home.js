@@ -166,7 +166,7 @@ export const COLORWAYS = {
   kitty: "#6f6482",
 };
 // Bedding whose pillows aren't plain white: "kitty" is the twin by Bedroom 2's door, a dusky
-// grey-plum comforter (her half of the room is dark pastel) and pink Hello Kitty pillowcases,
+// grey-plum comforter (that half of the room is dark pastel) and pink Hello Kitty pillowcases,
 // white faces dotted over them.
 export const PILLOWS = { kitty: { case: "#f3c6d6", print: "#ffffff" } };
 
@@ -176,8 +176,8 @@ export const MATERIALS = {
   porcelain: "#f7f7fa", water: "#8fd0ef", shade: "#ffe6a8", gold: "#e9b64a", red: "#e05d5d", food: "#c08a50",
   book1: "#d8645a", book2: "#5a8ad8", book3: "#f0c75e", book4: "#6fbf8a", frame: "#7a4f2e", sky: "#bfe3f5", pink: "#f4a6b8",
   granite: "#cfc9bf",
-  // Dark pastel, for her half of Bedroom 2 and its Kuromi-style pieces.
-  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", hood: "#57516a",
+  // Dark pastel, for the door half of Bedroom 2 and its Kuromi-style pieces.
+  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", hood: "#57516a", ink: "#0e0c12", inkHood: "#2a2630", blush: "#eda9cb",
   bondi: "#3fb6c4", bondiDark: "#24808e", bondiLight: "#8fe0e8", ice: "#e8eef0",
   sheet: "#8f8c98", cork: "#c9a27a", graniteDark: "#a39d94", hob: "#2f2b36", led: "#4f6bff",
 };
@@ -328,7 +328,7 @@ export const CATALOG = {
     bed: true,
   },
   platform_bed: {
-    // Her twin: a black steel platform frame on thin legs, no headboard, the mattress on top and
+    // The twin by the door: a black steel platform frame on thin legs, no headboard, the mattress on top and
     // the floor showing underneath.
     label: "Platform bed", group: "bedroom", w: 3.5, d: 6.5, layer: "solid", colors: ["kitty", "grey", "lilac", "pink", "blue", "sage"],
     boxes: [
@@ -492,7 +492,7 @@ export const CATALOG = {
     hd: [...legs(2, 1.75, 2.3, 0.08, 0.15, "main_"), [0, 0, 2.3, 2, 1.75, 0.1, "main"], ...imacG3(0.375, 0.02, 2.4, PIX / 2)],
   },
   storage_chest: {
-    // The lift-lid storage ottoman at the foot of her bed: black faux leather, a padded top that
+    // The lift-lid storage ottoman at the foot of the twin by the door: black faux leather, a padded top that
     // lifts, a bamboo tray sitting on it.
     label: "Storage ottoman", group: "bedroom", w: 2.5, d: 1.5, layer: "solid", colors: ["black", "lilac", "pink", "white", "oak"],
     boxes: [
@@ -503,7 +503,7 @@ export const CATALOG = {
     ],
   },
   cube_shelf: {
-    // A set of three small black cubes on the wall by her bed, stepped up one after another,
+    // A set of three small black cubes on the wall by the twin by the door, stepped up one after another,
     // full of VHS tapes standing on end: black cases, white labels on their spines.
     label: "Wall cubes", group: "wall", w: 2.25, d: 0.8, layer: "wall", colors: ["black", "white", "lilac", "pink"],
     boxes: [
@@ -813,112 +813,45 @@ export const CATALOG = {
     ],
   },
   kuromi_poster: {
-    // Kuromi, pixel by pixel after her picture: the two points of her dark grey jester hood
-    // flaring up to little balls, the pink skull on its front, the hood dipping to a V over her
-    // white face, mischievous tilted eyes with a lash flick, pink nose and tongue in a lopsided
-    // smile, the pointed collar with pink pom-poms, her white body and the devil tail curling up.
-    label: "Kuromi poster", group: "wall", w: 2, d: 0.08, layer: "wall", colors: ["lilac", "pink", "black"],
+    // Kuromi in chunky pixel art, after the 32 x 32 picture picked for it: her head in its
+    // near-black jester hood, the points flaring up and out, the pink skull with its eye slots,
+    // big shining eyes looking sideways, pink nose and blush. One poster pixel to a scene
+    // pixel, so it needs no sharp version.
+    label: "Kuromi poster", group: "wall", w: 2, d: 0.08, layer: "wall", colors: ["pink", "lilac", "black"],
     boxes: [
       [-0.04, 0, 1.96, 2.08, 0.04, 1.98, "kuromi"], [0, 0.04, 2.0, 2, 0.02, 1.9, "main"],
       ...pixelArt([
-        ".kk........................kk.",
-        "kggk......................kggk",
-        ".kggk....................kggk.",
-        ".kgggk..................kgggk.",
-        ".kggggk................kggggk.",
-        ".kgggggkkkkkkkkkkkkkkkkgggggk.",
-        "..kggggggggggggggggggggggggk..",
-        "..kggggggggggssssggggggggggk..",
-        "..kgggggggggssssssgggggggggk..",
-        "..kgggggggggskssksgggggggggk..",
-        "..kgggggggggssssssgggggggggk..",
-        "..kggggggggggksskggggggggggk..",
-        "..kggwwwwwwggggggggwwwwwwggk..",
-        "..kgwwwwwwwwwggggwwwwwwwwwgk..",
-        "..kgwwkwwwwwwwwwwwwwwwwkwwgk..",
-        "..kgwwwkeewwwwwwwwwweekwwwgk..",
-        "..kgwwwweewwwwwwwwwweewwwwgk..",
-        "...kgwwweewwwwppwwwweewwwgk...",
-        "...kgwwwwwwwwwkkkwwwwwwwwgk...",
-        "....kgwwwwwwwwwpwwwwwwwwgk....",
-        ".....kkwwwwwwwwwwwwwwwwkk.....",
-        "...kggkkkkkkkkkkkkkkkkkkggk...",
-        "..kggggggggggggggggggggggggk..",
-        "..kgk.kgggkkggggggkkgggk.kkk..",
-        "..pp...kgk.kgkkkkgk.kgk.kggk..",
-        "..pp....pp.kwwwwwwk.pp.kgkpp..",
-        "........ppkwwwwwwwwkppkgk.....",
-        "..........kwwwwwwwwkkgk.......",
-        "..........kwwwkkwwwk..........",
-        "...........kkkkkkkk...........",
-      ], { k: "kuromi", g: "hood", e: "kuromi", w: "white", s: "candy", p: "candy" }, [PIX, 0.06, 3.88]),
-    ],
-    // Drawn sharp (see hd): the same Kuromi at 60 pixels, twice the detail -- her outlines, the
-    // skull's eye holes and teeth, the lash flicks, the collar's points and pom-poms.
-    hd: [
-      [-0.04, 0, 1.96, 2.08, 0.04, 1.98, "kuromi"], [0, 0.04, 2.0, 2, 0.02, 1.9, "main"],
-      ...pixelArt([
-        "............................................................",
-        ".......kk..........................................kk.......",
-        "......kggk........................................kggk......",
-        ".....kggggk......................................kggggk.....",
-        ".....kggggk......................................kggggk.....",
-        ".....kggggk.......................................kggk......",
-        "......kgggk.....................................kkkgk.......",
-        ".......kgkgkkk................................kkgggkk.......",
-        "........kgggggkk...........................kkkggggggk.......",
-        "........kgggggggkk.......................kkgggggggggk.......",
-        ".........kggggggggkk...................kkgggggggggggk.......",
-        ".........kggggggggggkkk....kkkkkkkk..kkgggggggggggggk.......",
-        ".........kgggggggggggkkkkkkggggggggkkggkkgggggggggggk.......",
-        ".........kggggggggggkggggggggggggggggggggkgggggggggk........",
-        ".........kgggggggggkggggggggggggggggggggggkggggggggk........",
-        ".........kgggggggkkggggggggggggggggggggggggkkggggggk........",
-        ".........kggggggkggggggggggggggggggggggggggggkgggggk........",
-        ".........kggggggkgggggggggggsssssggggggggggggkgggggk........",
-        ".........kgggggkgggggggggggsssssssggggggggggggkggggk........",
-        ".........kggggkgggggggggggsssssssssggggggggggggkgggk........",
-        "..........kggkgggggggggggsssssssssssggggggggggggkggk........",
-        "..........kggkgggggggggggsssggssggssggggggggggggkkkk........",
-        "..........kggkgggggggggggsssggssggssgggggggggggk...k........",
-        "..........kkkgggggggggggggsssssssssgggggggggggggk...........",
-        "..........k..kgggggggggggggsssgsssggggggggggggggk...........",
-        ".............kgggggggggggggssgssgsggggggggggggggk...........",
-        ".............kgggggggggggggssgssgsggggggggggggggk...........",
-        ".............kgggggggkkggggsssssssggggkkkgggggggk...........",
-        ".............kgggggkkwwkkgggggggggggkkwwwkkgggggk...........",
-        ".............kggggkwwewwwkgggggggggkwwwwewwkggggk...........",
-        "..............kggkwwwwewwwkkgggggkkwwwwewwwwkggk............",
-        "..............kggkwwwwwewwwwkkgkkwwwwewwwwwwkggk............",
-        "..............kgkwwwwweeeeeewwkwweeeeeewwwwwwkgk............",
-        "...............kkwwwwweeeeeewwwwweeeeeewwwwwwkk.............",
-        "................kwwwwwweeeewwpppwweeeewwwwwwwk..............",
-        ".................kwwwwwweewwpppppwweewwwwwwwk...............",
-        ".................kkwwwwwwwwwwpppwewwwwwwwwwkk...............",
-        "...................kwwwwwwwwewwwwewwwwwwwwk.................",
-        "....................kwwwwwwwweepewwwwwwwwk..................",
-        ".....................kkkkkkkkkkppkkkkkkkk...................",
-        "..................kkkggggggggggkkggggggggkkk................",
-        "..................kggggggggggggggggggggggggk................",
-        "...................kgggggggggggggggggggggkk.................",
-        "..................kpkgggggggggggggggggggkpk.................",
-        ".................kpppkgggggggggggggggggkpppk................",
-        ".................kppkkgggggggggggggggggkpppk.k..............",
-        "..................kk.kkkggkgggggggkggkkgkpk..kkkk...........",
-        ".....................kppkkwkkgggkkwkkppkkk....kggkkk........",
-        "....................kppppkkwwkgkwwwkppppkwk...kgggk.........",
-        "....................kppppkkwwwkwwwwkppppkwk..kkgggk.........",
-        "....................kkppkwkwwwwwwwwwkppkwwwkkgkkgk..........",
-        ".....................kkkwkwwwwwwwwwwwkkwwwkgggk.kk..........",
-        "......................kkkwwwwwwwwwwwwwkkkkkkkk..k...........",
-        ".......................kwkkkkwwwwkkkkwk.....................",
-        ".......................kkwwwwkwwkwwwwkk.....................",
-        "........................kwwwwwkkwwwwwk......................",
-        ".......................kwwwwwwkwwwwwwwk.....................",
-        "........................kwwwwkkkkwwwwk......................",
-        ".........................kkkk....kkkk.......................",
-        "............................................................",
-      ], { k: "kuromi", g: "hood", e: "kuromi", w: "white", s: "candy", p: "candy" }, [PIX, 0.06, 3.88], 0.01, PIX / 2),
+        "................................",
+        "................................",
+        "................................",
+        "..ooo......................ooo..",
+        "..ohooooooo..........oooooooho..",
+        "..oohhhhhhho........ohhhhhhhoo..",
+        "...ohhhhhhho........ohhhhhhho...",
+        "...ohhhhhoooooooooooooohhhhho...",
+        "...ohhhhohhhhhhhhhhhhhhohhhho...",
+        "...ohhhohhhhhhsssshhhhhhohhho...",
+        "...ohhohhhhhhshsshshhhhhhohho...",
+        "...ohohhhhhhhshsshshhhhhhhoho...",
+        "...ohohhhhhhhhsssshhhhhhhhoho...",
+        "....oohhhhhoohhsshhoohhhhhoo....",
+        ".....ohhhhowwohhhhowwohhhho.....",
+        ".....ohhhowwwwohhowwwwohhho.....",
+        ".....ohhowowwwwoowwwwowohho.....",
+        ".....ohhowwoowwwwwwoowwohho.....",
+        ".....ohhowooowwwwwwooowohho.....",
+        ".....ohhowwoowwwwwwoowwohho.....",
+        "......ohowccwwwsswwwccwoho......",
+        ".......ohoccwwwwwwwwccoho.......",
+        "........oooooooooooooooo........",
+        "................................",
+        "................................",
+        "................................",
+        "................................",
+        "................................",
+        "................................",
+        "................................",
+      ], { o: "ink", h: "inkHood", s: "candy", w: "white", c: "blush" }, [0, 0.06, 3.88]),
     ],
   },
   string_lights: {
@@ -1213,7 +1146,7 @@ export const DEFAULT_LAYOUTS = {
     // own nook between the closet and the wall: the Twin XL's with the deep-silled window in the
     // left wall, the twin's with a little shelf on the right wall by its head and a tapestry hung
     // over it, in front of its window. Neither bed has a headboard. A black leather storage
-    // ottoman with a bamboo tray at the foot of hers, wall cubes of DVDs above it, a corkboard
+    // ottoman with a bamboo tray at the foot of the twin by the door, wall cubes of VHS tapes above it, a corkboard
     // by the door, cards pinned up by the Twin XL. The sizes are guesses until the room is
     // measured.
     wall: "white", floor: "greywood",
@@ -1225,9 +1158,9 @@ export const DEFAULT_LAYOUTS = {
       F("twin_xl", "lilac", 0, 18, 2), F("platform_bed", "kitty", 9.75, 18.5, 2), F("storage_chest", "black", 10.25, 17, 2),
       W("cube_shelf", "black", "e", 13, 17), F("robot_vacuum", "black", 8.25, 19),
       W("corkboard", "oak", "e", 13, 12.25), W("cards", "white", "w", 0, 22.75),
-      // Her half, the twin by the door, done up dark pastel with Kuromi about the place.
+      // The twin by the door and its half of the room, done up dark pastel with Kuromi about the place.
       F("skull_rug", "lilac", 6.75, 16),
-      W("kuromi_poster", "lilac", "e", 13, 19.25), W("string_lights", "pink", "w", 9.75, 22.5),
+      W("kuromi_poster", "pink", "e", 13, 19.25), W("string_lights", "pink", "w", 9.75, 22.5),
     ],
   },
   main: {

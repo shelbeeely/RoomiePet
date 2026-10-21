@@ -369,7 +369,7 @@ export function pieceSprite(item, cam, tint = null, part = null, hd = false) {
   });
 }
 
-// A few pieces (the iMac G3, the Kuromi poster) are drawn sharp: at HD times the scene's
+// A few pieces (the iMac G3) are drawn sharp: at HD times the scene's
 // resolution, in half-pixel boxes of their own (the catalog's hd), on a layer behind the scene
 // that shows through where they stand. Everything else stays at the scene's pixel size, which
 // is what keeps the frame rate (see HouseScene).

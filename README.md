@@ -153,7 +153,7 @@ pets will now and then go in to hide.
 
 The flat is drawn at 16 pixels to the foot. A few pieces are drawn sharp, at
 twice that (a catalog entry's `hd`): the teal iMac G3, built in half-pixel
-slices to its real egg-backed shape, and the 60-pixel Kuromi poster. They sit
+slices to its real egg-backed shape. They sit
 on a layer behind the scene and show through holes cut where they stand, so
 whatever is in front of them, a pet included, still covers them.
 

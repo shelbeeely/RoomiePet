@@ -50,7 +50,7 @@ function beyond(wall) {
  * order with where each lands on the screen (so a pet can have what stands
  * in front of it drawn over it again), what a tap can pick, and the lamps.
  *
- * A piece drawn sharp (the catalog's hd: the iMac G3, the Kuromi poster) is cut out of the
+ * A piece drawn sharp (the catalog's hd: the iMac G3) is cut out of the
  * canvas where it lands in the drawing order instead of drawn on it, and drawn at HD times the
  * pixels on a canvas of its own (hd) that the scene's is laid over: whatever stands in front of
  * it is drawn after, over the hole, so it still hides what it should, pets included.

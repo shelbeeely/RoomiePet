@@ -435,9 +435,98 @@ class Stitched(Bunny):
         p.rect(x - 6, y + 2, 2, 5, "B")
 
 
+def seam(p, a="w", b="b"):
+    """A dark line wherever a meets b: the face against the hood, the body against the collar."""
+    rows = [list(r) for r in p.rows()]
+    for y in range(N):
+        for x in range(N):
+            if rows[y][x] == a and any(0 <= x + dx < N and 0 <= y + dy < N and rows[y + dy][x + dx] == b
+                                       for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+                p._set(x, y, "o")
+
+
+class Kuromi(Animal):
+    """Kuromi, after the chunky pixel-art ones picked for her: a little white imp in a jester hood --
+    its two points flaring up and out to a ball each, a pink skull on its front, the white face
+    peeping out under it with the hood dipping to a V, big eyes with a lash flick, pink blush; a
+    pointed collar with pink pom-poms, a white body and paws, a devil's tail. b is the hood (the
+    colour that changes), w the white of her."""
+    head = (17, 14)
+    head_at = (32, 31)
+    body = (11, 8)
+    body_at = (32, 52)
+    eye_apart = 7
+    eye_y = 4
+    muzzle = None
+
+    def paw(self, p, x, y, up):
+        rimmed(p, x, y - up, 4, 2.6, "w", only="w")
+
+    def eye(self, p, x, y, kind, left):
+        super().eye(p, x, y, kind, left)
+        if kind in ("open", "sad"):                             # the lash flick at the outer corner
+            p.rect(x - 5 if left else x + 3, y - 4, 2, 1, "e")
+
+    def draw(self, eyes, mouth, brows, pose):
+        at = At(self, pose)
+        p = Painter(N, N)
+        hx, hy, bx, by = at.hx, at.hy, at.bx, at.by
+        # The devil's tail, out to the right with its arrowhead.
+        tail = [(bx + 8, by + 2), (bx + 15, by + 1), (bx + 18, by - 4)] if not at.lying else [(bx + 12, by + 2), (bx + 20, by)]
+        p.path(tail, "b", 1.3)
+        tx, ty = tail[-1]
+        p.poly([(tx - 3, ty - 2), (tx + 3, ty - 4), (tx + 1, ty + 3)], "b")
+        if at.lying:
+            rimmed(p, bx, by, self.body[0] + 5, self.body[1] - 1, "w", only="w")
+        else:
+            rimmed(p, bx, by, *self.body, "w", only="w")
+        for side, up in ((-1, at.paws[0]), (1, at.paws[1])):
+            self.paw(p, bx + side * 6, 58 if not at.lying else 57, up)
+        # The hood's points, a ball on each tip; flat out to the sides when she sleeps.
+        droop = 3 if at.droop else 0
+        for side in (-1, 1):
+            if at.lying:
+                tip = (hx + side * 26, hy - 5)
+                p.poly([(hx + side * 9, hy - 11), tip, (hx + side * 12, hy - 1)], "b")
+            else:
+                tip = (hx + side * (22 + droop), hy - 24 + droop * 2)
+                p.poly([(hx + side * 5, hy - 12), tip, (hx + side * 17, hy - 3)], "b")
+            p.ellipse(tip[0], tip[1], 2.6, 2.6, "b")
+        rimmed(p, hx, hy, *self.head, "b", only="bw")
+        # Her face under the hood, the hood dipping to a V in the middle of it.
+        p.ellipse(hx, hy + 5, 14, 9, "w", only="b")
+        p.poly([(hx - 5, hy - 4), (hx + 5, hy - 4), (hx, hy + 1)], "b", only="w")
+        if not at.lying:
+            # The pointed collar under her chin, a pink pom-pom on each point but the middle one.
+            top = by - 6
+            pts = [(bx - 10, top)]
+            for i, dx in enumerate((-8, -4, 0, 4, 8)):
+                pts += [(bx + dx - 2, top + 2), (bx + dx, top + 4)] if i else [(bx + dx, top + 4)]
+            pts += [(bx + 10, top + 2), (bx + 10, top)]
+            p.poly(pts, "b")
+        seam(p)
+        if not at.lying:
+            for dx in (-8, 8):
+                rimmed(p, bx + dx, top + 5, 1.4, 1.4, "p")
+        # The pink skull on the front of the hood: its eye holes and teeth.
+        sy = hy - 8
+        p.ellipse(hx, sy, 3.6, 3, "S")
+        p.rect(hx - 2, sy + 2, 5, 2, "S")
+        for dx in (-2, 1):
+            p.rect(hx + dx, sy - 1, 1, 2, "o")
+        for dx in (-1, 1):
+            p.rect(hx + dx, sy + 3, 1, 1, "o")
+        self.face(p, at, eyes, mouth, brows)
+        p.outline("o")
+        if POSES[pose].get("lift"):
+            p.shift(0, POSES[pose]["lift"])
+        return p.rows()
+
+
 SPECIES = {
     "cat": Cat(), "bunny": Bunny(), "chick": Chick(), "lop": Lop(),
     "raccoon": Raccoon(), "ferret": Ferret(), "possum": Possum(), "stitched": Stitched(),
+    "kuromi": Kuromi(),
 }
 
 

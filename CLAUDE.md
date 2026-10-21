@@ -22,7 +22,7 @@ Roommates' chores with a tamagotchi pet each (README.md has the whole picture).
 - The scene canvas is the scene's own pixel size, scaled up by CSS
   (`image-rendering: pixelated`) -- keep it that way: drawing at screen size
   cost the frame rate. Name labels and bubbles are DOM, moved by transform. A few pieces
-  (a catalog entry's `hd`: the iMac G3, the Kuromi poster) are drawn sharp at twice the
+  (a catalog entry's `hd`: the iMac G3) are drawn sharp at twice the
   pixels on a layer behind the scene, cut out of it where they stand; keep it to a few.
 - `client/public/sw.js` is not bundled: bump `VERSION` when what it caches changes.
 - The flat is `shared/home.js`: rooms and doors in feet, the furniture
