@@ -178,6 +178,7 @@ export const MATERIALS = {
   granite: "#cfc9bf",
   // Dark pastel, for her half of Bedroom 2 and its Kuromi-style pieces.
   kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e",
+  bondi: "#3fb6c4", bondiDark: "#24808e", ice: "#e8eef0",
   sheet: "#8f8c98", cork: "#c9a27a", graniteDark: "#a39d94", hob: "#2f2b36", led: "#4f6bff",
 };
 
@@ -363,6 +364,17 @@ export const CATALOG = {
       [3.3, 0.8, 3.1, 0.65, 0.12, 0.7, "metal"], [3.38, 0.92, 3.17, 0.5, 0.01, 0.56, "glass"],
     ],
   },
+  imac_g3: {
+    // A teal (Bondi blue) iMac G3 on a little side table: the see-through rounded back, the
+    // white-rimmed screen, its handle on top, the round puck mouse and the matching keyboard.
+    label: "iMac G3 on a side table", group: "bedroom", w: 2, d: 1.75, layer: "solid", colors: ["white", "black", "lilac", "pink"],
+    boxes: [
+      ...legs(2, 1.75, 2.3, 0.08, 0.15, "main_"), [0, 0, 2.3, 2, 1.75, 0.1, "main"],
+      [0.45, 0.2, 2.4, 1.1, 1.0, 0.12, "bondi"], [0.55, 0.12, 2.55, 0.9, 0.5, 0.95, "bondi"], [0.65, 0.08, 2.7, 0.7, 0.12, 0.65, "bondiDark"],
+      [0.4, 0.6, 2.5, 1.2, 0.55, 1.2, "bondi"], [0.42, 1.15, 2.52, 1.16, 0.04, 1.15, "ice"], [0.55, 1.19, 2.72, 0.9, 0.01, 0.78, "screen"],
+      [0.75, 0.35, 3.7, 0.5, 0.15, 0.08, "bondiDark"], [0.5, 1.3, 2.4, 1.0, 0.35, 0.06, "bondi"], [1.62, 1.38, 2.4, 0.16, 0.16, 0.08, "bondi"],
+    ],
+  },
   storage_chest: {
     // The lift-lid storage ottoman at the foot of her bed: black faux leather, a padded top that
     // lifts, a bamboo tray sitting on it.
@@ -376,15 +388,16 @@ export const CATALOG = {
   },
   cube_shelf: {
     // A set of three small black cubes on the wall by her bed, stepped up one after another,
-    // DVDs and little things in them.
+    // full of VHS tapes standing on end: black cases, white labels on their spines.
     label: "Wall cubes", group: "wall", w: 2.25, d: 0.8, layer: "wall", colors: ["black", "white", "lilac", "pink"],
     boxes: [
-      ...[[0, 2.6], [0.8, 3.1], [1.6, 2.6]].flatMap(([x, z]) => [
-        [x, 0, z, 0.65, 0.8, 0.06, "main"], [x, 0, z + 0.59, 0.65, 0.8, 0.06, "main"],
-        [x, 0, z, 0.06, 0.8, 0.65, "main"], [x + 0.59, 0, z, 0.06, 0.8, 0.65, "main"], [x, 0, z, 0.65, 0.04, 0.65, "main_"],
+      ...[[0, 2.5], [0.76, 3.0], [1.52, 2.5]].flatMap(([x, z]) => [
+        [x, 0, z, 0.72, 0.8, 0.06, "main"], [x, 0, z + 0.66, 0.72, 0.8, 0.06, "main"],
+        [x, 0, z, 0.06, 0.8, 0.72, "main"], [x + 0.66, 0, z, 0.06, 0.8, 0.72, "main"], [x, 0, z, 0.72, 0.04, 0.72, "main_"],
+        ...[0.07, 0.17, 0.27, 0.37, 0.47, 0.57].flatMap((u) => [
+          [x + u, 0.12, z + 0.06, 0.09, 0.62, 0.58, "dark"], [x + u + 0.01, 0.74, z + 0.2, 0.07, 0.01, 0.3, "white"],
+        ]),
       ]),
-      ...[0.08, 0.2, 0.32, 0.44].map((x, k) => [x, 0.15, 2.66, 0.1, 0.55, 0.45, `book${(k % 4) + 1}`]),
-      [0.95, 0.2, 3.16, 0.35, 0.4, 0.35, "candy"], [1.7, 0.2, 2.66, 0.4, 0.4, 0.3, "lavender"],
     ],
   },
   robot_vacuum: {
@@ -979,7 +992,7 @@ export const DEFAULT_LAYOUTS = {
   bedB: {
     // As sketched, and as the photos taken from the foot of the twin by the door show it: an
     // L-desk in the back left corner, the TV on its stand in the back right corner by the door
-    // with the 3-tier shelf beside it, the tall chest on the left wall, and along the front the Twin XL and
+    // with the 3-tier shelf beside it and a teal iMac G3 on a side table between that and the desk, the tall chest on the left wall, and along the front the Twin XL and
     // the twin with the closet (part of the walls, see ROOMS) a tight fit between them, a small
     // high window above each, a lift-lid chest at the foot of the twin. Each bed is in its
     // own nook between the closet and the wall: the Twin XL's with the deep-silled window in the
@@ -992,7 +1005,7 @@ export const DEFAULT_LAYOUTS = {
     items: [
       W("basement_window", "white", "s", 25, 0.5), W("tapestry", "black", "s", 25, 9.75),
       W("deep_window", "white", "w", 0, 18), W("floating_shelf", "black", "e", 13, 22.75),
-      F("l_desk", "walnut", 0, 12), F("office_chair", "white", 2.25, 13.75, 2), F("shelf_3tier", "black", 7, 12),
+      F("l_desk", "walnut", 0, 12), F("office_chair", "white", 2.25, 13.75, 2), F("shelf_3tier", "black", 7, 12), F("imac_g3", "white", 4.75, 12),
       F("desk_tv", "black", 9, 12), F("tall_chest", "white", 0, 15, 3), F("clothes_rack", "white", 4.75, 14),
       F("twin_xl", "lilac", 0, 18, 2), F("platform_bed", "kitty", 9.75, 18.5, 2), F("storage_chest", "black", 10.25, 17, 2),
       W("cube_shelf", "black", "e", 13, 17), F("robot_vacuum", "black", 8.25, 19),

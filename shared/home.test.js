@@ -193,6 +193,10 @@ describe("room to live in", () => {
       const w = l.items.find((i) => i.kind === kind);
       expect(w.side === "e" || w.line >= 6.5, kind).toBe(true);
     }
+    // A teal iMac G3 against the back wall, between the desk and the shelf.
+    expect(at("imac_g3").y0).toBe(room.y0);
+    expect(at("imac_g3").x0).toBeGreaterThanOrEqual(at("l_desk").x1);
+    expect(at("imac_g3").x1).toBeLessThanOrEqual(at("shelf_3tier").x0);
     // The clothes rack rolls about: it is a piece like any other.
     expect(l.items.some((i) => i.kind === "clothes_rack")).toBe(true);
     for (const kind of ["shelf_3tier", "desk_tv"]) expect(at(kind).y0, kind).toBe(room.y0);
