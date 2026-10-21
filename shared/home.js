@@ -1125,7 +1125,7 @@ export const DEFAULT_LAYOUTS = {
       W("cube_shelf", "black", "e", 13, 17), F("robot_vacuum", "black", 8.25, 19),
       W("corkboard", "oak", "e", 13, 12.25), W("cards", "white", "w", 0, 22.75),
       // Her half, the twin by the door, done up dark pastel with Kuromi about the place.
-      F("skull_rug", "lilac", 6.75, 16), F("kuromi_bed", "black", 5, 16.5),
+      F("skull_rug", "lilac", 6.75, 16),
       W("kuromi_poster", "lilac", "e", 13, 19.25), W("string_lights", "pink", "w", 9.75, 22.5),
     ],
   },

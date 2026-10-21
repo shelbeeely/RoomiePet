@@ -188,7 +188,7 @@ describe("room to live in", () => {
     expect(beds.find((b) => b.kind === "platform_bed").color).toBe("kitty");
     expect(PILLOWS.kitty.case).toMatch(/^#/);
     // Her half (the twin by the door) is dark pastel, with Kuromi about it.
-    for (const kind of ["kuromi_bed", "skull_rug"]) expect(at(kind).x1, kind).toBeGreaterThan(6.5);
+    expect(at("skull_rug").x0).toBeGreaterThanOrEqual(6.5);
     for (const kind of ["kuromi_poster", "string_lights"]) {
       const w = l.items.find((i) => i.kind === kind);
       expect(w.side === "e" || w.line >= 6.5, kind).toBe(true);
