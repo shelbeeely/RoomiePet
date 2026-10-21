@@ -179,7 +179,7 @@ export const MATERIALS = {
   book1: "#d8645a", book2: "#5a8ad8", book3: "#f0c75e", book4: "#6fbf8a", frame: "#7a4f2e", sky: "#bfe3f5", pink: "#f4a6b8",
   granite: "#cfc9bf",
   // Dark pastel, for the door half of Bedroom 2 and its Kuromi-style pieces.
-  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", fabric: "#c9c6c2", fabricDark: "#b3afab", dockPad: "#9d9995", clockScreen: "#0d0f18", clockTime: "#8fd4ff", hood: "#57516a", ink: "#0e0c12", inkHood: "#2a2630", blush: "#eda9cb",
+  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", fabric: "#cfccc8", fabricDark: "#a9a5a1", dock: "#dcd9d5", dockPad: "#f4f2ef", clockBezel: "#141418", clockBlue: "#3c74d4", hood: "#57516a", ink: "#0e0c12", inkHood: "#2a2630", blush: "#eda9cb",
   bondi: "#3fb6c4", bondiDark: "#24808e", bondiLight: "#8fe0e8", ice: "#e8eef0",
   sheet: "#8f8c98", cork: "#c9a27a", graniteDark: "#a39d94", hob: "#2f2b36", led: "#4f6bff",
 };
@@ -421,25 +421,30 @@ function cubeBoxes(item, hd) {
 }
 
 /**
- * A Lenovo Smart Clock 2 on its charging dock, at [u, v, z] (v out from the wall): 4.4 in wide,
- * a soft grey fabric wedge whose front leans back, the screen on it. The dock it sits in is the
- * same grey and reaches out in front of it: a pad to lay a phone on to charge, and a little
- * night light along its front edge. Drawn sharp, the screen shows the time in blue (2:47, as in
- * the photo).
+ * A Lenovo Smart Clock 2 in its charging dock, from the pictures of it: the dock a long, low,
+ * speckled pale-grey tray along the shelf from [u, v, z] (v out from the wall), the clock at its
+ * left end and the wireless charging pad, marked with a +, at its right; a white light where the
+ * clock meets the dock. The clock is grey fabric, its front the tallest part and the back
+ * curving down; the black-rimmed screen fills the front, the Lenovo badge under it. Drawn sharp,
+ * the screen shows the time in white on blue (2:47, as in the photo of hers).
  */
 function smartClock(u, v, z, px = PIX) {
-  const W = 0.375;
-  const D = 0.06;                                                                // the dock's height
+  const L = 0.95, T = 0.4, H = 0.05;                                            // the dock
+  const W = 0.375, x = u + 0.04, y = v + 0.05, zc = z + H;                     // the clock on it
+  const f = y + 0.26;                                                            // the clock's front
   const out = [
-    [u - 0.03, v, z, W + 0.06, 0.4, D, "fabricDark"],                            // the dock
-    [u + 0.06, v + 0.25, z + D, W - 0.12, 0.12, 0.004, "dockPad"],               // its charging pad
-    [u + 0.1, v + 0.4, z + 0.015, W - 0.2, 0.004, 0.02, "clockTime"],            // the night light
-    [u, v + 0.02, z + D, W, 0.1, 0.27, "fabric"],                                // the clock: its back, tallest
-    [u, v + 0.12, z + D, W, 0.06, 0.24, "fabric"],                               // the front leaning back
-    [u + 0.02, v + 0.18, z + D, W - 0.04, 0.02, 0.21, "fabric"],
-    [u + 0.03, v + 0.2, z + D + 0.03, W - 0.06, 0.005, 0.18, "clockScreen"],
+    [u, v, z, L, T, H, "dock"],
+    [x + 0.01, f - 0.01, zc, W - 0.02, 0.03, 0.012, "white"],                    // the light
+    [u + L - 0.32, v + T / 2 - 0.012, zc, 0.14, 0.024, 0.004, "dockPad"],        // the +
+    [u + L - 0.262, v + T / 2 - 0.07, zc, 0.024, 0.14, 0.004, "dockPad"],
+    [x, y, zc, W, 0.1, 0.22, "fabric"],                                          // the back, curving down
+    [x, y + 0.1, zc, W, 0.08, 0.27, "fabric"],
+    [x, y + 0.18, zc, W, 0.08, 0.3, "fabric"],                                   // the front, tallest
+    [x + 0.015, f, zc + 0.05, W - 0.03, 0.005, 0.23, "clockBezel"],
+    [x + 0.03, f + 0.002, zc + 0.07, W - 0.06, 0.005, 0.18, "clockBlue"],
+    [x + 0.03, f, zc + 0.015, 0.07, 0.004, 0.02, "fabricDark"],                 // the badge
   ];
-  if (px === PIX) return [...out, [u + 0.08, v + 0.206, z + D + 0.09, W - 0.16, 0.003, 0.05, "clockTime"]];
+  if (px === PIX) return [...out, [x + 0.09, f + 0.008, zc + 0.14, W - 0.18, 0.003, 0.05, "white"]];
   const time = [
     "11..1.1.11",
     ".1.11.1..1",
@@ -447,7 +452,7 @@ function smartClock(u, v, z, px = PIX) {
     "1.....1..1",
     "11.1..1..1",
   ];
-  return [...out, ...pixelArt(time, { 1: "clockTime" }, [u + W / 2 - 5 * px, v + 0.206, z + D + 0.195], 0.003, px)];
+  return [...out, ...pixelArt(time, { 1: "white" }, [x + W / 2 - 5 * px, f + 0.008, zc + 0.235], 0.003, px)];
 }
 
 const legs = (w, d, h, inset = 0.1, s = 0.25, mat = "wood") => [
@@ -935,8 +940,8 @@ export const CATALOG = {
     // The little black shelf by the head of the twin by the door: a book or two, and her Lenovo
     // Smart Clock 2 on its white charging dock (see smartClock), drawn sharp so the time shows.
     label: "Floating shelf", group: "wall", w: 1.75, d: 0.75, layer: "wall", colors: ["black", "white", "oak"],
-    boxes: [[0, 0, 2.9, 1.75, 0.75, 0.1, "main"], [0.15, 0.15, 3.0, 0.7, 0.5, 0.15, "book3"], ...smartClock(0.95, 0.12, 3.0)],
-    hd: [[0, 0, 2.9, 1.75, 0.75, 0.1, "main"], [0.15, 0.15, 3.0, 0.7, 0.5, 0.15, "book3"], ...smartClock(0.95, 0.12, 3.0, PIX / 2)],
+    boxes: [[0, 0, 2.9, 1.75, 0.75, 0.1, "main"], [0.08, 0.15, 3.0, 0.5, 0.5, 0.15, "book3"], ...smartClock(0.7, 0.15, 3.0)],
+    hd: [[0, 0, 2.9, 1.75, 0.75, 0.1, "main"], [0.08, 0.15, 3.0, 0.5, 0.5, 0.15, "book3"], ...smartClock(0.7, 0.15, 3.0, PIX / 2)],
   },
   deep_window: {
     // The bigger window in Bedroom 2's side wall, over the Twin XL: set deep in the wall with a
