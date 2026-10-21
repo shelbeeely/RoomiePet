@@ -154,7 +154,10 @@ pets will now and then go in to hide.
 The wall cubes in Bedroom 2 hold her VHS tapes, each with a title and a spine
 colour, in order (`tapes` on the item, checked by `tapeProblem`). Pick the cubes
 up in the builder to move tapes along a cube or into another, rename and
-recolour them, take them out or add more.
+recolour them, take them out or add more. Hers have their own spines: cut out of
+a photo of the shelf and straightened by `art/tapes.py` (the photo stays out of
+the repo) into `client/public/tapes/`, shown whole in the builder and boiled down
+to a spine's few pixels in the room (`shared/tapeArt.js`).
 
 The flat is drawn at 16 pixels to the foot. A few pieces are drawn sharp, at
 twice that (a catalog entry's `hd`): the teal iMac G3, built in half-pixel

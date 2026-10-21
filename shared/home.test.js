@@ -42,7 +42,7 @@ describe("the catalog", () => {
       expect(c.colors.length, kind).toBeGreaterThan(0);
       for (const b of c.boxes) {
         expect(b.length, kind).toBe(7);
-        expect(b[6].startsWith("main") || Object.hasOwn(MATERIALS, b[6]), `${kind}: ${b[6]}`).toBe(true);
+        expect(b[6].startsWith("main") || Object.hasOwn(MATERIALS, b[6]) || /^#[0-9a-f]{6}$/.test(b[6]), `${kind}: ${b[6]}`).toBe(true);
       }
     }
   });
@@ -322,11 +322,18 @@ describe("the VHS tapes in the wall cubes", () => {
     expect(layoutProblem("bedB", withTapes([[{ t: "x", c: "plaid" }], [], []]))).toMatch(/colour/);
     const saved = cleanLayout(withTapes([[{ t: "Coraline", c: "purple", sneaky: 1 }], [], []]));
     expect(saved.items.find((i) => i.kind === "cube_shelf").tapes).toEqual([[{ t: "Coraline", c: "purple" }], [], []]);
+    expect(layoutProblem("bedB", withTapes([[{ t: "x", c: "black", a: "jaws" }], [], []]))).toMatch(/spine art/);
+    const kept = cleanLayout(withTapes([[{ t: "The Matrix", c: "silver", a: "the_matrix" }], [], []]));
+    expect(kept.items.find((i) => i.kind === "cube_shelf").tapes[0][0]).toEqual({ t: "The Matrix", c: "silver", a: "the_matrix" });
   });
 
   test("are drawn as they stand: a spine for each, the title's marks on it when sharp", () => {
     const spines = (item, hd) => boxesOf(item, hd).filter((b) => b.mat.startsWith("tape_") && b.mat !== "tape_case");
-    expect(spines(shelf(), false)).toHaveLength(DEFAULT_TAPES.flat().length);
+    // Hers have their own spines, from the photo: their colours a pixel at a time, finer when sharp.
+    const art = (item, hd) => boxesOf(item, hd).filter((b) => b.mat.startsWith("#")).length;
+    expect(art(shelf(), false)).toBe(7 * 9);
+    expect(art(shelf(), true)).toBe(7 * 2 * 18);
+    expect(spines(shelf(), false)).toHaveLength(0);
     const one = { ...shelf(), tapes: [[{ t: "Up", c: "red" }], [], []] };
     expect(spines(one, false).map((b) => b.mat)).toEqual(["tape_red"]);
     const marks = (item) => boxesOf(item, true).filter((b) => b.mat === "ink" || b.mat === "white").length;

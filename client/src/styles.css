@@ -89,6 +89,12 @@ main > * + * { margin-top: 12px; }
 .tape-shelf .tape-end { width: 26px; min-height: 120px; padding: 0; background: transparent; color: var(--muted, #aaa); border: 1px dashed #4a4456; border-radius: 2px; font-size: 14px; }
 .tape-shelf .tape-edit { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .tape-shelf .tape-edit input { flex: 1; min-width: 120px; }
+/* A tape with its own spine: the photo of it, straightened. */
+.tape-shelf .tape.art { background-size: 100% 100%; background-repeat: no-repeat; image-rendering: auto; }
+.tape-shelf .spine-art { display: flex; flex-wrap: wrap; gap: 4px; flex-basis: 100%; }
+.tape-shelf .spine-art button { width: 18px; height: 72px; min-height: 0; padding: 0; border-radius: 2px; border: 1px solid #0e0c12; background-size: 100% 100%; }
+.tape-shelf .spine-art button.plain { width: auto; padding: 0 8px; font-size: 11px; background: var(--panel); color: var(--fg); }
+.tape-shelf .spine-art button.on { outline: 2px solid var(--accent); outline-offset: 1px; }
 .seg button { flex: 1; background: var(--panel-2); color: var(--fg); font-weight: 500; min-height: 34px; }
 .seg button.on { background: var(--accent); color: var(--accent-fg); font-weight: 600; }
 .catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 6px; }

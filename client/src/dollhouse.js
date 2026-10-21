@@ -51,6 +51,7 @@ function rgb(hex) {
 const mul = (c, k) => [Math.min(255, c[0] * k), Math.min(255, c[1] * k), Math.min(255, c[2] * k)];
 
 export function colorOf(mat, item) {
+  if (mat.startsWith("#")) return rgb(mat);                   // a colour of its own (a tape's spine art)
   if (mat.startsWith("main")) {
     const base = rgb(COLORWAYS[item.color] || COLORWAYS.grey);
     if (mat.endsWith("^")) return mul(base, 1.14);

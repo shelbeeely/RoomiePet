@@ -2,7 +2,7 @@
 // house it saw), push notifications arrive while it is closed, and tapping
 // one opens the app where it points. The API is never cached -- it is
 // always the server's word.
-const VERSION = "rp-29";
+const VERSION = "rp-30";
 const SHELL = ["/", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/badge-96.png", "/sprites/sheet.png", "/sprites/sheet.json"];
 
 self.addEventListener("install", (event) => {
@@ -36,7 +36,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
   // Built assets have hashed names and never change: the cache first.
-  if (url.pathname.startsWith("/assets/") || url.pathname.startsWith("/icons/") || url.pathname.startsWith("/sprites/")) {
+  if (url.pathname.startsWith("/assets/") || url.pathname.startsWith("/icons/") || url.pathname.startsWith("/sprites/") || url.pathname.startsWith("/tapes/")) {
     event.respondWith(
       caches.match(req).then(
         (hit) =>

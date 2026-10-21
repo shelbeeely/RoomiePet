@@ -6,7 +6,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   CATALOG, COLORWAYS, FLOORS, PILLOWS, GRID, ROOMS, TAPES_PER_CUBE, TAPE_COLORS, TAPE_TITLE_MAX, WALLPAPERS,
-  PALE_SPINES, freeSpot, layoutProblem, moveTape, tapesOf, turned,
+  PALE_SPINES, TAPE_ART, freeSpot, layoutProblem, moveTape, tapesOf, turned,
 } from "@shared/home.js";
 import { dollCamera, pieceSprite } from "./dollhouse.js";
 
@@ -79,7 +79,11 @@ function TapeShelf({ tapes, onChange }) {
     if (next < 0 || next >= tapes.length) return;
     put({ cube: next, i: dir > 0 ? 0 : tapes[next].length });
   };
-  const edit = (patch) => onChange(tapes.map((c, k) => (k === held.cube ? c.map((t, j) => (j === held.i ? { ...t, ...patch } : t)) : c)));
+  const edit = (patch) => onChange(tapes.map((c, k) => (k === held.cube ? c.map((t, j) => {
+    if (j !== held.i) return t;
+    const { a, ...rest } = { ...t, ...patch };
+    return a ? { ...rest, a } : rest;
+  }) : c)));
   const add = (cube) => {
     if (tapes[cube].length >= TAPES_PER_CUBE) return setNote(`That cube is full: it holds ${TAPES_PER_CUBE}.`);
     onChange(tapes.map((c, k) => (k === cube ? [...c, { t: "New tape", c: "black" }] : c)));
@@ -93,10 +97,11 @@ function TapeShelf({ tapes, onChange }) {
             {cube.map((t, i) => {
               const on = held && held.cube === k && held.i === i;
               return (
-                <button key={i} className={`tape${on ? " on" : ""}`} style={{ "--spine": TAPE_COLORS[t.c], "--ink": PALE_SPINES.has(t.c) ? "#1f1c26" : "#f6f3ec" }} aria-pressed={on}
+                <button key={i} className={`tape${on ? " on" : ""}${t.a ? " art" : ""}`} aria-pressed={on}
+                  style={{ "--spine": TAPE_COLORS[t.c], "--ink": PALE_SPINES.has(t.c) ? "#1f1c26" : "#f6f3ec", ...(t.a ? { backgroundImage: `url(/tapes/${t.a}.png)` } : {}) }}
                   aria-label={`${t.t}, cube ${k + 1}, ${i + 1} of ${cube.length}`}
                   onClick={() => (on ? setHeld(null) : held ? put({ cube: k, i }) : setHeld({ cube: k, i }))}>
-                  <span>{t.t}</span>
+                  {!t.a && <span>{t.t}</span>}
                 </button>
               );
             })}
@@ -114,6 +119,13 @@ function TapeShelf({ tapes, onChange }) {
             {Object.entries(TAPE_COLORS).map(([c, hex]) => (
               <button key={c} role="radio" aria-checked={tape.c === c} aria-label={c} title={c}
                 className={`swatch${tape.c === c ? " on" : ""}`} style={{ background: hex }} onClick={() => edit({ c })} />
+            ))}
+          </div>
+          <div className="spine-art" role="radiogroup" aria-label="Spine art">
+            <button role="radio" aria-checked={!tape.a} className={`plain${!tape.a ? " on" : ""}`} onClick={() => edit({ a: undefined })}>Plain</button>
+            {Object.entries(TAPE_ART).map(([id, art]) => (
+              <button key={id} role="radio" aria-checked={tape.a === id} aria-label={art.label} title={art.label}
+                className={tape.a === id ? "on" : ""} style={{ backgroundImage: `url(/tapes/${id}.png)` }} onClick={() => edit({ a: id })} />
             ))}
           </div>
           <button className="ghost small" onClick={() => {

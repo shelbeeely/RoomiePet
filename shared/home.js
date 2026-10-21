@@ -8,6 +8,8 @@
 // builder. The server keeps each household's layouts and checks them here,
 // so a phone can't save a bed through a wall or across a doorway.
 
+import { TAPE_ART } from "./tapeArt.js";
+
 export const FLAT = { w: 30, d: 25 };
 
 export const ROOMS = {
@@ -324,14 +326,18 @@ for (const [k, v] of Object.entries(TAPE_COLORS)) MATERIALS[`tape_${k}`] = v;
 MATERIALS.tape_case = "#15131a";
 export const TAPES_PER_CUBE = 7;
 export const TAPE_TITLE_MAX = 24;
-const TAPE = (t, c) => ({ t, c });
+// a is the tape's spine artwork, if it has its own (TAPE_ART: cut from the photo of her shelf).
+const TAPE = (t, c, a) => (a ? { t, c, a } : { t, c });
+export { TAPE_ART };
 // Hers, as in the photo of the shelf: all in the raised middle cube, the other two empty --
 // Independence Day twice, the three Matrix films, an orange one and a Memorex blank.
 export const DEFAULT_TAPES = [
   [],
   [
-    TAPE("Independence Day", "black"), TAPE("Independence Day", "black"), TAPE("The Matrix", "silver"),
-    TAPE("Matrix Reloaded", "black"), TAPE("Matrix Revolutions", "teal"), TAPE("Orange one", "orange"), TAPE("Memorex blank", "peach"),
+    TAPE("Independence Day", "black", "independence_day_1"), TAPE("Independence Day", "black", "independence_day_2"),
+    TAPE("The Matrix", "silver", "the_matrix"), TAPE("Matrix Reloaded", "black", "matrix_reloaded"),
+    TAPE("Matrix Revolutions", "teal", "matrix_revolutions"), TAPE("Orange one", "orange", "orange_one"),
+    TAPE("Memorex blank", "peach", "memorex_blank"),
   ],
   [],
 ];
@@ -350,6 +356,7 @@ export function tapeProblem(tapes, cubes) {
     for (const tape of cube) {
       if (!tape || typeof tape.t !== "string" || tape.t.length > TAPE_TITLE_MAX) return `A tape's title is up to ${TAPE_TITLE_MAX} letters`;
       if (!Object.hasOwn(TAPE_COLORS, tape.c)) return "A tape doesn't come in that colour";
+      if (tape.a !== undefined && !Object.hasOwn(TAPE_ART, tape.a)) return "There's no such spine art";
     }
   }
   return null;
@@ -383,7 +390,17 @@ function cubeBoxes(item, hd) {
     cube.forEach((tape, i) => {
       const tx = x + 0.07 + i * 0.084;
       const ink = PALE_SPINES.has(tape.c) ? "ink" : "white";
-      out.push([tx, 0.12, z + 0.06, 0.078, 0.62, 0.58, "tape_case"], [tx + 0.004, 0.74, z + 0.07, 0.07, 0.01, 0.56, `tape_${tape.c}`]);
+      out.push([tx, 0.12, z + 0.06, 0.078, 0.62, 0.58, "tape_case"]);
+      const art = tape.a && TAPE_ART[tape.a];
+      if (art) {
+        // Its own spine, from the photo: the colours of it, a pixel at a time, top to bottom.
+        const grid = hd ? art.hd : art.lo;
+        const h = 0.56 / grid.length;
+        const w = 0.07 / grid[0].length;
+        grid.forEach((row, r) => row.forEach((hex, c) => out.push([tx + 0.004 + c * w, 0.74, z + 0.63 - (r + 1) * h, w, 0.01, h, hex])));
+        return;
+      }
+      out.push([tx + 0.004, 0.74, z + 0.07, 0.07, 0.01, 0.56, `tape_${tape.c}`]);
       if (!hd) {
         out.push([tx + 0.025, 0.75, z + 0.2, 0.03, 0.01, 0.3, ink]);
         return;
@@ -1235,7 +1252,7 @@ export function cleanLayout(layout) {
     items: layout.items.map((i) => (CATALOG[i.kind].layer === "wall"
       ? {
         kind: i.kind, color: i.color, side: i.side, line: i.line, at: i.at,
-        ...(CATALOG[i.kind].shelves && Array.isArray(i.tapes) ? { tapes: i.tapes.map((cube) => cube.map(({ t, c }) => ({ t, c }))) } : {}),
+        ...(CATALOG[i.kind].shelves && Array.isArray(i.tapes) ? { tapes: i.tapes.map((cube) => cube.map(({ t, c, a }) => (a ? { t, c, a } : { t, c }))) } : {}),
       }
       : { kind: i.kind, color: i.color, x: i.x, y: i.y, rot: i.rot })),
   };
