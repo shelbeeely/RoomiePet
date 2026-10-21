@@ -116,7 +116,7 @@ describe("room to live in", () => {
     }
   });
 
-  test("Bedroom 2, as sketched: white, 13 x 13, a Twin XL and a twin with headboards on the front wall, small windows above them, a built-in closet between", () => {
+  test("Bedroom 2, as sketched: white, 13 x 13, a Twin XL and a twin with their heads at the front wall, small windows above them, a built-in closet between", () => {
     const l = DEFAULT_LAYOUTS.bedB;
     expect(layoutProblem("bedB", l)).toBe(null);
     expect(l.wall).toBe("white");
@@ -179,7 +179,7 @@ describe("room to live in", () => {
     for (const [x, y] of CATALOG.l_desk.plan) expect(x <= CATALOG.l_desk.w && y <= CATALOG.l_desk.d).toBe(true);   // the L inside its box
     // From the photo of the desk: the chair is tucked into the crook of the L, which is floor;
     // on either arm it is not.
-    const chair = l.items.find((i) => i.kind === "chair");
+    const chair = l.items.find((i) => i.kind === "office_chair");
     const desk = l.items.find((i) => i.kind === "l_desk");
     expect(overlapping(footprint(chair), footprint(desk))).toBe(true);
     expect(layoutProblem("bedB", { ...l, items: l.items.map((i) => (i === chair ? { ...i, x: 0.25 } : i)) })).toMatch(/overlaps the l-desk/);
@@ -206,7 +206,7 @@ describe("room to live in", () => {
     expect(side.at >= left.y0 && side.at + CATALOG.deep_window.w <= left.y1).toBe(true);
     expect(left.y1 - left.y0).toBe(CATALOG.twin_xl.d);
     expect(at("storage_chest").y1).toBe(right.y0);                    // the lift-lid chest at its foot
-    expect(CATALOG.platform_bed.boxes.every((b) => b[2] + b[5] <= 2.1)).toBe(true);   // no headboard
+    for (const kind of ["platform_bed", "twin_xl"]) expect(CATALOG[kind].boxes.every((b) => b[2] + b[5] <= 2.1), kind).toBe(true);   // no headboards
     // And there is still room to add things.
     for (const kind of ["beanbag", "bookshelf", "lamp"]) expect(freeSpot("bedB", l, kind), kind).not.toBe(null);
   });

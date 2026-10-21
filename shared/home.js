@@ -177,7 +177,8 @@ export const MATERIALS = {
   book1: "#d8645a", book2: "#5a8ad8", book3: "#f0c75e", book4: "#6fbf8a", frame: "#7a4f2e", sky: "#bfe3f5", pink: "#f4a6b8",
   granite: "#cfc9bf",
   // Dark pastel, for her half of Bedroom 2 and its Kuromi-style pieces.
-  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", graniteDark: "#a39d94", hob: "#2f2b36", led: "#4f6bff",
+  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e",
+  sheet: "#8f8c98", cork: "#c9a27a", graniteDark: "#a39d94", hob: "#2f2b36", led: "#4f6bff",
 };
 
 // Boxes: [x, y, z, w, d, h, material], in feet, x across the piece and y from its back (y = 0)
@@ -220,14 +221,16 @@ export const CATALOG = {
     bed: true,
   },
   twin_xl: {
-    // A college-length twin, 80 in: the one on the left in Bedroom 2.
-    label: "Twin XL bed", group: "bedroom", w: 3.5, d: 6.5, layer: "solid", colors: ["sage", "blue", "pink", "lilac", "sun"],
+    // A college-length twin, 80 in: the one on the left in Bedroom 2. No headboard: a low white
+    // base, grey sheets and pillows, the comforter thrown over.
+    label: "Twin XL bed", group: "bedroom", w: 3.5, d: 6.5, layer: "solid", colors: ["lilac", "sage", "blue", "pink", "sun"],
     boxes: [
-      [0, 0, 0, 3.5, 0.3, 2.8, "wood"], [0, 0.3, 0, 3.5, 6.2, 1.1, "wood"],
-      [0.1, 0.3, 1.1, 3.3, 1.9, 0.6, "white"], [0.5, 0.45, 1.7, 2.5, 1.0, 0.35, "pillow"],
-      [0.05, 2.2, 1.1, 3.4, 4.25, 0.7, "main"], [0.05, 2.2, 1.8, 3.4, 0.45, 0.08, "main^"],
+      ...[[0.05, 0.05], [3.2, 0.05], [0.05, 6.2], [3.2, 6.2]].map(([x, y]) => [x, y, 0, 0.25, 0.25, 0.2, "white"]),
+      [0, 0, 0.2, 3.5, 6.5, 0.7, "white"], [0.3, 6.5, 0.3, 2.9, 0.02, 0.45, "porcelain"],
+      [0.05, 0.05, 0.9, 3.4, 6.4, 0.6, "sheet"], [0.4, 0.2, 1.5, 2.7, 1.0, 0.35, "sheet"],
+      [0.02, 1.8, 1.15, 3.46, 4.65, 0.42, "main"], [0.02, 1.8, 1.57, 3.46, 0.45, 0.06, "main^"],
     ],
-    spots: [[1.2, 4.2, 1.8], [2.4, 4.8, 1.8], [1.75, 3.2, 1.8]],
+    spots: [[1.2, 4.2, 1.6], [2.4, 4.8, 1.6], [1.75, 3.2, 1.6]],
     bed: true,
   },
   double_bed: {
@@ -291,7 +294,7 @@ export const CATALOG = {
     ],
   },
   l_desk: {
-    // The corner desk in the photos of Bedroom 2: the long arm along the back wall with the
+    // The corner desk in the photos of Bedroom 2, a dark wood top on black steel legs: the long arm along the back wall with the
     // monitor on a riser lit blue underneath and a little two-drawer cabinet under its far end,
     // the short arm down the left wall by the tall chest. parts are its two arms, so the floor in
     // the crook of the L is floor: the chair tucks in there.
@@ -299,11 +302,11 @@ export const CATALOG = {
     parts: [[0, 0, 4.5, 1.75], [0, 1.75, 1.75, 1.25]],
     plan: [[0, 0], [4.5, 0], [4.5, 1.75], [1.75, 1.75], [1.75, 3], [0, 3]],   // its outline from above
     boxes: [
-      [0.1, 0.1, 0, 0.15, 0.15, 2.3, "main_"], [4.25, 0.1, 0, 0.15, 0.15, 2.3, "main_"],
-      [0.1, 2.75, 0, 0.15, 0.15, 2.3, "main_"], [1.5, 2.75, 0, 0.15, 0.15, 2.3, "main_"],
+      [0.1, 0.1, 0, 0.15, 0.15, 2.3, "steel"], [4.25, 0.1, 0, 0.15, 0.15, 2.3, "steel"],
+      [0.1, 2.75, 0, 0.15, 0.15, 2.3, "steel"], [1.5, 2.75, 0, 0.15, 0.15, 2.3, "steel"],
       [3.1, 0.2, 0, 1.1, 1.4, 1.6, "woodDark"], [3.2, 1.6, 0.15, 0.9, 0.04, 0.6, "wood"], [3.2, 1.6, 0.85, 0.9, 0.04, 0.6, "wood"],
       [0, 0, 2.3, 4.5, 1.75, 0.15, "main"], [0, 1.75, 2.3, 1.75, 1.25, 0.15, "main"],
-      [0.6, 0.05, 2.45, 0.08, 0.6, 0.35, "main_"], [4.2, 0.05, 2.45, 0.08, 0.6, 0.35, "main_"], [0.6, 0.05, 2.8, 3.7, 0.65, 0.06, "main"],
+      [0.6, 0.05, 2.45, 0.08, 0.6, 0.35, "steel"], [4.2, 0.05, 2.45, 0.08, 0.6, 0.35, "steel"], [0.6, 0.05, 2.8, 3.7, 0.65, 0.06, "main"],
       [0.6, 0.68, 2.72, 3.7, 0.03, 0.08, "led"],
       [2.15, 0.2, 2.86, 0.5, 0.35, 0.1, "dark"], [1.55, 0.3, 2.95, 1.7, 0.08, 1.05, "dark"], [1.62, 0.38, 3.02, 1.56, 0.02, 0.9, "screen"],
       [1.8, 0.85, 2.45, 1.2, 0.4, 0.07, "white"],
@@ -341,26 +344,52 @@ export const CATALOG = {
       ...[0.3, 1.05, 1.8, 2.55, 3.3].flatMap((z) => [
         [0.2, 1.5, z, 2.35, 0.04, 0.65, "main^"], [0.45, 1.54, z + 0.28, 0.12, 0.06, 0.12, "dark"], [2.18, 1.54, z + 0.28, 0.12, 0.06, 0.12, "dark"],
       ]),
-      [1.6, 0.4, 4.2, 0.45, 0.45, 0.5, "white"], [0.4, 0.3, 4.2, 0.9, 0.5, 0.35, "book2"],
+      // On top, as in the photo: a lace runner hanging over the ends, books stacked at both
+      // ends, a tumbler and a candle.
+      [-0.05, 0.1, 4.2, 2.85, 1.3, 0.02, "white"], [-0.05, 0.1, 3.5, 0.05, 1.3, 0.7, "white"], [2.75, 0.1, 3.5, 0.05, 1.3, 0.7, "white"],
+      [0.15, 0.2, 4.22, 0.7, 0.55, 0.35, "book4"], [2.0, 0.2, 4.22, 0.65, 0.55, 0.5, "white"],
+      [1.15, 0.35, 4.22, 0.3, 0.3, 0.55, "cream"], [2.1, 0.95, 4.22, 0.35, 0.35, 0.3, "cream"],
     ],
   },
   desk_tv: {
-    // The stand on the back wall by the door, as in the photo: dark, a shelf below its top, a
-    // big TV standing on it.
+    // The stand on the back wall by the door, as in the photos: black, a wood top and a shelf
+    // below it, a big TV standing on it and a round lit vanity mirror at its end by the door.
     label: "Desk with TV", group: "bedroom", w: 4, d: 2, layer: "solid", colors: ["black", "white", "oak", "walnut"],
     boxes: [
-      ...legs(4, 2, 2.3, 0.1, 0.25, "main_"), [0.1, 0.1, 1.0, 3.8, 1.8, 0.1, "main_"], [0, 0, 2.3, 4, 2, 0.15, "main"],
-      [1.6, 0.5, 2.45, 0.8, 0.45, 0.12, "dark"], [1.9, 0.6, 2.57, 0.2, 0.15, 0.3, "dark"],
-      [0.4, 0.5, 2.85, 3.2, 0.15, 1.75, "dark"], [0.5, 0.65, 2.95, 3.0, 0.03, 1.55, "screen"],
+      ...legs(4, 2, 2.3, 0.1, 0.25, "main_"), [0.1, 0.1, 1.0, 3.8, 1.8, 0.1, "main_"], [0, 0, 2.3, 4, 2, 0.15, "wood"],
+      [1.3, 0.5, 2.45, 0.8, 0.45, 0.12, "dark"], [1.6, 0.6, 2.57, 0.2, 0.15, 0.3, "dark"],
+      [0.1, 0.5, 2.85, 3.2, 0.15, 1.75, "dark"], [0.2, 0.65, 2.95, 3.0, 0.03, 1.55, "screen"],
+      [3.45, 0.7, 2.45, 0.35, 0.35, 0.08, "metal"], [3.58, 0.8, 2.53, 0.1, 0.1, 0.6, "metal"],
+      [3.3, 0.8, 3.1, 0.65, 0.12, 0.7, "metal"], [3.38, 0.92, 3.17, 0.5, 0.01, 0.56, "glass"],
     ],
   },
   storage_chest: {
-    // The small chest at the foot of her bed: its lid lifts up, no drawers.
-    label: "Storage chest", group: "bedroom", w: 2.5, d: 1.25, layer: "solid", colors: ["lilac", "black", "pink", "white", "oak"],
+    // The lift-lid storage ottoman at the foot of her bed: black faux leather, a padded top that
+    // lifts, a bamboo tray sitting on it.
+    label: "Storage ottoman", group: "bedroom", w: 2.5, d: 1.5, layer: "solid", colors: ["black", "lilac", "pink", "white", "oak"],
     boxes: [
-      [0.05, 0.05, 0, 2.4, 1.15, 1.3, "main"], [0, 0, 1.3, 2.5, 1.25, 0.2, "main_"],
-      [0.05, 1.2, 1.25, 2.4, 0.02, 0.05, "kuromi"], [1.1, 1.25, 1.0, 0.3, 0.04, 0.3, "candy"],
-      [-0.03, 0.45, 0.75, 0.05, 0.35, 0.12, "kuromi"], [2.48, 0.45, 0.75, 0.05, 0.35, 0.12, "kuromi"],
+      [0.03, 0.03, 0, 2.44, 1.44, 1.15, "main"], [0, 0, 1.15, 2.5, 1.5, 0.22, "main^"],
+      [0.03, 1.47, 0.1, 2.44, 0.02, 0.04, "main_"], [0.03, 1.47, 1.1, 2.44, 0.02, 0.04, "main_"],
+      [0.3, 0.2, 1.37, 1.9, 1.1, 0.05, "wood"], [0.3, 0.2, 1.42, 1.9, 0.06, 0.18, "wood"], [0.3, 1.24, 1.42, 1.9, 0.06, 0.18, "wood"],
+      [0.3, 0.26, 1.42, 0.06, 0.98, 0.18, "wood"], [2.14, 0.26, 1.42, 0.06, 0.98, 0.18, "wood"], [1.55, 0.26, 1.42, 0.05, 0.98, 0.18, "wood"],
+    ],
+  },
+  cube_shelf: {
+    // The small black cube shelf beside the ottoman, DVDs in it.
+    label: "Cube shelf", group: "bedroom", w: 1.25, d: 1, layer: "solid", colors: ["black", "white", "oak"],
+    boxes: [
+      [0, 0, 0, 1.25, 1, 0.08, "main"], [0, 0, 0.72, 1.25, 1, 0.06, "main"], [0, 0, 1.42, 1.25, 1, 0.08, "main"],
+      [0, 0, 0, 0.08, 1, 1.5, "main"], [1.17, 0, 0, 0.08, 1, 1.5, "main"], [0.08, 0, 0.08, 1.09, 0.06, 1.34, "main_"],
+      ...[0.12, 0.27, 0.42, 0.57, 0.72, 0.87].map((x, k) => [x, 0.25, 0.08, 0.12, 0.6, 0.6, `book${(k % 4) + 1}`]),
+      ...[0.12, 0.3, 0.48].map((x, k) => [x, 0.25, 0.78, 0.15, 0.6, 0.55, `book${((k + 2) % 4) + 1}`]),
+    ],
+  },
+  robot_vacuum: {
+    // The robot vacuum that does the rounds of the floor.
+    label: "Robot vacuum", group: "pets", w: 1.25, d: 1.25, layer: "small", colors: ["black", "white", "grey"],
+    boxes: [
+      [0.15, 0, 0, 0.95, 1.25, 0.28, "main"], [0, 0.15, 0, 1.25, 0.95, 0.28, "main"],
+      [0.5, 0.5, 0.28, 0.25, 0.25, 0.03, "metal"], [0.15, 0.1, 0.18, 0.95, 0.05, 0.06, "dark"],
     ],
   },
   chest_2: {
@@ -374,6 +403,18 @@ export const CATALOG = {
   chair: {
     label: "Chair", group: "bedroom", w: 1.5, d: 1.5, layer: "solid", colors: ["oak", "coral", "teal", "white", "black"],
     boxes: [...legs(1.5, 1.5, 1.4, 0.1, 0.2, "main_"), [0.05, 0.05, 1.4, 1.4, 1.4, 0.2, "main"], [0.05, 0.05, 1.6, 1.4, 0.2, 1.5, "main"]],
+  },
+  office_chair: {
+    // The desk chair in the photo: white tufted seat and back on a black star base and wheels.
+    label: "Office chair", group: "bedroom", w: 1.75, d: 1.75, layer: "solid", colors: ["white", "black", "pink", "lilac"],
+    boxes: [
+      [0.1, 0.82, 0.08, 1.55, 0.12, 0.1, "steel"], [0.82, 0.1, 0.08, 0.12, 1.55, 0.1, "steel"],
+      ...[[0.05, 0.8], [1.55, 0.8], [0.8, 0.05], [0.8, 1.55]].map(([x, y]) => [x, y, 0, 0.15, 0.15, 0.08, "steel"]),
+      [0.8, 0.8, 0.18, 0.16, 0.16, 1.05, "metal"],
+      [0.15, 0.3, 1.23, 1.45, 1.35, 0.22, "main"],
+      ...[[0.5, 0.65], [1.1, 0.65], [0.5, 1.2], [1.1, 1.2]].map(([x, y]) => [x, y, 1.45, 0.08, 0.08, 0.02, "main_"]),
+      [0.25, 0.1, 1.6, 1.25, 0.22, 1.25, "main"], [0.75, 0.05, 0.95, 0.25, 0.08, 0.85, "steel"],
+    ],
   },
   bookshelf: {
     label: "Bookshelf", group: "living", w: 3, d: 1, layer: "solid", colors: ["oak", "white", "walnut", "teal"],
@@ -608,6 +649,18 @@ export const CATALOG = {
       [1.2, 0.05, 2.75, 0.85, 0.01, 0.75, "white"], [1.42, 0.06, 2.95, 0.4, 0.01, 0.35, "main"],
       [0.5, 0.05, 2.95, 0.4, 0.01, 0.4, "white"], [2.35, 0.05, 2.95, 0.4, 0.01, 0.4, "white"],
       ...[[0.25, 3.5], [2.85, 3.5], [0.3, 2.4], [2.8, 2.4], [1.6, 3.65]].map(([x, z]) => [x, 0.05, z, 0.1, 0.01, 0.1, "white"]),
+    ],
+  },
+  corkboard: {
+    label: "Corkboard", group: "wall", w: 1.5, d: 0.08, layer: "wall", colors: ["oak", "white", "black"],
+    boxes: [[0, 0, 2.3, 1.5, 0.05, 2.0, "main"], [0.1, 0.05, 2.4, 1.3, 0.01, 1.8, "cork"], [0.95, 0.06, 3.7, 0.08, 0.03, 0.08, "gold"]],
+  },
+  cards: {
+    // Birthday cards and letters pinned up on the wall by the Twin XL's head.
+    label: "Cards", group: "wall", w: 1.5, d: 0.06, layer: "wall", colors: ["white", "pink", "blue"],
+    boxes: [
+      [0, 0, 3.0, 0.4, 0.02, 0.5, "white"], [0.45, 0, 3.05, 0.4, 0.02, 0.45, "main"], [0.25, 0, 2.5, 0.45, 0.02, 0.45, "white"],
+      [0.75, 0, 2.45, 0.35, 0.03, 0.55, "book1"], [1.1, 0, 2.5, 0.4, 0.02, 0.5, "white"], [1.18, 0, 2.62, 0.08, 0.01, 0.08, "book2"],
     ],
   },
   floating_shelf: {
@@ -928,16 +981,21 @@ export const DEFAULT_LAYOUTS = {
     // high window above each, a lift-lid chest at the foot of the twin. Each bed is in its
     // own nook between the closet and the wall: the Twin XL's with the deep-silled window in the
     // left wall, the twin's with a little shelf on the right wall by its head and a tapestry hung
-    // over it, in front of its window. The sizes are guesses until the room is measured.
+    // over it, in front of its window. Neither bed has a headboard. A black leather storage
+    // ottoman with a bamboo tray and a little cube shelf of DVDs at the foot of hers, a corkboard
+    // by the door, cards pinned up by the Twin XL. The sizes are guesses until the room is
+    // measured.
     wall: "white", floor: "greywood",
     items: [
       W("basement_window", "white", "s", 25, 0.5), W("tapestry", "black", "s", 25, 9.75),
       W("deep_window", "white", "w", 0, 18), W("floating_shelf", "black", "e", 13, 22.75),
-      F("l_desk", "black", 0, 12), F("chair", "white", 2.5, 13.75, 2), F("shelf_3tier", "black", 5, 12),
+      F("l_desk", "walnut", 0, 12), F("office_chair", "white", 2.25, 13.75, 2), F("shelf_3tier", "black", 5, 12),
       F("desk_tv", "black", 7.5, 12), F("tall_chest", "white", 0, 15, 3), F("clothes_rack", "white", 4.75, 14),
-      F("twin_xl", "lilac", 0, 18, 2), F("platform_bed", "kitty", 9.75, 18.5, 2), F("storage_chest", "lilac", 10.25, 17.25, 2),
+      F("twin_xl", "lilac", 0, 18, 2), F("platform_bed", "kitty", 9.75, 18.5, 2), F("storage_chest", "black", 10.25, 17, 2),
+      F("cube_shelf", "black", 8.75, 17.25, 2), F("robot_vacuum", "black", 8.25, 19),
+      W("corkboard", "oak", "e", 13, 12.25), W("cards", "white", "w", 0, 22.75),
       // Her half, the twin by the door, done up dark pastel with Kuromi about the place.
-      F("skull_rug", "lilac", 5.5, 16.75), F("kuromi_bed", "black", 8, 16.5),
+      F("skull_rug", "lilac", 6.75, 16), F("kuromi_bed", "black", 5, 16.5),
       W("kuromi_poster", "lilac", "e", 13, 19.25), W("string_lights", "pink", "w", 9.75, 22.5),
     ],
   },
