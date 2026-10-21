@@ -163,10 +163,11 @@ export function builtinAt(x, y) {
 export const COLORWAYS = {
   blue: "#7fa8d8", pink: "#e7a1b6", sage: "#a8c99a", sun: "#f0c75e", lilac: "#c3b3e0", coral: "#ee8f6f",
   teal: "#5fb3b3", grey: "#a7a7b8", oak: "#c08a5c", walnut: "#7a553c", white: "#efeae2", black: "#55506a",
-  kitty: "#8e8b96",
+  kitty: "#6f6482",
 };
-// Bedding whose pillows aren't plain white: "kitty" is the twin by Bedroom 2's door, a grey
-// comforter and pink Hello Kitty pillowcases (white faces dotted over them).
+// Bedding whose pillows aren't plain white: "kitty" is the twin by Bedroom 2's door, a dusky
+// grey-plum comforter (her half of the room is dark pastel) and pink Hello Kitty pillowcases,
+// white faces dotted over them.
 export const PILLOWS = { kitty: { case: "#f3c6d6", print: "#ffffff" } };
 
 export const MATERIALS = {
@@ -174,7 +175,9 @@ export const MATERIALS = {
   glass: "#9fd3ef", leaf: "#5fae5a", leafDark: "#3f8a4a", pot: "#c8643c", screen: "#33406a", pillow: "#fffaf0", pillowPrint: "#fffaf0",
   porcelain: "#f7f7fa", water: "#8fd0ef", shade: "#ffe6a8", gold: "#e9b64a", red: "#e05d5d", food: "#c08a50",
   book1: "#d8645a", book2: "#5a8ad8", book3: "#f0c75e", book4: "#6fbf8a", frame: "#7a4f2e", sky: "#bfe3f5", pink: "#f4a6b8",
-  granite: "#cfc9bf", graniteDark: "#a39d94", hob: "#2f2b36", led: "#4f6bff",
+  granite: "#cfc9bf",
+  // Dark pastel, for her half of Bedroom 2 and its Kuromi-style pieces.
+  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", graniteDark: "#a39d94", hob: "#2f2b36", led: "#4f6bff",
 };
 
 // Boxes: [x, y, z, w, d, h, material], in feet, x across the piece and y from its back (y = 0)
@@ -337,7 +340,7 @@ export const CATALOG = {
     ],
   },
   chest_2: {
-    label: "Two-drawer chest", group: "bedroom", w: 2, d: 1.5, layer: "solid", colors: ["white", "oak", "walnut", "black"],
+    label: "Two-drawer chest", group: "bedroom", w: 2, d: 1.5, layer: "solid", colors: ["white", "oak", "walnut", "black", "lilac", "pink"],
     boxes: [
       [0, 0, 0, 2, 1.5, 2.05, "main"], [0, 0, 2.05, 2, 1.5, 0.15, "main_"],
       [0.15, 1.5, 0.2, 1.7, 0.04, 0.8, "main_"], [0.15, 1.5, 1.1, 1.7, 0.04, 0.8, "main_"],
@@ -377,6 +380,20 @@ export const CATALOG = {
     boxes: [[0, 0, 0, 2, 2, 0.25, "main_"], [0, 0, 0.25, 2, 0.35, 0.4, "main"], [0, 0.35, 0.25, 0.35, 1.65, 0.4, "main"],
       [1.65, 0.35, 0.25, 0.35, 1.65, 0.4, "main"], [0.35, 1.7, 0.25, 1.3, 0.3, 0.2, "main"], [0.35, 0.35, 0.25, 1.3, 1.35, 0.1, "pillow"]],
     spots: [[1, 1.05, 0.35]],
+    pets: true,
+  },
+  kuromi_bed: {
+    // A pet bed made like Kuromi's hood: black, the two long ears standing up at the back with
+    // pink inside, a pink skull on the front of the hood, a lavender cushion to curl up on.
+    label: "Kuromi pet bed", group: "pets", w: 2, d: 2, layer: "solid", colors: ["black", "lilac", "pink"],
+    boxes: [
+      [0, 0.3, 0, 2, 1.7, 0.45, "main"], [0.25, 0.55, 0.45, 1.5, 1.2, 0.06, "lavender"],
+      [0.1, 0, 0, 1.8, 0.35, 1.3, "main"],
+      [0.15, 0.05, 1.3, 0.4, 0.25, 0.85, "main"], [1.45, 0.05, 1.3, 0.4, 0.25, 0.85, "main"],
+      [0.25, 0.3, 1.35, 0.2, 0.01, 0.65, "candy"], [1.55, 0.3, 1.35, 0.2, 0.01, 0.65, "candy"],
+      [0.8, 0.35, 0.75, 0.4, 0.01, 0.35, "candy"], [0.88, 0.36, 0.9, 0.08, 0.01, 0.08, "kuromi"], [1.04, 0.36, 0.9, 0.08, 0.01, 0.08, "kuromi"],
+    ],
+    spots: [[1, 1.15, 0.5]],
     pets: true,
   },
   toybox: {
@@ -501,6 +518,15 @@ export const CATALOG = {
     label: "Small rug", group: "floor", w: 4, d: 3, layer: "rug", colors: ["sage", "pink", "blue", "sun", "lilac", "coral"],
     boxes: [[0, 0, 0, 4, 3, 0.05, "main"], [0.3, 0.3, 0.05, 3.4, 2.4, 0.01, "main^"]],
   },
+  skull_rug: {
+    // Lavender with a black edge and a pink skull in the middle: a dark pastel rug.
+    label: "Skull rug", group: "floor", w: 3, d: 2.5, layer: "rug", colors: ["lilac", "pink", "black"],
+    boxes: [
+      [0, 0, 0, 3, 2.5, 0.05, "kuromi"], [0.2, 0.2, 0.05, 2.6, 2.1, 0.01, "main"],
+      [1.15, 0.8, 0.06, 0.7, 0.55, 0.01, "candy"], [1.3, 1.35, 0.06, 0.4, 0.2, 0.01, "candy"],
+      [1.28, 0.95, 0.07, 0.15, 0.15, 0.01, "kuromi"], [1.57, 0.95, 0.07, 0.15, 0.15, 0.01, "kuromi"],
+    ],
+  },
   mat: {
     label: "Bath mat", group: "floor", w: 3, d: 2, layer: "rug", colors: ["blue", "pink", "sage", "white"],
     boxes: [[0, 0, 0, 3, 2, 0.06, "main"]],
@@ -575,6 +601,24 @@ export const CATALOG = {
       [0.15, 0.04, 3.1, 2.45, 0.03, 2.4, "sky"],
       [0.25, 0.2, 3.1, 0.65, 0.4, 0.25, "book1"], [0.45, 0.3, 3.35, 0.2, 0.2, 0.45, "pink"], [0.3, 0.2, 3.75, 0.55, 0.45, 0.4, "white"],
       [1.1, 0.25, 3.1, 0.55, 0.35, 0.2, "book2"], [2.0, 0.2, 3.1, 0.4, 0.4, 0.4, "water"],
+    ],
+  },
+  kuromi_poster: {
+    // Kuromi: her white face in the black jester hood, the long ears up, the pink skull on it.
+    label: "Kuromi poster", group: "wall", w: 2, d: 0.08, layer: "wall", colors: ["lilac", "pink", "black"],
+    boxes: [
+      [0, 0, 2.0, 2, 0.05, 1.9, "main"],
+      [0.45, 0.05, 2.25, 1.1, 0.01, 1.0, "kuromi"], [0.45, 0.05, 3.2, 0.28, 0.01, 0.6, "kuromi"], [1.27, 0.05, 3.2, 0.28, 0.01, 0.6, "kuromi"],
+      [0.6, 0.06, 2.3, 0.8, 0.01, 0.6, "white"], [0.9, 0.06, 3.0, 0.2, 0.01, 0.18, "candy"],
+      [0.75, 0.07, 2.62, 0.1, 0.01, 0.12, "kuromi"], [1.15, 0.07, 2.62, 0.1, 0.01, 0.12, "kuromi"], [0.95, 0.07, 2.5, 0.1, 0.01, 0.06, "candy"],
+    ],
+  },
+  string_lights: {
+    // A string of little lights in pink and lavender.
+    label: "String lights", group: "wall", w: 2.5, d: 0.15, layer: "wall", colors: ["pink", "lilac", "white"],
+    boxes: [
+      [0, 0.05, 3.8, 2.5, 0.03, 0.03, "kuromi"],
+      ...[0.15, 0.55, 0.95, 1.35, 1.75, 2.15].map((x, k) => [x, 0.03, 3.62 - (k % 2) * 0.08, 0.14, 0.12, 0.14, k % 2 ? "lavender" : "candy"]),
     ],
   },
   clock: {
@@ -866,7 +910,10 @@ export const DEFAULT_LAYOUTS = {
       W("deep_window", "white", "w", 0, 18), W("floating_shelf", "black", "e", 13, 22.75),
       F("l_desk", "black", 0, 12), F("chair", "white", 2.5, 13.75, 2), F("shelf_3tier", "black", 5, 12),
       F("desk_tv", "black", 7.5, 12), F("tall_chest", "white", 0, 15, 3), F("clothes_rack", "white", 4.75, 14),
-      F("twin_xl", "lilac", 0, 18, 2), F("bed", "kitty", 9.75, 18.5, 2), F("chest_2", "white", 10.25, 17, 2),
+      F("twin_xl", "lilac", 0, 18, 2), F("bed", "kitty", 9.75, 18.5, 2), F("chest_2", "lilac", 10.25, 17, 2),
+      // Her half, the twin by the door, done up dark pastel with Kuromi about the place.
+      F("skull_rug", "lilac", 5.5, 16.75), F("kuromi_bed", "black", 8, 16.5),
+      W("kuromi_poster", "lilac", "e", 13, 19.25), W("string_lights", "pink", "w", 9.75, 22.5),
     ],
   },
   main: {

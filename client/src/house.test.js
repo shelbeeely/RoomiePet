@@ -64,10 +64,11 @@ describe("where pets go", () => {
   test("asleep: their own bedroom, the pet bed first, then the bed", () => {
     expect(bedroomOf(0)).toBe("bedA");
     expect(bedroomOf(1)).toBe("bedB");
-    // Bedroom 2 as sketched has no pet bed: they sleep on the beds.
-    expect(sleepSpots(layouts, "bedB").every((s) => s.z > 1)).toBe(true);
-    const bedB = { ...DEFAULT_LAYOUTS.bedB, items: [...DEFAULT_LAYOUTS.bedB.items, { kind: "pet_bed", color: "pink", x: 5, y: 16, rot: 0 }] };
-    const withPetBed = allLayouts({ bedB });
+    // In Bedroom 2 the pet bed is the Kuromi one on her side; without it they sleep on the beds.
+    const bedB = { ...DEFAULT_LAYOUTS.bedB, items: DEFAULT_LAYOUTS.bedB.items.filter((i) => !CATALOG[i.kind].pets) };
+    expect(sleepSpots(allLayouts({ bedB }), "bedB").every((s) => s.z > 1)).toBe(true);
+    const withPetBed = layouts;
+    expect(layouts.bedB.items.find((i) => CATALOG[i.kind].pets).kind).toBe("kuromi_bed");
     const spots = sleepSpots(withPetBed, "bedB");
     expect(spots[0].z).toBeLessThan(1);         // in the pet bed, on the floor
     expect(spots[1].z).toBeGreaterThan(1);      // then up on the bed
