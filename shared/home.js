@@ -163,11 +163,15 @@ export function builtinAt(x, y) {
 export const COLORWAYS = {
   blue: "#7fa8d8", pink: "#e7a1b6", sage: "#a8c99a", sun: "#f0c75e", lilac: "#c3b3e0", coral: "#ee8f6f",
   teal: "#5fb3b3", grey: "#a7a7b8", oak: "#c08a5c", walnut: "#7a553c", white: "#efeae2", black: "#55506a",
+  kitty: "#8e8b96",
 };
+// Bedding whose pillows aren't plain white: "kitty" is the twin by Bedroom 2's door, a grey
+// comforter and pink Hello Kitty pillowcases (white faces dotted over them).
+export const PILLOWS = { kitty: { case: "#f3c6d6", print: "#ffffff" } };
 
 export const MATERIALS = {
   wood: "#b07a4a", woodDark: "#7a4f2e", white: "#f4efe6", cream: "#efe2c8", metal: "#b8c0cc", dark: "#3b3049",
-  glass: "#9fd3ef", leaf: "#5fae5a", leafDark: "#3f8a4a", pot: "#c8643c", screen: "#33406a", pillow: "#fffaf0",
+  glass: "#9fd3ef", leaf: "#5fae5a", leafDark: "#3f8a4a", pot: "#c8643c", screen: "#33406a", pillow: "#fffaf0", pillowPrint: "#fffaf0",
   porcelain: "#f7f7fa", water: "#8fd0ef", shade: "#ffe6a8", gold: "#e9b64a", red: "#e05d5d", food: "#c08a50",
   book1: "#d8645a", book2: "#5a8ad8", book3: "#f0c75e", book4: "#6fbf8a", frame: "#7a4f2e", sky: "#bfe3f5", pink: "#f4a6b8",
   granite: "#cfc9bf", graniteDark: "#a39d94", hob: "#2f2b36", led: "#4f6bff",
@@ -187,10 +191,11 @@ const legs = (w, d, h, inset = 0.1, s = 0.25, mat = "wood") => [
 
 export const CATALOG = {
   bed: {
-    label: "Bed", group: "bedroom", w: 3.5, d: 6.5, layer: "solid", colors: ["blue", "pink", "sage", "lilac", "sun", "grey"],
+    label: "Bed", group: "bedroom", w: 3.5, d: 6.5, layer: "solid", colors: ["blue", "pink", "sage", "lilac", "sun", "grey", "kitty"],
     boxes: [
       [0, 0, 0, 3.5, 0.3, 2.8, "wood"], [0, 0.3, 0, 3.5, 6.2, 1.1, "wood"],
       [0.1, 0.3, 1.1, 3.3, 1.9, 0.6, "white"], [0.5, 0.45, 1.7, 2.5, 1.0, 0.35, "pillow"],
+      ...[[0.8, 0.6], [1.5, 0.95], [2.3, 0.6], [1.15, 1.25], [2.55, 1.15]].map(([x, y]) => [x, y, 2.05, 0.18, 0.15, 0.01, "pillowPrint"]),
       [0.05, 2.2, 1.1, 3.4, 4.25, 0.7, "main"], [0.05, 2.2, 1.8, 3.4, 0.45, 0.08, "main^"],
     ],
     spots: [[1.2, 4.2, 1.8], [2.4, 4.8, 1.8], [1.75, 3.2, 1.8]],
@@ -861,7 +866,7 @@ export const DEFAULT_LAYOUTS = {
       W("deep_window", "white", "w", 0, 18), W("floating_shelf", "black", "e", 13, 22.75),
       F("l_desk", "black", 0, 12), F("chair", "white", 2.5, 13.75, 2), F("shelf_3tier", "black", 5, 12),
       F("desk_tv", "black", 7.5, 12), F("tall_chest", "white", 0, 15, 3), F("clothes_rack", "white", 4.75, 14),
-      F("twin_xl", "lilac", 0, 18, 2), F("bed", "grey", 9.75, 18.5, 2), F("chest_2", "white", 10.25, 17, 2),
+      F("twin_xl", "lilac", 0, 18, 2), F("bed", "kitty", 9.75, 18.5, 2), F("chest_2", "white", 10.25, 17, 2),
     ],
   },
   main: {

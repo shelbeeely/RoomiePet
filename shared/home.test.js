@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import {
-  CATALOG, DEFAULT_LAYOUTS, DOORS, FLAT, FLOORS, GRID, MATERIALS, MAX_ITEMS, ROOMS, WALLPAPERS,
+  CATALOG, DEFAULT_LAYOUTS, DOORS, FLAT, FLOORS, GRID, MATERIALS, MAX_ITEMS, PILLOWS, ROOMS, WALLPAPERS,
   bounds, cleanLayout, footprint, freeSpot, layoutProblem, place, roomAt, turned, wallSpotNear, wallsOf,
 } from "./home.js";
 
@@ -184,6 +184,9 @@ describe("room to live in", () => {
     expect(overlapping(footprint(chair), footprint(desk))).toBe(true);
     expect(layoutProblem("bedB", { ...l, items: l.items.map((i) => (i === chair ? { ...i, x: 0.25 } : i)) })).toMatch(/overlaps the l-desk/);
     expect(layoutProblem("bedB", { ...l, items: l.items.map((i) => (i === chair ? { ...i, y: 12.5 } : i)) })).toMatch(/overlaps the l-desk/);
+    // The twin by the door: grey comforter, pink Hello Kitty pillowcases.
+    expect(beds.find((b) => b.kind === "bed").color).toBe("kitty");
+    expect(PILLOWS.kitty.case).toMatch(/^#/);
     // The clothes rack rolls about: it is a piece like any other.
     expect(l.items.some((i) => i.kind === "clothes_rack")).toBe(true);
     for (const kind of ["shelf_3tier", "desk_tv"]) expect(at(kind).y0, kind).toBe(room.y0);

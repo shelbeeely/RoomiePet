@@ -4,7 +4,7 @@
 // Every change is checked as shared/home.js checks it on the server, so what
 // can be saved is what the room shows.
 import { useEffect, useRef, useState } from "react";
-import { CATALOG, COLORWAYS, FLOORS, GRID, ROOMS, WALLPAPERS, freeSpot, layoutProblem, turned } from "@shared/home.js";
+import { CATALOG, COLORWAYS, FLOORS, PILLOWS, GRID, ROOMS, WALLPAPERS, freeSpot, layoutProblem, turned } from "@shared/home.js";
 import { dollCamera, pieceSprite } from "./dollhouse.js";
 
 const GROUPS = [
@@ -98,7 +98,7 @@ export default function RoomBuilder({ edit, saving, onChange, onSelect, onUndo, 
             <div className="swatches" role="radiogroup" aria-label="Colour">
               {pc.colors.map((c) => (
                 <button key={c} role="radio" aria-checked={picked.color === c} aria-label={c} title={c}
-                  className={`swatch${picked.color === c ? " on" : ""}`} style={{ background: COLORWAYS[c] }}
+                  className={`swatch${picked.color === c ? " on" : ""}`} style={{ background: PILLOWS[c] ? `linear-gradient(135deg, ${COLORWAYS[c]} 55%, ${PILLOWS[c].case} 55%)` : COLORWAYS[c] }}
                   onClick={() => onChange({ ...draft, items: draft.items.map((it, k) => (k === sel ? { ...it, color: c } : it)) })} />
               ))}
             </div>

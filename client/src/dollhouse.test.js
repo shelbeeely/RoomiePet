@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { CUTAWAY, dollCamera, order, pieceBox, wallPieceBox } from "./dollhouse.js";
+import { CUTAWAY, colorOf, dollCamera, order, pieceBox, wallPieceBox } from "./dollhouse.js";
 
 describe("the dollhouse's drawing order", () => {
   const window = { kind: "window", color: "white", side: "n", line: 0, at: 4.5 };
@@ -33,6 +33,14 @@ describe("an L-desk, its arms in order on their own", () => {
     // seen from the left, that arm is in front of it.
     const sides = [1, 3].map((rot) => names(rot).indexOf("left arm") < names(rot).indexOf("chair"));
     expect(sides.sort()).toEqual([false, true]);
+  });
+});
+
+describe("bedding", () => {
+  test("the kitty bed has pink pillowcases with white faces; other beds white pillows", () => {
+    expect(colorOf("pillow", { color: "kitty" })).toEqual([0xf3, 0xc6, 0xd6]);
+    expect(colorOf("pillowPrint", { color: "kitty" })).toEqual([255, 255, 255]);
+    expect(colorOf("pillow", { color: "blue" })).toEqual(colorOf("pillowPrint", { color: "blue" }));
   });
 });
 

@@ -9,7 +9,7 @@
 //
 // Everything is in scene pixels, 16 to the foot; the canvas scales them up.
 import {
-  CATALOG, COLORWAYS, DOORS, FLAT, FLOORS, MATERIALS, ROOMS, WALLPAPERS, boxesOf, bounds, partsOf, roomAt, wallsOf,
+  CATALOG, COLORWAYS, DOORS, FLAT, FLOORS, MATERIALS, PILLOWS, ROOMS, WALLPAPERS, boxesOf, bounds, partsOf, roomAt, wallsOf,
 } from "@shared/home.js";
 
 export const PX = 16;
@@ -57,6 +57,9 @@ export function colorOf(mat, item) {
     if (mat.endsWith("_")) return mul(base, 0.8);
     return base;
   }
+  const bedding = PILLOWS[item.color];
+  if (bedding && mat === "pillow") return rgb(bedding.case);
+  if (bedding && mat === "pillowPrint") return rgb(bedding.print);
   return rgb(MATERIALS[mat] || "#ff00ff");
 }
 
