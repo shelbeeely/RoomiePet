@@ -299,12 +299,21 @@ function screenBounds(boxes, cam) {
   return [x0, y0, x1, y1];
 }
 
-/** Back to front: a box goes after every box it is in front of. */
+/**
+ * Back to front: a box goes after every box it is in front of -- among those it overlaps on the
+ * screen. Ordering two that don't overlap only adds rules, and rules between far-apart boxes
+ * chained into loops: on the 3-tier shelf a pole at the top back went before one at the bottom
+ * front, which went before the bottom shelf, ... until the pots came before the shelf they
+ * stand on and it was drawn over them.
+ */
 export function order(units, cam, key = (u) => u) {
   const n = units.length;
   const after = Array.from({ length: n }, () => []);
+  const rects = units.map((u) => screenBounds([key(u)], cam));
+  const apart = (r, q) => r[2] <= q[0] + 0.01 || q[2] <= r[0] + 0.01 || r[3] <= q[1] + 0.01 || q[3] <= r[1] + 0.01;
   for (let i = 0; i < n; i++) {
     for (let j = i + 1; j < n; j++) {
+      if (apart(rects[i], rects[j])) continue;
       const a = key(units[i]);
       const b = key(units[j]);
       if (cam.behind(a, b)) after[j].push(i);

@@ -60,6 +60,22 @@ describe("pieces drawn sharp", () => {
   });
 });
 
+describe("things on shelves", () => {
+  test("go after the shelf they stand on, from every side, however many there are", () => {
+    const shelf = { kind: "shelf_3tier", color: "black", x: 5, y: 15, rot: 0 };
+    for (const hd of [false, true]) {
+      const boxes = boxesOf(shelf, hd);
+      const mid = boxes.find((b) => b.mat === "main" && Math.abs(b.z0 - 2.0) < 1e-6);
+      const onIt = boxes.filter((b) => b.mat === "lushPot" && b.z0 > 2.05 && b.z0 < 2.2);
+      expect(onIt.length).toBeGreaterThan(0);
+      for (const rot of [0, 1, 2, 3]) {
+        const drawn = order(boxes, dollCamera("bedB", rot));
+        for (const pot of onIt) expect(drawn.indexOf(pot), `rot ${rot}`).toBeGreaterThan(drawn.indexOf(mid));
+      }
+    }
+  });
+});
+
 describe("bedding", () => {
   test("the kitty bed has pink pillowcases with white faces; other beds white pillows", () => {
     expect(colorOf("pillow", { color: "kitty" })).toEqual([0xf3, 0xc6, 0xd6]);

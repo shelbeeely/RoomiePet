@@ -179,7 +179,7 @@ export const MATERIALS = {
   book1: "#d8645a", book2: "#5a8ad8", book3: "#f0c75e", book4: "#6fbf8a", frame: "#7a4f2e", sky: "#bfe3f5", pink: "#f4a6b8",
   granite: "#cfc9bf",
   // Dark pastel, for the door half of Bedroom 2 and its Kuromi-style pieces.
-  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", fabric: "#cfccc8", fabricDark: "#a9a5a1", dock: "#dcd9d5", dockPad: "#f4f2ef", clockBezel: "#141418", clockBlue: "#3c74d4", hood: "#57516a", ink: "#0e0c12", inkHood: "#2a2630", blush: "#eda9cb",
+  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", lushPot: "#141414", lushKraft: "#c9a57a", lushGreen: "#5aa66a", lushBottle: "#f2f0ea", sun: "#efc23a", fabric: "#cfccc8", fabricDark: "#a9a5a1", dock: "#dcd9d5", dockPad: "#f4f2ef", clockBezel: "#141418", clockBlue: "#3c74d4", hood: "#57516a", ink: "#0e0c12", inkHood: "#2a2630", blush: "#eda9cb",
   bondi: "#3fb6c4", bondiDark: "#24808e", bondiLight: "#8fe0e8", ice: "#e8eef0",
   sheet: "#8f8c98", cork: "#c9a27a", graniteDark: "#a39d94", hob: "#2f2b36", led: "#4f6bff",
 };
@@ -473,6 +473,56 @@ function cubeBoxes(item, hd) {
 }
 
 /**
+ * Her things from Lush, on the 3-tier shelf as in the photo of it: on top the kraft-paper gift
+ * bag with LUSH across it in big black letters, a green bag behind; on the middle shelf the
+ * black pots with their white labels, a white Dream Cream bottle with its black cap and a pink
+ * bath bomb; on the bottom more pots, a bar of soap wrapped in paper, a blue and a yellow bath
+ * bomb. Drawn sharp (px half a pixel), the labels carry lines of print and the bag its letters.
+ */
+function lushShelf(px) {
+  const sharp = px < PIX;
+  const out = [];
+  const label = (x, y, z, w, h) => {
+    out.push([x, y, z, w, 0.005, h, "white"]);
+    if (sharp) for (let k = 0; k < 2; k += 1) out.push([x + px, y + 0.004, z + h - (k + 1.5) * px * 1.4, w - 2 * px, 0.003, px * 0.7, "ink"]);
+  };
+  const pot = (x, z, w, h) => {                                           // a black Lush pot
+    out.push([x, 0.55, z, w, w, h, "lushPot"], [x - 0.01, 0.54, z + h, w + 0.02, w + 0.02, 0.04, "lushPot"]);
+    label(x + 0.03, 0.55 + w, z + h * 0.25, w - 0.06, h * 0.5);
+  };
+  const bomb = (x, z, r, mat) => {                                         // a bath bomb, round as the pixels allow
+    out.push([x, 0.6, z, r, r, r, mat], [x - 0.02, 0.62, z + 0.03, r + 0.04, r - 0.04, r - 0.06, mat],
+      [x + 0.02, 0.62, z + r, r - 0.04, r - 0.04, 0.02, mat]);
+  };
+  // The top: the gift bag and the green one behind it.
+  const zt = 3.68;
+  out.push([1.05, 0.2, zt, 0.75, 0.4, 0.62, "lushGreen"], [1.1, 0.6, zt + 0.42, 0.65, 0.005, 0.06, "ink"]);
+  out.push([0.18, 0.35, zt, 0.95, 0.45, 0.72, "lushKraft"],
+    [0.3, 0.55, zt + 0.72, 0.03, 0.03, 0.1, "lushPot"], [0.98, 0.55, zt + 0.72, 0.03, 0.03, 0.1, "lushPot"]);   // its handles
+  if (sharp) {
+    out.push(...pixelArt([
+      "#...#.#..##.#.#",
+      "#...#.#.#...#.#",
+      "#...#.#..#..###",
+      "#...#.#...#.#.#",
+      "###.###.##..#.#",
+    ], { "#": "lushPot" }, [0.42, 0.805, zt + 0.5], 0.004, px));
+  } else out.push([0.3, 0.805, zt + 0.3, 0.35, 0.004, 0.2, "lushPot"], [0.72, 0.805, zt + 0.15, 0.3, 0.004, 0.25, "lushPot"]);
+  // The middle shelf.
+  const zm = 2.08;
+  pot(0.15, zm, 0.26, 0.22); pot(0.48, zm, 0.22, 0.3); pot(0.78, zm, 0.2, 0.18);
+  out.push([1.08, 0.5, zm, 0.16, 0.16, 0.48, "lushBottle"], [1.12, 0.54, zm + 0.48, 0.08, 0.08, 0.08, "lushPot"]);   // Dream Cream
+  label(1.1, 0.66, zm + 0.12, 0.12, 0.2);
+  bomb(1.45, zm, 0.24, "candy");
+  // The bottom shelf.
+  const zb = 0.48;
+  pot(0.15, zb, 0.24, 0.26); pot(0.46, zb, 0.2, 0.2);
+  out.push([0.75, 0.5, zb, 0.36, 0.26, 0.14, "lushKraft"], [0.75, 0.76, zb + 0.05, 0.36, 0.005, 0.04, "lushGreen"]);   // soap in paper
+  bomb(1.2, zb, 0.22, "water"); bomb(1.5, zb, 0.2, "sun");
+  return out;
+}
+
+/**
  * A Lenovo Smart Clock 2 in its charging dock, from the pictures of it: the dock a long, low,
  * speckled pale-grey tray along the shelf from [u, v, z] (v out from the wall), the clock at its
  * left end and the wireless charging pad, marked with a +, at its right; a white light where the
@@ -636,15 +686,19 @@ export const CATALOG = {
     ],
   },
   shelf_3tier: {
-    // As in the photo of Bedroom 2: three dark shelves on four silver poles, as tall as the TV
-    // beside it, a bag on top.
+    // As in the photo of Bedroom 2: three dark smoked-glass shelves on four silver poles, as tall
+    // as the TV beside it, and on them all her things from Lush (see lushShelf). Drawn sharp, so
+    // the pots' labels and the bag's lettering show.
     label: "3-tier shelf", group: "bedroom", w: 2, d: 1.25, layer: "solid", colors: ["black", "white", "oak", "walnut"],
-    boxes: [
-      ...[[0.05, 0.05], [1.8, 0.05], [0.05, 1.05], [1.8, 1.05]].map(([x, y]) => [x, y, 0, 0.15, 0.15, 4.2, "metal"]),
+    boxesFor: (item, hd) => [
+      // The poles a section between each shelf and the next: one pole the shelf's height stood
+      // both in front of the pots and below the shelf they're on, and they went in the wrong order.
+      ...[[0.05, 0.05], [1.8, 0.05], [0.05, 1.05], [1.8, 1.05]].flatMap(([x, y]) =>
+        [[0, 0.4], [0.48, 2.0], [2.08, 3.6], [3.68, 4.2]].map(([z0, z1]) => [x, y, z0, 0.15, 0.15, z1 - z0, "metal"])),
       ...[0.4, 2.0, 3.6].map((z) => [0, 0, z, 2, 1.25, 0.08, "main"]),
-      [0.25, 0.3, 0.48, 0.5, 0.7, 0.85, "book1"], [0.8, 0.3, 0.48, 0.3, 0.7, 0.75, "book3"], [1.15, 0.3, 0.48, 0.5, 0.7, 0.8, "book2"],
-      [0.3, 0.2, 2.08, 1.4, 0.9, 0.5, "cream"], [0.3, 0.3, 3.68, 0.9, 0.6, 0.8, "leaf"],
+      ...lushShelf(hd ? PIX / 2 : PIX),
     ],
+    hd: true,
   },
   clothes_rack: {
     // A rolling garment rail, as in the photos of Bedroom 2: it gets wheeled about the room, so
