@@ -179,7 +179,7 @@ export const MATERIALS = {
   book1: "#d8645a", book2: "#5a8ad8", book3: "#f0c75e", book4: "#6fbf8a", frame: "#7a4f2e", sky: "#bfe3f5", pink: "#f4a6b8",
   granite: "#cfc9bf",
   // Dark pastel, for the door half of Bedroom 2 and its Kuromi-style pieces.
-  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", pillowGrey: "#7d7a86", plaidLav: "#b5abd6", plaidBlue: "#a3c0dc", plaidGrey: "#8f8a99", fawnFur: "#b47a40", fawnDark: "#8a5a2c", fawnLight: "#efdcc0", fawnEar: "#d9bf9a", hornGrey: "#7a7e88", cheek: "#ee8f86", sageBlanket: "#d6e4bc", ginghamMid: "#a9c48a", ginghamDark: "#4f6e48", plushBlue: "#3b8db8", knitGreen: "#3d7a58", monsterBlue: "#3a9ad8", purpleCan: "#5b3a8a", stanley: "#ebe3d6", candleJar: "#efe8dc", amberPill: "#e8902a", glassGreen: "#2f8f5a", coasterPink: "#eaa3ac", stickerBox: "#f2a28c", silverBook: "#c8c8c4", twix: "#c0392b", lushPot: "#141414", lushKraft: "#c9a57a", lushGreen: "#5aa66a", lushBottle: "#f2f0ea", sun: "#efc23a", fabric: "#cfccc8", fabricDark: "#a9a5a1", dock: "#dcd9d5", dockPad: "#f4f2ef", clockBezel: "#141418", clockBlue: "#3c74d4", hood: "#57516a", ink: "#0e0c12", inkHood: "#2a2630", blush: "#eda9cb",
+  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", pillowGrey: "#7d7a86", plaidLav: "#b5abd6", plaidBlue: "#a3c0dc", plaidGrey: "#8f8a99", fawnFur: "#b47a40", fawnFurLight: "#c48b51", fawnFurDark: "#a06c36", fawnDark: "#8a5a2c", fawnEarRim: "#c9ab83", hornLight: "#a2a6ae", pawSheen: "#3a3638", eyeRing: "#c3c9d4", cheekLight: "#f6b4ab", fawnLight: "#efdcc0", fawnEar: "#d9bf9a", hornGrey: "#7a7e88", cheek: "#ee8f86", sageBlanket: "#d6e4bc", ginghamMid: "#a9c48a", ginghamDark: "#4f6e48", plushBlue: "#3b8db8", knitGreen: "#3d7a58", monsterBlue: "#3a9ad8", purpleCan: "#5b3a8a", stanley: "#ebe3d6", candleJar: "#efe8dc", amberPill: "#e8902a", glassGreen: "#2f8f5a", coasterPink: "#eaa3ac", stickerBox: "#f2a28c", silverBook: "#c8c8c4", twix: "#c0392b", lushPot: "#141414", lushKraft: "#c9a57a", lushGreen: "#5aa66a", lushBottle: "#f2f0ea", sun: "#efc23a", fabric: "#cfccc8", fabricDark: "#a9a5a1", dock: "#dcd9d5", dockPad: "#f4f2ef", clockBezel: "#141418", clockBlue: "#3c74d4", hood: "#57516a", ink: "#0e0c12", inkHood: "#2a2630", blush: "#eda9cb",
   bondi: "#3fb6c4", bondiDark: "#24808e", bondiLight: "#8fe0e8", ice: "#e8eef0",
   sheet: "#8f8c98", cork: "#c9a27a", graniteDark: "#a39d94", hob: "#2f2b36", led: "#4f6bff",
 };
@@ -207,7 +207,7 @@ function pixelArt(rows, palette, [u, v, z], depth = 0.01, px = PIX) {
   rows.forEach((row, r) => {
     for (let c = 0; c < row.length;) {
       let e = c;
-      while (e < row.length && row[e] === row[c]) e += 1;
+      while (e < row.length && palette[row[e]] === palette[row[c]]) e += 1;
       if (palette[row[c]]) out.push([u + c * px, v, z - (r + 1) * px, (e - c) * px, depth, px, palette[row[c]]]);
       c = e;
     }
@@ -529,71 +529,167 @@ function chestTop(z) {
   return out;
 }
 
+// Her bunny's pixel art: as the bed is drawn (sharp, a pixel 1/32 ft), and at twice that again
+// for the 4x canvas the bed has of its own -- the same drawing, each pixel doubled, with only
+// the fine things added: strands in her fur, the eyes' silver-ringed lights and sad lids, the
+// stitched nose, a smooth swirl and smile, the shading inside her ears, light on her horns,
+// the sheen on her paws and hooves.
+const BUNNY_2X = [
+  "..................................",
+  "..........HH..........HH..........",
+  ".........HHH..DDDDDD..HHH.........",
+  "........DHHHDDFFFFFFDDHHHD........",
+  "........DFHHFFFFFFFFFFHHFD........",
+  ".......DFDDFFFFFFFFFFFFDDFD.......",
+  ".......DDDFFFFFFFFFFFFFFDDD.......",
+  ".......DDFFFFFFFFFFFFFFFFDD.......",
+  ".......DDFFFFFFFFFFFFFFFFDD.......",
+  "......DDFFFFFFCCCCCCFFFFFFDD......",
+  "......DDFFFFCCCCCCCCCCFFFFDD......",
+  "......DDFFFCKKCCCCCCKKCFFFDD......",
+  "......DDFFCKWWKCCCCKWWKCFFDD......",
+  ".....DFDFFCKWWKCCCCKWWKCFFDFD.....",
+  ".....DFEDFCKKKKCCCCKKKKCFDEFD.....",
+  ".....DFEDFCKKKWCCCCKKKWCFDEFD.....",
+  "....DFFEDDFCCCCCKKCCCCCFDDEFFD....",
+  "....DFEEEPPCCDDDCKDDDCCPPEEEFD....",
+  "....DFEEEDDDDBBBCCBBBDDDDEEEFD....",
+  "....DFEEDDFFBBBBDDBBBBFFDDEEFD....",
+  "...DFFEEDFFFBBBBDDBBBBFFFDEEFFD...",
+  "...DFEEEDFFFDBBBDDBBBDFFFDEEEFD...",
+  "...DFEEEDFFFFDBDFFDBDFFFFDEEEFD...",
+  "...DFEEEFDDDDDFFKKKFDDDDDFEEEFD...",
+  "..DFEEEEFFDFFFFKFFFKFFFDFFEEEEFD..",
+  "..DFEEEEFDDFFFFKFKFKFFFDDFEEEEFD..",
+  "..DFEEEEFDFFFFFKCCKFFFFFDFEEEEFD..",
+  ".DFFEEEEFDFFFFCCKCCCFFFFDFEEEEFFD.",
+  ".DFEEEEEFDFFFCKCCCCKCFFFDFEEEEEFD.",
+  ".DFEEEEEFDDFFCCKKKKCCFFDDFEEEEEFD.",
+  ".DFEEEEEFDDFCCCCCCCCCCFDDFEEEEEFD.",
+  ".DFFFFFFD.DDFCCCCCCCCFDD.DFFFFFFD.",
+  "..DFFFD...DDDCCCCCCCCDDD...DFFFD..",
+  "...DFD....DFDDCCCCCCDDFD....DFD...",
+  "..........DFFFDDCCDDFFFD..........",
+  "..........DFFFFFDDFFFFFD..........",
+  "..........DFVVVFDDFVVVFD..........",
+  "...........VVVVV..VVVVV...........",
+  "...........VVVVV..VVVVV...........",
+  "............VVV....VVV............",
+];
+const BUNNY_4X = [
+  "....................................................................",
+  "....................................................................",
+  "....................hhhh....................hhhh....................",
+  "....................hhhh....................hhhh....................",
+  "..................hhhhhh....DDDDDDDDDDDD....hhhhhh..................",
+  "..................hhhhhh....DDDDDDDDDDDD....hhhhhh..................",
+  "................DDhhhhhhDDDDFFGFFFFFFFFFDDDDhhhhhhDD................",
+  "................DDhhhhhhDDDDFFGFFFFFFFFFDDDDhhhhhhDD................",
+  "................DDFFhhhhFFFFFFFFFFFFFFFFFFFFhhhhFFDD................",
+  "................DDFFhhhhFLFFFFGFFFFFFFFFFLFFhhhhFFDD................",
+  "..............DDFFDDDDFLFLFFFLGFGFFFFLFFFLFFFLDDDDFFDD..............",
+  "..............DDFFDDDDFLFFFFFLFFGFFFFLFFFFFFGLDDDDFFDD..............",
+  "..............DDDDDDFFFFFFFFFFFFFFFFFFFLFFFFGFFFDDDDDD..............",
+  "..............DDDDDDFFFFLFFFFFFFFFFFGFFLFFFFFFFFDDDDDD..............",
+  "..............DDDDFFFFFFLFFFFFFFFLFFGFFFFFFFFLFFFFDDDD..............",
+  "..............DDDDFFGFFLFFFFFFFFFLFLFGFFFFFFFLFFFFDDDD..............",
+  "..............DDDDGFGFFLFFFLGFFFFFFLFGFFFGFGFFFFFFDDDD..............",
+  "..............DDDDGFFFFFFFFLGFFFFFFFFFFFFGFGFFFFFFDDDD..............",
+  "............DDDDFFFFFFFFFFFFCCCCCCCCCCCCFGFFFFFFFLFFDDDD............",
+  "............DDDDFFFFFFFFFFFFCCCCCCCCCCCCFGFFFFFFFLFFDDDD............",
+  "............DDDDFFFFFFFFCCCCCCKCCCCCCKCCCCCCFFFFFFFFDDDD............",
+  "............DDDDLFFFFFFFCKKKKKKCCCCCCKKKKKKCFFFFFFFFDDDD............",
+  "............DDDDLFFFFKKKKKKKKKCCCCCCCCKKKKKKKKKFFFFFDDDD............",
+  "............DDDDFFFFKKKKKSKKKCCCCCCCCCCSSSKKKKKKFFFFDDDD............",
+  "............DDDDFFFFKCSWWWSKKKCCCCCCCCSWWWSKKKCKFFFFDDDD............",
+  "............DDDDFGFFCCSWWWSKKKCCCCCCCCSWWWSKKKCCFFFFDDDD............",
+  "..........DDFFDDFGFFCKKSWSKKKKKCCCCCCKKSWSKKKKKCFFFFDDFFDD..........",
+  "..........DDFFDDFFFFCKKKSKKKKKKCCCCCCKKKSKKKKKKCFFFFDDFLDD..........",
+  "..........DDLFeeDDLFCKKKKKKKKKKCCCCCCKKKKKKKKKKCFFDDeeLLDD..........",
+  "..........DDLFeeDDLFCCKKKKKKKKCCCCCCCCKKKKKKKKCCFFDDeeLFDD..........",
+  "..........DDFFeeDDFFCCKKKKKWWKCCCCCCCCKKKKKWWKCCFFDDeeFFDD..........",
+  "..........DDFFeeDDFFCCKKKKKWKWCCCCCCCCKKKKKWKWCCFFDDeeFFDD..........",
+  "........DDFFFFeeDDDDFFCCKKKKCCCCKKKKCCCCKKKKCCFFDDDDeeFFFFDD........",
+  "........DDFFFFeeDDDDPPCCCCCCCCCCCKKCCCCCCCCCCCPPDDDDeeFFFFDD........",
+  "........DDFFeEEEEEPpPPPCCCDDDDDDCKCCDDDDDDCCCPpPPPEEEEEeFFDD........",
+  "........DDFFeEEEEEPPPPPPCCDDDDDDKKKCDDDDDDCCPPPPPPEEEEEeFFDD........",
+  "........DDFFeEEEEeDDDDDDDDBbbbbBCCCCBbbbbBDDDDDDDDeEEEEeFFDD........",
+  "........DDFFeEEEEeDDDDDDDDBBBBBBCCCCBBBBBBDDDDDDDDeEEEEeFFDD........",
+  "........DDFFeEEeDDDDLFFFBbBBBBBBDDDDBBBBBBbBFFFFDDDDeEEeFFDD........",
+  "........DDFFeEEeDDDDLFFLBBBBBBBBDDDDBBBBBBBBFFFFDDDDeEEeFFDD........",
+  "......DDFFFFeEEeDDFFFFFLBBBBBBBBDDDDBBBBBBBBFFFFLLDDeEEeFFFFDD......",
+  "......DDFFFFeEEeDDGFFGFFBBBBBBBBDDDDBBBBBBBBFFFFLLDDeEEeFFFFDD......",
+  "......DDFFeEEEEeDDGFFGGFDDBBBBBBDDDDBBBBBBDDFFFFFFDDeEEEEeFLDD......",
+  "......DDFFeEEEEeDDFFFFGFDDBBBBBBDDDDBBBBBBDDFFFFLFDDeEEEEeGLDD......",
+  "......DDLGeEEEEeDDFFFLFGFGDDBBDDKFFFDDBBDDFFFFFFLFDDeEEEEeGFDD......",
+  "......DDLGeEEEEeDDFFFLFGFGDDBBDKKFFFDDBBDDFFFFFFFFDDeEEEEeFFDD......",
+  "......DDLFeEEEEeFFDDDDDDDDDDFFKFFFFFFFFFDDDDDDDDDDFLeEEEEeFFDD......",
+  "......DDLFeEEEEeFFDDDDDDDDDDFKKFFKKKKFFFDDDDDDDDDDFLeEEEEeFFDD......",
+  "....DDFFeEEEEEEeFFFFDDFFFFFFFKFFKKFFKKFFFFFFFFDDFFGFeEEEEEEeFFDD....",
+  "....DDFFeEEEEEEeFFFFDDFFGFFFFKFFKLFFFKFFFFFFFFDDFFGFeEEEEEEeFFDD....",
+  "....DDFFeEEEEEEeFFDDDDFLGFFFFKFFKKKKFKFFFFFFFFDDDDFFeEEEEEEeFFDD....",
+  "....DDFFeEEEEEEeLFDDDDFLFFFFFKKFFKKFFKFFFFFFFFDDDDFFeEEEEEEeFFDD....",
+  "....DDFFeEEEEEEeLFDDFFFFFFFFFFKFCCCCKKFFFFFFFFFGDDFFeEEEEEEeFLDD....",
+  "....DDFLeEEEEEEeFFDDFFFFLFFFFFFKKCCKKFFFGFFFGFFGDDLFeEEEEEEeFLDD....",
+  "..DDFFFLeEEEEEEeFFDDFFFFLFFFCCCCKKKKCCCCGFFFGLLFDDLFeEEEEEEeFFFFDD..",
+  "..DDFFFFeEEEEEEeFFDDFFFFFFFFCCCCFFCCCCCCFFFFFLLFDDFFeEEEEEEeFFFFDD..",
+  "..DDFFeEEEEEEEEeFFDDFFFFFFCKFFCCCCCCCCFFCKFFFFLFDDFFeEEEEEEEEeFFDD..",
+  "..DDFFeEEEEEEEEeFFDDFFFFFFCKFFCCCCCCCCFFCKFFFFLFDDFFeEEEEEEEEeFFDD..",
+  "..DDFFeEEEEEEEEeFFDDDDFFFFCCKKFFFFFFFFCKKCLFFFDDDDFFeEEEEEEEEeFFDD..",
+  "..DDFFeEEEEEEEEeFFDDDDLFFFCCCCKKKKKKKKKCCCLFFFDDDDFGeEEEEEEEEeFFDD..",
+  "..DDFFeEEEEEEEEeFFDDDDLLCCCCCCCCCCCCCCCCCCCCGFDDDDFGeEEEEEEEEeFFDD..",
+  "..DDFFeEEEEEEEEeFFDDDDFLCCCCCCCCCCCCCCCCCCCCGFDDDDFFeEEEEEEEEeLFDD..",
+  "..DDFFFFFFFFFFFFDD..DDDDFFCCCCCCCCCCCCCCCCFFDDDD..DDFLFFFFFFFFLFDD..",
+  "..DDFFFFFFFFFFFFDD..DDDDFFCCCCCCCCCCCCCCCCFFDDDD..DDFLFFFFFFFFFFDD..",
+  "....DDFFFFFFDD......DDDDDDCCCCCCCCCCCCCCCCDDDDDD......DDFFFLFFDD....",
+  "....DDFFFLFFDD......DDDDDDCCCCCCCCCCCCCCCCDDDDDD......DDFFLLFFDD....",
+  "......DDFLDD........DDFFDDDDCCCCCCCCCCCCDDDDFFDD........DDLFDD......",
+  "......DDFFDD........DDFFDDDDCCCCCCCCCCCCDDDDFFDD........DDFFDD......",
+  "....................DDFFLFFFDDDDCCCCDDDDFFFFFFDD....................",
+  "....................DDFFLLFFDDDDCCCCDDDDFFFFLGDD....................",
+  "....................DDFFFLFFFFFFDDDDFFFFFFFFLGDD....................",
+  "....................DDFGFFFFFFFFDDDDFFFFFFFFFFDD....................",
+  "....................DDFGVvvvvVFFDDDDFFVvvvvVFFDD....................",
+  "....................DDFFVVVVVVFFDDDDFFVVVVVVFFDD....................",
+  "......................VvVVVVVVvV....VvVVVVVVvV......................",
+  "......................VVVVVVVVVV....VVVVVVVVVV......................",
+  "......................VVVVVVVVVV....VVVVVVVVVV......................",
+  "......................VVVVVVVVVV....VVVVVVVVVV......................",
+  "........................VVVVVV........VVVVVV........................",
+  "........................VVVVVV........VVVVVV........................",
+];
+
 /**
  * Her bunny: the Plushie Dreadfuls fawn bunny, from its photos (and the brown one in the photo of
  * the bed, taken at first for a lion). Spotted fawn fur, the long ears hanging from the top of her
  * head down past her arms with their beige insides towards us, little grey horns, a cream face
- * and tummy with the black swirl, big sad black eyes, pink cheeks, black paws and hooves. Built
- * of boxes she read as a monkey -- ears out at the sides of a square head -- so she is drawn as
- * pixel art, a cut-out of fur an inch thick with her front painted on it, her paws held up
- * under her chin as she holds them; at [u, v, z] her lower-left back corner, facing +y.
+ * and tummy with the black swirl, big sad black eyes, pink cheeks, both black paws held up under
+ * her chin as she holds them, black hooves. Built of boxes she read as a monkey -- ears out at the
+ * sides of a square head -- so she is pixel art on a cut-out of fur an inch thick; fine, the 4x
+ * drawing. At [u, v, z] her lower-left back corner, facing +y; 1.06 ft wide, 1.25 ft tall.
  */
-function fawnBunny(u, v, z, px = PIX) {
-  const rows = [
-    "..................................",
-    "..........HH..........HH..........",
-    ".........HHH..DDDDDD..HHH.........",
-    "........DHHHDDFFFFFFDDHHHD........",
-    "........DFHHFFFFFFFFFFHHFD........",
-    ".......DFDDFFFFFFFFFFFFDDFD.......",
-    ".......DDDFFFFFFFFFFFFFFDDD.......",
-    ".......DDFFFFFFFFFFFFFFFFDD.......",
-    ".......DDFFFFFFFFFFFFFFFFDD.......",
-    "......DDFFFFFFCCCCCCFFFFFFDD......",
-    "......DDFFFFCCCCCCCCCCFFFFDD......",
-    "......DDFFFCKKCCCCCCKKCFFFDD......",
-    "......DDFFCKWWKCCCCKWWKCFFDD......",
-    ".....DFDFFCKWWKCCCCKWWKCFFDFD.....",
-    ".....DFEDFCKKKKCCCCKKKKCFDEFD.....",
-    ".....DFEDFCKKKWCCCCKKKWCFDEFD.....",
-    "....DFFEDDFCCCCCKKCCCCCFDDEFFD....",
-    "....DFEEEPPCCDDDCKDDDCCPPEEEFD....",
-    "....DFEEEDDDDBBBCCBBBDDDDEEEFD....",
-    "....DFEEDDFFBBBBDDBBBBFFDDEEFD....",
-    "...DFFEEDFFFBBBBDDBBBBFFFDEEFFD...",
-    "...DFEEEDFFFDBBBDDBBBDFFFDEEEFD...",
-    "...DFEEEDFFFFDBDFFDBDFFFFDEEEFD...",
-    "...DFEEEFDDDDDFFKKKFDDDDDFEEEFD...",
-    "..DFEEEEFFDFFFFKFFFKFFFDFFEEEEFD..",
-    "..DFEEEEFDDFFFFKFKFKFFFDDFEEEEFD..",
-    "..DFEEEEFDFFFFFKCCKFFFFFDFEEEEFD..",
-    ".DFFEEEEFDFFFFCCKCCCFFFFDFEEEEFFD.",
-    ".DFEEEEEFDFFFCKCCCCKCFFFDFEEEEEFD.",
-    ".DFEEEEEFDDFFCCKKKKCCFFDDFEEEEEFD.",
-    ".DFEEEEEFDDFCCCCCCCCCCFDDFEEEEEFD.",
-    ".DFFFFFFD.DDFCCCCCCCCFDD.DFFFFFFD.",
-    "..DFFFD...DDDCCCCCCCCDDD...DFFFD..",
-    "...DFD....DFDDCCCCCCDDFD....DFD...",
-    "..........DFFFDDCCDDFFFD..........",
-    "..........DFFFFFDDFFFFFD..........",
-    "..........DFVVVFDDFVVVFD..........",
-    "...........VVVVV..VVVVV...........",
-    "...........VVVVV..VVVVV...........",
-    "............VVV....VVV............",
-  ];
+function fawnBunny(u, v, z, fine = false) {
+  const rows = fine ? BUNNY_4X : BUNNY_2X;
+  const px = fine ? PIX / 4 : PIX / 2;
+  const q = PIX / 2;
   const top = z + rows.length * px;
   const D = 0.08;
   // The cut-out is fur all through, black only at her hooves (V): painted as her front is, her
   // eyes, swirl and paws (B) showed through on her back.
-  const fur = { F: "fawnFur", D: "fawnFur", C: "fawnFur", E: "fawnFur", W: "fawnFur", P: "fawnFur", K: "fawnFur", B: "fawnFur", H: "hornGrey", V: "lushPot" };
-  const face = { F: "fawnFur", D: "fawnDark", C: "fawnLight", E: "fawnEar", H: "hornGrey", K: "lushPot", B: "lushPot", V: "lushPot", W: "white", P: "cheek" };
-  const at = (c, r) => [u + c * px, v - 0.005, top - (r + 1) * px];
+  const fur = { H: "hornGrey", h: "hornGrey", V: "lushPot", v: "lushPot" };
+  for (const ch of "FLGDCEeWSPpKBb") fur[ch] = "fawnFur";
+  const face = {
+    F: "fawnFur", L: "fawnFurLight", G: "fawnFurDark", D: "fawnDark", C: "fawnLight", E: "fawnEar", e: "fawnEarRim",
+    H: "hornGrey", h: "hornLight", K: "lushPot", B: "lushPot", b: "pawSheen", V: "lushPot", v: "pawSheen",
+    W: "white", S: "eyeRing", P: "cheek", p: "cheekLight",
+  };
+  const at = (c, r) => [u + c * q, v - 0.005, top - (r + 1) * q];
   return [
     ...pixelArt(rows, fur, [u, v, top], D, px), ...pixelArt(rows, face, [u, v + D, top], 0.005, px),
     // Her back: the fawn's pale spots and the white cotton tail.
     ...[[13, 8], [20, 9], [16, 12], [11, 14], [22, 15], [14, 24], [19, 23], [12, 28], [21, 28]]
-      .map(([c, r]) => [...at(c, r), px, 0.005, px, "fawnLight"]),
-    [...at(15, 31).slice(0, 2).map((q, i) => (i ? q - 0.04 : q)), top - 32 * px, 4 * px, 0.045, 3 * px, "white"],
+      .map(([c, r]) => [...at(c, r), q, 0.005, q, "fawnLight"]),
+    [u + 15 * q, v - 0.045, top - 32 * q, 4 * q, 0.045, 3 * q, "white"],
   ];
 }
 
@@ -760,8 +856,6 @@ export const CATALOG = {
         .map(([c, r]) => [1.75 + c * 0.25, 5.5 + r * 0.25, 1.79, 0.25, 0.25, 0.006, "lushPot"]),
       ...[0, 2, 4, 6].map((c) => [1.75 + c * 0.25, 6.55, 1.45, 0.25, 0.005, 0.33, "lushPot"]),
       // The plushies at the head, on and around the pillow.
-      // Her bunny, the one that matters most, sat up in the middle of the pillow facing out.
-      ...fawnBunny(1.12, 0.6, 1.82, PIX / 2),
       // The blue dragon lying on its front, its yellow fin up.
       [0.1, 0.55, 1.5, 0.75, 0.85, 0.32, "plushBlue"], [0.2, 0.75, 1.82, 0.45, 0.42, 0.24, "plushBlue"],
       [0.25, 1.16, 1.92, 0.06, 0.01, 0.06, "lushPot"], [0.48, 1.16, 1.92, 0.06, 0.01, 0.06, "lushPot"],
@@ -1329,7 +1423,17 @@ for (const [kind, [w, d]] of Object.entries(REAL)) {
   c.d = d;
 }
 // The Twin XL drawn sharp as it is, once it's its real size: the plaid's lines read.
-CATALOG.twin_xl.hd = CATALOG.twin_xl.boxes;
+// Her bunny, the one that matters most, sat up in the middle of the Twin XL's pillow facing out:
+// put in after the bed is stretched to its real size, so her pixels stay square. Drawn sharp,
+// on a 4x canvas of the bed's own (sharp: 4), where she is the fine drawing (each box marked
+// fine, its own pixels) and the rest of the bed is drawn in 2x2 blocks, as it is at 2x.
+{
+  const c = CATALOG.twin_xl;
+  const [u, v] = [1.12 * REAL.twin_xl[0] / 3.5, 0.6 * REAL.twin_xl[1] / 6.5];
+  c.hd = [...c.boxes, ...fawnBunny(u, v, 1.82, true).map((b) => [...b, true])];
+  c.boxes = [...c.boxes, ...fawnBunny(u, v, 1.82)];
+  c.sharp = 4;
+}
 
 export const WALLPAPERS = {
   white: { label: "White", base: "#fdfcf8", pattern: "plain" },
@@ -1416,10 +1520,12 @@ export function boxesOf(item, hd = false) {
   const c = CATALOG[item.kind];
   const at = c.layer === "wall" ? wallPlace : place;
   const src = c.boxesFor ? c.boxesFor(item, hd && !!c.hd) : hd && c.hd ? c.hd : c.boxes;
-  return src.map(([x, y, z, w, d, h, mat]) => {
+  return src.map(([x, y, z, w, d, h, mat, fine]) => {
     const [ax, ay] = at(item, x, y);
     const [bx, by] = at(item, x + w, y + d);
-    return { x0: Math.min(ax, bx), x1: Math.max(ax, bx), y0: Math.min(ay, by), y1: Math.max(ay, by), z0: z, z1: z + h, mat };
+    const b = { x0: Math.min(ax, bx), x1: Math.max(ax, bx), y0: Math.min(ay, by), y1: Math.max(ay, by), z0: z, z1: z + h, mat };
+    if (fine) b.fine = true;
+    return b;
   });
 }
 

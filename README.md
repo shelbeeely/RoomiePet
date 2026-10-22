@@ -167,6 +167,10 @@ twice that (a catalog entry's `hd`): the teal iMac G3, built in half-pixel
 slices to its real egg-backed shape. They sit
 on a layer behind the scene and show through holes cut where they stand, so
 whatever is in front of them, a pet included, still covers them.
+One goes further: the Twin XL is drawn at 4x (`sharp: 4`) on a small canvas
+of its own over its place, so her fawn bunny on its pillow has her fine
+details; the rest of the bed is drawn there in 2x2 blocks, so it looks as it
+does at 2x.
 
 Pets find their way round the furniture and through the doors
 (`client/src/house.js`, A* on a half-foot grid). They sleep in their bedroom

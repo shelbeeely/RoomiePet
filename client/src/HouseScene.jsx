@@ -160,8 +160,11 @@ function stillScene(layouts, cam, open) {
     : [];
   const hits = [...list.filter((u) => u.kind === "piece").reverse(), ...wallHits, ...rugs];
   // The sharp layer: each piece first as the scene draws it, doubled, so no seam shows round
-  // its edge, then sharp over that.
+  // its edge, then sharp over that. A piece sharper than HD (the Twin XL, 4x) goes on a small
+  // canvas of its own laid over its place instead: the whole layer at 4x would be four times
+  // the memory for one bed.
   let hd = null;
+  const finer = [];
   if (sharp.length) {
     hd = document.createElement("canvas");
     hd.width = cam.width * HD;
@@ -171,10 +174,11 @@ function stillScene(layouts, cam, open) {
     for (const { item, sprite } of sharp) {
       h.drawImage(sprite.canvas, sprite.ox * HD, sprite.oy * HD, sprite.w * HD, sprite.h * HD);
       const fine = hdSprite(item, cam);
-      h.drawImage(fine.canvas, fine.ox, fine.oy);
+      if (fine.k === HD) h.drawImage(fine.canvas, fine.ox, fine.oy);
+      else finer.push({ canvas: fine.canvas, x: fine.ox / fine.k, y: fine.oy / fine.k, w: fine.w / fine.k, h: fine.h / fine.k });
     }
   }
-  return { layouts, cam, open, canvas, units: list, hits, glows, closets, hd };
+  return { layouts, cam, open, canvas, units: list, hits, glows, closets, hd, finer };
 }
 
 /** Round the piece that's picked up: its footprint on the floor, or for a wall piece where it hangs. */
@@ -201,6 +205,7 @@ function outlinePath(ctx, cam, item) {
 export default function HouseScene({ atlas, pets, effects, selectedId, onSelect, hour, layouts: saved, onSaveRoom }) {
   const canvas = useRef(null);
   const sharpLayer = useRef(null);
+  const finerLayer = useRef(null);
   const labels = useRef(new Map());
   const bubbles = useRef(new Map());
   const walkers = useRef(new Map());
@@ -322,6 +327,20 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
           sl.width = still.hd ? still.hd.width : 1;
           sl.height = still.hd ? still.hd.height : 1;
           if (still.hd) sl.getContext("2d").drawImage(still.hd, 0, 0);
+        }
+        const fl = finerLayer.current;
+        if (fl) {
+          fl.replaceChildren(...still.finer.map((f) => {
+            const c = document.createElement("canvas");
+            c.width = f.canvas.width;
+            c.height = f.canvas.height;
+            c.getContext("2d").drawImage(f.canvas, 0, 0);
+            Object.assign(c.style, {
+              left: `${(f.x / cam.width) * 100}%`, top: `${(f.y / cam.height) * 100}%`,
+              width: `${(f.w / cam.width) * 100}%`, height: `${(f.h / cam.height) * 100}%`,
+            });
+            return c;
+          }));
         }
       }
       stillRef.current = still;
@@ -612,6 +631,7 @@ export default function HouseScene({ atlas, pets, effects, selectedId, onSelect,
       )}
       <div className="scene" style={{ aspectRatio: `${cam.width} / ${cam.height}`, display: edit?.plan ? "none" : undefined }}>
         <canvas ref={sharpLayer} className="sharp-layer" width="1" height="1" aria-hidden="true" />
+        <div ref={finerLayer} className="finer-layer" aria-hidden="true" />
         <canvas
           ref={canvas}
           className={edit ? "editing" : ""}

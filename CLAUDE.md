@@ -24,6 +24,8 @@ Roommates' chores with a tamagotchi pet each (README.md has the whole picture).
   cost the frame rate. Name labels and bubbles are DOM, moved by transform. A few pieces
   (a catalog entry's `hd`: the iMac G3) are drawn sharp at twice the
   pixels on a layer behind the scene, cut out of it where they stand; keep it to a few.
+  The Twin XL goes to 4x (`sharp: 4`, its own small canvas) for her bunny, whose boxes
+  are marked fine; the rest of it is drawn in 2x2 blocks to match.
 - `client/public/sw.js` is not bundled: bump `VERSION` when what it caches changes.
 - The flat is `shared/home.js`: rooms and doors in feet, the furniture
   catalog (pieces are boxes), default layouts, and `layoutProblem`, which

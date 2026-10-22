@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { CUTAWAY, HD, colorOf, dollCamera, hdCamera, order, pieceBox, wallPieceBox } from "./dollhouse.js";
+import { CUTAWAY, HD, colorOf, dollCamera, hdCamera, order, pieceBox, sharpness, wallPieceBox } from "./dollhouse.js";
 import { CATALOG, boxesOf } from "@shared/home.js";
 
 describe("the dollhouse's drawing order", () => {
@@ -42,6 +42,28 @@ describe("pieces drawn sharp", () => {
     const cam = dollCamera("bedB", 1);
     expect(hdCamera(cam).project(3, 14, 2)).toEqual(cam.project(3, 14, 2).map((a) => a * HD));
     expect(hdCamera(cam).key).not.toBe(cam.key);
+  });
+
+  test("her bunny on the Twin XL is drawn at 4x, the rest of the bed as it is at 2x", () => {
+    const item = { kind: "twin_xl", color: "plaid", x: 0, y: 18, rot: 2 };
+    expect(sharpness(item)).toBe(4);
+    expect(sharpness({ kind: "imac_g3" })).toBe(HD);
+    expect(hdCamera(dollCamera("bedB", 0), 4).project(3, 14, 2)).toEqual(dollCamera("bedB", 0).project(3, 14, 2).map((a) => a * 4));
+    const sharp = boxesOf(item, true);
+    const fine = sharp.filter((b) => b.fine);
+    // Only her boxes are fine, in quarter pixels (1/64 ft) high; the bed's boxes are the same.
+    expect(fine.length).toBeGreaterThan(200);
+    expect(fine.every((b) => /fawn|horn|lushPot|white|cheek|eyeRing|pawSheen/.test(b.mat))).toBe(true);
+    expect(fine.some((b) => Math.abs(b.z1 - b.z0 - 1 / 64) < 1e-9)).toBe(true);
+    const plain = (bs) => bs.filter((b) => !b.fine && !/fawn|horn|eyeRing|pawSheen|cheek/.test(b.mat) && !(b.mat === "white" && b.z0 > 1.8) && !(b.mat === "lushPot" && b.z0 > 1.8));
+    expect(plain(sharp)).toEqual(plain(boxesOf(item)));
+    // Her pixels stay square: the bed was stretched to its real size before she was put on it.
+    const face = fine.filter((b) => b.y1 - b.y0 < 0.01 && b.x1 - b.x0 < 0.02);
+    expect(face.every((b) => Math.abs((b.x1 - b.x0) - (b.z1 - b.z0)) < 1e-9)).toBe(true);
+    // Only her hooves are black from behind: her eyes, swirl and paws showed through on her back.
+    const back = boxesOf(item).filter((b) => b.mat === "lushPot" && b.y1 - b.y0 > 0.05 && b.z0 > 1.8);
+    expect(back.length).toBeGreaterThan(0);
+    expect(back.every((b) => b.z1 < 1.82 + 0.2)).toBe(true);
   });
 
   test("the iMac G3 has a sharp version, in half pixels, filling the same space", () => {

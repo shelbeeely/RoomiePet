@@ -221,45 +221,60 @@ class Raster {
     this.data[i + 3] = 255;
   }
 
-  /** The parallelogram p0 + a*(pu - p0) + b*(pv - p0), a and b in 0..1, coloured by color(a, b). */
-  face(p0, pu, pv, color, edge = 0) {
+  /**
+   * The parallelogram p0 + a*(pu - p0) + b*(pv - p0), a and b in 0..1, coloured by color(a, b).
+   * In blocks of block x block pixels, sampled at each block's middle: a piece drawn at 4x
+   * with block 2 comes out as it is at 2x, pixel for pixel, doubled.
+   */
+  face(p0, pu, pv, color, edge = 0, block = 1) {
     const ux = pu[0] - p0[0];
     const uy = pu[1] - p0[1];
     const vx = pv[0] - p0[0];
     const vy = pv[1] - p0[1];
     const det = ux * vy - uy * vx;
-    if (Math.abs(det) < 0.5) return;           // seen edge-on
+    if (Math.abs(det) < 0.5 * block * block) return;           // seen edge-on
     const xs = [p0[0], pu[0], pv[0], pu[0] + vx];
     const ys = [p0[1], pu[1], pv[1], pu[1] + vy];
     const lu = Math.hypot(ux, uy);
     const lv = Math.hypot(vx, vy);
     const du = Math.abs(det) / lv;             // pixels across the face along a
     const dv = Math.abs(det) / lu;
-    for (let py = Math.floor(Math.min(...ys)); py <= Math.ceil(Math.max(...ys)); py++) {
-      for (let px = Math.floor(Math.min(...xs)); px <= Math.ceil(Math.max(...xs)); px++) {
-        const cx = px + 0.5 - p0[0];
-        const cy = py + 0.5 - p0[1];
+    const snap = (n) => Math.floor(n / block) * block;
+    for (let py = snap(Math.min(...ys)); py <= Math.ceil(Math.max(...ys)); py += block) {
+      for (let px = snap(Math.min(...xs)); px <= Math.ceil(Math.max(...xs)); px += block) {
+        const cx = px + block / 2 - p0[0];
+        const cy = py + block / 2 - p0[1];
         const a = (cx * vy - cy * vx) / det;
         const b = (ux * cy - uy * cx) / det;
         if (a < -1e-6 || a > 1 + 1e-6 || b < -1e-6 || b > 1 + 1e-6) continue;
         let c = typeof color === "function" ? color(a, b) : color;
-        if (edge && (a * du < 1 || (1 - a) * du < 1 || b * dv < 1 || (1 - b) * dv < 1)) c = mul(c, edge);
-        this.set(px, py, c);
+        if (edge && (a * du < block || (1 - a) * du < block || b * dv < block || (1 - b) * dv < block)) c = mul(c, edge);
+        for (let y = 0; y < block; y++) for (let x = 0; x < block; x++) this.set(px + x, py + y, c);
       }
     }
   }
 
-  outline(c = OUTLINE) {
+  /** A line of c round what is drawn, a block thick (on the same block grid as face's). */
+  outline(c = OUTLINE, block = 1) {
     const { w, h, data } = this;
-    const solid = (x, y) => x >= 0 && y >= 0 && x < w && y < h && data[(y * w + x) * 4 + 3] === 255;
+    const lit = (x, y) => x >= 0 && y >= 0 && x < w && y < h && data[(y * w + x) * 4 + 3] === 255;
+    // A block is solid if any pixel of it is drawn.
+    const solid = (bx, by) => {
+      for (let y = 0; y < block; y++) for (let x = 0; x < block; x++) if (lit(bx * block + x - this.ox, by * block + y - this.oy)) return true;
+      return false;
+    };
     const add = [];
-    for (let y = 0; y < h; y++) {
-      for (let x = 0; x < w; x++) {
-        if (solid(x, y)) continue;
-        if (solid(x - 1, y) || solid(x + 1, y) || solid(x, y - 1) || solid(x, y + 1)) add.push(x, y);
+    const b0 = Math.floor(this.ox / block) - 1;
+    const c0 = Math.floor(this.oy / block) - 1;
+    for (let by = c0; by <= c0 + h / block + 2; by++) {
+      for (let bx = b0; bx <= b0 + w / block + 2; bx++) {
+        if (solid(bx, by)) continue;
+        if (solid(bx - 1, by) || solid(bx + 1, by) || solid(bx, by - 1) || solid(bx, by + 1)) add.push(bx, by);
       }
     }
-    for (let i = 0; i < add.length; i += 2) this.set(add[i] + this.ox, add[i + 1] + this.oy, c);
+    for (let i = 0; i < add.length; i += 2) {
+      for (let y = 0; y < block; y++) for (let x = 0; x < block; x++) this.set(add[i] * block + x, add[i + 1] * block + y, c);
+    }
   }
 
   toCanvas() {
@@ -341,13 +356,13 @@ export function order(units, cam, key = (u) => u) {
   return out;
 }
 
-function drawBoxes(r, boxes, cam, colorFor, { edge = 0.82 } = {}) {
+function drawBoxes(r, boxes, cam, colorFor, { edge = 0.82, block = 1 } = {}) {
   for (const box of order(boxes, cam)) {
     const thin = Math.min(box.x1 - box.x0, box.y1 - box.y0, box.z1 - box.z0) < 0.1;
     for (const [p0, pu, pv, side] of facesOf(box, cam)) {
       const c = colorFor(box, side);
       if (!c) continue;
-      r.face(p0, pu, pv, typeof c === "function" ? c : mul(c, cam.faces[side]), thin ? 0 : edge);
+      r.face(p0, pu, pv, typeof c === "function" ? c : mul(c, cam.faces[side]), thin ? 0 : edge, box.fine ? 1 : block);
     }
   }
 }
@@ -370,14 +385,17 @@ export function pieceSprite(item, cam, tint = null, part = null, hd = false) {
   const key = `${cam.key}|${JSON.stringify(item)}|${tint || ""}|${part ?? ""}|${hd ? "hd" : ""}`;
   return cached(key, () => {
     const boxes = cutBoxes(item, part, hd);
-    const view = hd ? hdCamera(cam) : cam;
+    const k = hd ? sharpness(item) : 1;
+    const view = hd ? hdCamera(cam, k) : cam;
+    // Past 2x, all but the boxes marked fine are drawn in blocks, so they look as they do at 2x.
+    const block = Math.max(1, k / HD);
     const r = new Raster(...screenBounds(boxes, view));
     drawBoxes(r, boxes, view, (box) => {
       const c = colorOf(box.mat, item);
       return tint ? [c[0] * 0.5 + tint[0] * 0.5, c[1] * 0.5 + tint[1] * 0.5, c[2] * 0.5 + tint[2] * 0.5] : c;
-    });
-    r.outline();
-    return r.toCanvas();
+    }, { block });
+    r.outline(OUTLINE, block);
+    return { ...r.toCanvas(), k };
   });
 }
 
@@ -387,12 +405,20 @@ export function pieceSprite(item, cam, tint = null, part = null, hd = false) {
 // is what keeps the frame rate (see HouseScene).
 export const HD = 2;
 
-/** The camera looking the same way at HD times the pixels. */
-export function hdCamera(cam) {
-  return { ...cam, key: `${cam.key}:hd`, project: (x, y, z) => cam.project(x, y, z).map((a) => a * HD) };
+/** The camera looking the same way at k (HD) times the pixels. */
+export function hdCamera(cam, k = HD) {
+  return { ...cam, key: `${cam.key}:hd${k === HD ? "" : k}`, project: (x, y, z) => cam.project(x, y, z).map((a) => a * k) };
 }
 
-/** A piece drawn sharp, its canvas and origin in HD pixels; null for a piece without an hd. */
+/**
+ * How many times the scene's pixels a sharp piece is drawn at: HD, or more for one that asks
+ * (the Twin XL, 4x, for her bunny's fine drawing), which goes on a small canvas of its own.
+ */
+export function sharpness(item) {
+  return CATALOG[item.kind].sharp ?? HD;
+}
+
+/** A piece drawn sharp, its canvas and origin in its sharpness's pixels (k); null for a piece without an hd. */
 export function hdSprite(item, cam) {
   return CATALOG[item.kind].hd ? pieceSprite(item, cam, null, null, true) : null;
 }
