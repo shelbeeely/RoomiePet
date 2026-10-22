@@ -663,8 +663,9 @@ export const CATALOG = {
     // wall and the closet, from the photo of it. No headboard: a low white base, grey sheets and
     // a grey pillow, the white plaid comforter (lavender, blue and grey lines) turned back,
     // the green gingham and black-and-white check blankets over the foot; her plushies
-    // at the head -- the black bunny in the corner, the blue dragon with its yellow fin on the left, the brown lion in the right
-    // corner, the fluffy white one between -- and the green knit beanie.
+    // at the head -- the black bunny sat up in the middle of the pillow, the blue dragon with its
+    // yellow fin on the left, the brown lion in the right corner, the fluffy white one at the
+    // bunny's feet -- and the green knit beanie.
     // main is the comforter; drawn sharp, so the plaid's lines show.
     label: "Twin XL bed", group: "bedroom", w: 3.5, d: 6.5, layer: "solid", colors: ["plaid", "lilac", "sage", "blue", "pink", "sun"],
     boxes: [
@@ -692,16 +693,20 @@ export const CATALOG = {
         .map(([c, r]) => [1.75 + c * 0.25, 5.5 + r * 0.25, 1.79, 0.25, 0.25, 0.006, "lushPot"]),
       ...[0, 2, 4, 6].map((c) => [1.75 + c * 0.25, 6.55, 1.45, 0.25, 0.005, 0.33, "lushPot"]),
       // The plushies at the head, on and around the pillow.
-      // The black bunny, sat in the corner behind the dragon, ears up against the wall.
-      [0.05, 0.05, 1.5, 0.5, 0.35, 0.4, "lushPot"], [0.1, 0.08, 1.9, 0.4, 0.3, 0.26, "lushPot"],
-      [0.13, 0.1, 2.16, 0.1, 0.08, 0.3, "lushPot"], [0.29, 0.1, 2.16, 0.1, 0.08, 0.3, "lushPot"],
-      [0.17, 0.38, 2.02, 0.05, 0.01, 0.05, "white"], [0.33, 0.38, 2.02, 0.05, 0.01, 0.05, "white"],
+      // The black bunny, hers and the one that matters most: sat up in the middle of the pillow
+      // facing out, bigger than the rest, ears up with their pink insides, the others around her.
+      [1.3, 0.3, 1.82, 0.7, 0.55, 0.5, "lushPot"], [1.38, 0.33, 2.32, 0.54, 0.48, 0.4, "lushPot"],
+      [1.43, 0.45, 2.72, 0.14, 0.12, 0.55, "lushPot"], [1.79, 0.45, 2.72, 0.14, 0.12, 0.55, "lushPot"],
+      [1.46, 0.57, 2.8, 0.08, 0.01, 0.4, "blush"], [1.82, 0.57, 2.8, 0.08, 0.01, 0.4, "blush"],
+      [1.47, 0.81, 2.5, 0.09, 0.01, 0.09, "white"], [1.78, 0.81, 2.5, 0.09, 0.01, 0.09, "white"],
+      [1.63, 0.81, 2.42, 0.06, 0.01, 0.05, "blush"], [1.45, 0.85, 2.0, 0.4, 0.01, 0.25, "inkHood"],
+      [1.32, 0.85, 1.82, 0.22, 0.25, 0.13, "lushPot"], [1.76, 0.85, 1.82, 0.22, 0.25, 0.13, "lushPot"],
       // The blue dragon lying on its front, its yellow fin up.
       [0.1, 0.55, 1.5, 0.75, 0.85, 0.32, "plushBlue"], [0.2, 0.75, 1.82, 0.45, 0.42, 0.24, "plushBlue"],
       [0.25, 1.16, 1.92, 0.06, 0.01, 0.06, "lushPot"], [0.48, 1.16, 1.92, 0.06, 0.01, 0.06, "lushPot"],
       [0.85, 0.65, 1.7, 0.08, 0.5, 0.32, "sun"],
-      // The fluffy white one, flopped in the middle.
-      [1.25, 0.95, 1.5, 0.75, 0.55, 0.26, "white"], [1.35, 1.05, 1.76, 0.4, 0.35, 0.14, "white"],
+      // The fluffy white one, flopped at the bunny's feet.
+      [1.2, 1.15, 1.5, 0.8, 0.5, 0.26, "white"], [1.3, 1.25, 1.76, 0.4, 0.32, 0.14, "white"],
       // The brown lion in the right corner, its mane round its face.
       [2.5, 0.15, 1.5, 0.65, 0.5, 0.42, "plushBrown"], [2.42, 0.12, 1.92, 0.8, 0.5, 0.4, "plushMane"],
       [2.55, 0.62, 1.98, 0.5, 0.04, 0.28, "plushBrown"],
