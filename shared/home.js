@@ -179,7 +179,7 @@ export const MATERIALS = {
   book1: "#d8645a", book2: "#5a8ad8", book3: "#f0c75e", book4: "#6fbf8a", frame: "#7a4f2e", sky: "#bfe3f5", pink: "#f4a6b8",
   granite: "#cfc9bf",
   // Dark pastel, for the door half of Bedroom 2 and its Kuromi-style pieces.
-  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", pillowGrey: "#7d7a86", plaidLav: "#b5abd6", plaidBlue: "#a3c0dc", plaidGrey: "#8f8a99", sageBlanket: "#c4d8a0", plushBlue: "#3b8db8", plushBrown: "#9a6a3e", plushMane: "#7a5030", knitGreen: "#3d7a58", monsterBlue: "#3a9ad8", purpleCan: "#5b3a8a", stanley: "#ebe3d6", candleJar: "#efe8dc", amberPill: "#e8902a", glassGreen: "#2f8f5a", coasterPink: "#eaa3ac", stickerBox: "#f2a28c", silverBook: "#c8c8c4", twix: "#c0392b", lushPot: "#141414", lushKraft: "#c9a57a", lushGreen: "#5aa66a", lushBottle: "#f2f0ea", sun: "#efc23a", fabric: "#cfccc8", fabricDark: "#a9a5a1", dock: "#dcd9d5", dockPad: "#f4f2ef", clockBezel: "#141418", clockBlue: "#3c74d4", hood: "#57516a", ink: "#0e0c12", inkHood: "#2a2630", blush: "#eda9cb",
+  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", pillowGrey: "#7d7a86", plaidLav: "#b5abd6", plaidBlue: "#a3c0dc", plaidGrey: "#8f8a99", sageBlanket: "#d6e4bc", ginghamMid: "#a9c48a", ginghamDark: "#4f6e48", plushBlue: "#3b8db8", plushBrown: "#9a6a3e", plushMane: "#7a5030", knitGreen: "#3d7a58", monsterBlue: "#3a9ad8", purpleCan: "#5b3a8a", stanley: "#ebe3d6", candleJar: "#efe8dc", amberPill: "#e8902a", glassGreen: "#2f8f5a", coasterPink: "#eaa3ac", stickerBox: "#f2a28c", silverBook: "#c8c8c4", twix: "#c0392b", lushPot: "#141414", lushKraft: "#c9a57a", lushGreen: "#5aa66a", lushBottle: "#f2f0ea", sun: "#efc23a", fabric: "#cfccc8", fabricDark: "#a9a5a1", dock: "#dcd9d5", dockPad: "#f4f2ef", clockBezel: "#141418", clockBlue: "#3c74d4", hood: "#57516a", ink: "#0e0c12", inkHood: "#2a2630", blush: "#eda9cb",
   bondi: "#3fb6c4", bondiDark: "#24808e", bondiLight: "#8fe0e8", ice: "#e8eef0",
   sheet: "#8f8c98", cork: "#c9a27a", graniteDark: "#a39d94", hob: "#2f2b36", led: "#4f6bff",
 };
@@ -529,7 +529,7 @@ function chestTop(z) {
   return out;
 }
 
-/** A rumple of the plaid comforter: the cloth (main) and its lines across the top, both ways. */
+/** A layer of the plaid comforter: the cloth (main) and its lines across the top, both ways. */
 function plaid(x, y, z, w, d, h) {
   const out = [[x, y, z, w, d, h, "main"]];
   const top = z + h;
@@ -661,37 +661,55 @@ export const CATALOG = {
   twin_xl: {
     // A college-length twin, 80 in: the one on the left in Bedroom 2, in its nook between the
     // wall and the closet, from the photo of it. No headboard: a low white base, grey sheets and
-    // a grey pillow, the white plaid comforter (lavender, blue and grey lines) thrown back in
-    // rumples, the green gingham and black-and-white check blankets over the foot; her plushies
+    // a grey pillow, the white plaid comforter (lavender, blue and grey lines) turned back,
+    // the green gingham and black-and-white check blankets over the foot; her plushies
     // at the head -- the black bunny in the corner, the blue dragon with its yellow fin on the left, the brown lion in the right
-    // corner, the fluffy white one between -- the green knit beanie, a black hoodie by the foot.
+    // corner, the fluffy white one between -- and the green knit beanie.
     // main is the comforter; drawn sharp, so the plaid's lines show.
     label: "Twin XL bed", group: "bedroom", w: 3.5, d: 6.5, layer: "solid", colors: ["plaid", "lilac", "sage", "blue", "pink", "sun"],
     boxes: [
       ...[[0.05, 0.05], [3.2, 0.05], [0.05, 6.2], [3.2, 6.2]].map(([x, y]) => [x, y, 0, 0.25, 0.25, 0.2, "white"]),
       [0, 0, 0.2, 3.5, 6.5, 0.7, "white"], [0.3, 6.5, 0.3, 2.9, 0.02, 0.45, "porcelain"],
       [0.05, 0.05, 0.9, 3.4, 6.4, 0.6, "sheet"], [0.35, 0.15, 1.5, 2.6, 0.95, 0.32, "pillowGrey"],
-      // The comforter, thrown back off the pillow and rumpled.
-      ...plaid(0.02, 2.2, 1.15, 3.46, 4.25, 0.35), ...plaid(0.3, 2.6, 1.5, 1.5, 1.3, 0.16), ...plaid(1.7, 3.3, 1.5, 1.6, 1.5, 0.22),
-      ...plaid(0.5, 4.6, 1.5, 2.3, 1.0, 0.1),
-      // The blankets over the foot: green gingham, then the black-and-white check.
-      [0.02, 5.6, 1.5, 3.46, 0.88, 0.12, "sageBlanket"],
-      ...[0, 1, 2, 3, 4].flatMap((k) => [[0.1 + k * 0.32, 5.62, 1.62, 0.16, 0.84, 0.01, "plaidGrey"]]),
-      ...[0, 1, 2, 3].flatMap((r) => [0, 1, 2, 3, 4, 5].map((c) => [1.6 + c * 0.3, 5.62 + r * 0.22, 1.62, 0.3, 0.22, 0.012, (r + c) % 2 ? "white" : "lushPot"])),
-      // The plushies, the beanie and the hoodie.
-      [0.15, 0.35, 1.5, 0.85, 1.0, 0.42, "plushBlue"], [0.25, 0.42, 1.92, 0.45, 0.4, 0.22, "plushBlue"],
+      // The comforter, one smooth layer turned back at the head: rumples stacked as boxes, each
+      // with its own plaid, read as a pile of see-through panels, so it lies flat and the plaid
+      // runs once, evenly, across its top.
+      // It lies on the sheet and hangs down the sides outside it: a box cutting into the sheet
+      // drew the sheet over it from the far side.
+      ...plaid(0.05, 2.0, 1.5, 3.4, 4.5, 0.2), ...plaid(0.05, 2.0, 1.7, 3.4, 0.5, 0.08),
+      [0, 2.0, 1.2, 0.05, 4.5, 0.5, "main"], [3.45, 2.0, 1.2, 0.05, 4.5, 0.5, "main"],
+      // Over the foot, draped down its end: the green gingham the whole width, the
+      // black-and-white check folded over the right half.
+      [0, 5.5, 1.71, 3.5, 1.0, 0.03, "sageBlanket"], [0, 6.5, 1.0, 3.5, 0.02, 0.74, "sageBlanket"],
+      ...[0, 1, 2, 3].flatMap((r) => Array.from({ length: 14 }, (_, c) => [c, r]))
+        .filter(([c, r]) => c % 2 || r % 2)
+        .map(([c, r]) => [c * 0.25, 5.5 + r * 0.25, 1.74, 0.25, 0.25, 0.006, c % 2 && r % 2 ? "ginghamDark" : "ginghamMid"]),
+      ...[0, 1, 2].flatMap((r) => Array.from({ length: 7 }, (_, c) => [c, r]))
+        .filter(([c, r]) => c % 2 || r % 2)
+        .map(([c, r]) => [c * 0.25, 6.52, 1.49 - r * 0.25, 0.25, 0.004, 0.25, c % 2 && r % 2 ? "ginghamDark" : "ginghamMid"]),
+      [1.75, 5.5, 1.75, 1.75, 1.0, 0.04, "white"], [1.75, 6.53, 1.1, 1.75, 0.02, 0.68, "white"],
+      ...[0, 1, 2, 3].flatMap((r) => [0, 1, 2, 3, 4, 5, 6].map((c) => [c, r])).filter(([c, r]) => (c + r) % 2)
+        .map(([c, r]) => [1.75 + c * 0.25, 5.5 + r * 0.25, 1.79, 0.25, 0.25, 0.006, "lushPot"]),
+      ...[0, 2, 4, 6].map((c) => [1.75 + c * 0.25, 6.55, 1.45, 0.25, 0.005, 0.33, "lushPot"]),
+      // The plushies at the head, on and around the pillow.
       // The black bunny, sat in the corner behind the dragon, ears up against the wall.
-      [0.03, 0.03, 1.5, 0.55, 0.32, 0.42, "lushPot"], [0.1, 0.05, 1.92, 0.42, 0.32, 0.26, "lushPot"],
-      [0.13, 0.08, 2.18, 0.1, 0.08, 0.32, "lushPot"], [0.29, 0.08, 2.18, 0.1, 0.08, 0.32, "lushPot"],
-      [0.17, 0.37, 2.03, 0.05, 0.01, 0.05, "white"], [0.33, 0.37, 2.03, 0.05, 0.01, 0.05, "white"],
-      [0.6, 1.1, 1.7, 0.35, 0.25, 0.3, "sun"], [0.0, 1.0, 1.5, 0.25, 0.4, 0.3, "plushBlue"],
-      [1.3, 1.05, 1.5, 0.85, 0.6, 0.32, "white"], [1.45, 1.15, 1.82, 0.4, 0.35, 0.12, "white"],
-      [2.45, 0.2, 1.5, 0.75, 0.6, 0.55, "plushBrown"], [2.55, 0.25, 2.05, 0.55, 0.45, 0.25, "plushMane"],
-      [2.66, 0.7, 2.12, 0.07, 0.01, 0.07, "lushPot"], [2.86, 0.7, 2.12, 0.07, 0.01, 0.07, "lushPot"],
-      [2.15, 1.05, 1.5, 0.6, 0.5, 0.22, "knitGreen"],
-      [2.5, 4.6, 1.5, 1.0, 0.95, 0.14, "lushPot"],
+      [0.05, 0.05, 1.5, 0.5, 0.35, 0.4, "lushPot"], [0.1, 0.08, 1.9, 0.4, 0.3, 0.26, "lushPot"],
+      [0.13, 0.1, 2.16, 0.1, 0.08, 0.3, "lushPot"], [0.29, 0.1, 2.16, 0.1, 0.08, 0.3, "lushPot"],
+      [0.17, 0.38, 2.02, 0.05, 0.01, 0.05, "white"], [0.33, 0.38, 2.02, 0.05, 0.01, 0.05, "white"],
+      // The blue dragon lying on its front, its yellow fin up.
+      [0.1, 0.55, 1.5, 0.75, 0.85, 0.32, "plushBlue"], [0.2, 0.75, 1.82, 0.45, 0.42, 0.24, "plushBlue"],
+      [0.25, 1.16, 1.92, 0.06, 0.01, 0.06, "lushPot"], [0.48, 1.16, 1.92, 0.06, 0.01, 0.06, "lushPot"],
+      [0.85, 0.65, 1.7, 0.08, 0.5, 0.32, "sun"],
+      // The fluffy white one, flopped in the middle.
+      [1.25, 0.95, 1.5, 0.75, 0.55, 0.26, "white"], [1.35, 1.05, 1.76, 0.4, 0.35, 0.14, "white"],
+      // The brown lion in the right corner, its mane round its face.
+      [2.5, 0.15, 1.5, 0.65, 0.5, 0.42, "plushBrown"], [2.42, 0.12, 1.92, 0.8, 0.5, 0.4, "plushMane"],
+      [2.55, 0.62, 1.98, 0.5, 0.04, 0.28, "plushBrown"],
+      [2.65, 0.66, 2.12, 0.06, 0.01, 0.06, "lushPot"], [2.89, 0.66, 2.12, 0.06, 0.01, 0.06, "lushPot"],
+      // The green knit beanie beside him.
+      [2.05, 1.0, 1.5, 0.55, 0.45, 0.16, "knitGreen"],
     ],
-    spots: [[1.2, 4.2, 1.6], [2.4, 4.8, 1.6], [1.75, 3.2, 1.6]],
+    spots: [[1.2, 4.2, 1.8], [2.4, 4.6, 1.8], [1.75, 3.2, 1.8]],
     bed: true,
   },
   double_bed: {
