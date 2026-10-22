@@ -192,6 +192,8 @@ function PixelCover({ tape, width = 72 }) {
 function spineBg(id) {
   const art = TAPE_ART[id];
   if (!art) return {};
+  // A drawn one (the Matrix trilogy) at its own proportions, square pixels and all.
+  if (art.drawn) return { backgroundImage: `url(${art.img})`, backgroundSize: "auto 100%", backgroundPosition: "center", imageRendering: "pixelated" };
   if (!art.spine) return { backgroundImage: `url(${art.img})`, backgroundSize: "100% 100%" };
   const [x, w] = art.spine;
   return { backgroundImage: `url(${art.img})`, backgroundSize: `${100 / w}% 100%`, backgroundPosition: `${(x / (1 - w)) * 100}% 0` };

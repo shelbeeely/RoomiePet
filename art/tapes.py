@@ -121,6 +121,83 @@ def front(im, x0, x1):
 FLOPPIES_BOX = (0.117, 0.158, 0.914, 0.803)
 
 
+# The Matrix trilogy, drawn rather than cut from the photo (where they came out dim): one set --
+# a black spine with a faint green rain of code, the Warner shield in gold at the top, MATRIX in
+# silver down it, each film's name under that in its own colour.
+FONT = {   # 3 x 5 capitals
+    "A": [".#.", "#.#", "###", "#.#", "#.#"], "D": ["##.", "#.#", "#.#", "#.#", "##."], "E": ["###", "#..", "##.", "#..", "###"],
+    "I": ["###", ".#.", ".#.", ".#.", "###"], "L": ["#..", "#..", "#..", "#..", "###"], "M": ["#.#", "###", "###", "#.#", "#.#"],
+    "N": ["#.#", "###", "###", "###", "#.#"], "O": [".#.", "#.#", "#.#", "#.#", ".#."], "R": ["##.", "#.#", "##.", "#.#", "#.#"],
+    "S": [".##", "#..", ".#.", "..#", "##."], "T": ["###", ".#.", ".#.", ".#.", ".#."], "U": ["#.#", "#.#", "#.#", "#.#", "###"],
+    "V": ["#.#", "#.#", "#.#", "#.#", ".#."], "X": ["#.#", "#.#", ".#.", "#.#", "#.#"],
+}
+MATRIX = {
+    "the_matrix": (None, (60, 207, 106)),
+    "matrix_reloaded": ("RELOADED", (143, 179, 217)),
+    "matrix_revolutions": ("REVOLUTIONS", (47, 179, 165)),
+}
+SPINE_W, SPINE_H = 10, 100
+INK, RAIN, SILVER, GOLD = (11, 13, 12), (22, 70, 40), (205, 212, 217), (201, 166, 74)
+
+
+def drawn_spine(sub, accent):
+    """One of the trilogy's spines as pixel art, 10 x 100, top to bottom, the words reading down it."""
+    g = [[INK] * SPINE_W for _ in range(SPINE_H)]
+    for y in range(SPINE_H):                                   # the rain of code, the same on all three
+        for x in range(SPINE_W):
+            if (x * 7 + y * 3) % 11 == 0 and (y // 3 + x) % 4 == 0:
+                g[y][x] = RAIN
+    shield = ["..####..", ".#GGGG#.", ".#GGGG#.", ".#GGGG#.", "..#GG#..", "...##..."]
+    for r, row in enumerate(shield):
+        for c, ch in enumerate(row):
+            if ch != ".":
+                g[3 + r][1 + c] = GOLD if ch == "#" else (150, 120, 50)
+
+    def word(text, y, colour):
+        # Turned to read down the spine: each letter's top to the right.
+        for ch in text:
+            glyph = FONT[ch]
+            for r in range(5):
+                for c in range(3):
+                    if glyph[r][c] == "#":
+                        g[y + c][2 + (4 - r)] = colour
+            y += 4
+        return y
+
+    for x in range(1, SPINE_W - 1):
+        g[11][x] = accent
+    y = word("MATRIX", 14, SILVER)
+    for x in range(1, SPINE_W - 1):
+        g[y + 1][x] = accent
+    if sub:
+        word(sub, y + 4, accent)
+    else:
+        # The first film has no second line: streams of its green code run down under the title.
+        for x, start, length in ((2, 2, 30), (4, 10, 22), (6, 0, 34), (8, 6, 26)):
+            for k in range(length):
+                yy = y + 4 + start + k
+                if yy < SPINE_H - 7 and k % 3 != 2:
+                    g[yy][x] = accent if k < 3 else tuple(int(v * (0.85 - 0.6 * k / length)) for v in accent)
+    for x in range(3, 7):                                        # the label at the foot
+        g[SPINE_H - 4][x] = SILVER
+    return g
+
+
+def bands(g, rows, cols):
+    """The spine as the room shows it, rows x cols: each cell its strongest colour, else black."""
+    out = []
+    for r in range(rows):
+        row = []
+        for c in range(cols):
+            cells = [g[y][x] for y in range(r * SPINE_H // rows, (r + 1) * SPINE_H // rows)
+                     for x in range(c * SPINE_W // cols, (c + 1) * SPINE_W // cols)]
+            lit = [p for p in cells if p not in (INK, RAIN)]
+            pick = max(set(lit), key=lit.count) if len(lit) >= len(cells) * 0.15 else INK
+            row.append("#%02x%02x%02x" % pick)
+        out.append(row)
+    return out
+
+
 def main(photo, floppies=None):
     src = ImageOps.exif_transpose(Image.open(photo)).convert("RGB")
     k = src.width / 1500
@@ -134,6 +211,14 @@ def main(photo, floppies=None):
         im.save(os.path.join(out, f"{name}.png"), optimize=True)
         hd, lo = grids(im)
         art[name] = {"label": label, "img": f"/tapes/{name}.png", "hd": hd, "lo": lo}
+    for name, (sub, accent) in MATRIX.items():
+        g = drawn_spine(sub, accent)
+        im = Image.new("RGB", (SPINE_W, SPINE_H))
+        for y in range(SPINE_H):
+            for x in range(SPINE_W):
+                im.putpixel((x, y), g[y][x])
+        im.resize((SPINE_W * 4, SPINE_H * 4), Image.NEAREST).save(os.path.join(out, f"{name}.png"), optimize=True)
+        art[name] = {**art[name], "drawn": True, "hd": bands(g, 18, 2), "lo": bands(g, 9, 1)}
     archive = {}
     covers = {"art:memorex_floppies": pixel_cover(Image.open(os.path.join(out, "memorex_floppies.png")))}
     if floppies:

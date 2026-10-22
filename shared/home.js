@@ -354,9 +354,9 @@ export const DEFAULT_TAPES = [
   [
     TAPE("Independence Day", "black", "independence_day_1", VC("19992_Independence%2520Day%25201")),
     TAPE("Independence Day", "black", "independence_day_2", VC("19992_Independence%2520Day%25201")),
-    TAPE("The Matrix", "silver", "the_matrix", VC("20892_Matrix%25201")),
+    TAPE("The Matrix", "black", "the_matrix", VC("20892_Matrix%25201")),
     TAPE("Matrix Reloaded", "black", "matrix_reloaded", VC("30312_The%2520Matrix%2520Reloaded")),
-    TAPE("Matrix Revolutions", "teal", "matrix_revolutions"),
+    TAPE("Matrix Revolutions", "black", "matrix_revolutions"),
     TAPE("Indiana Jones", "orange", "indiana_jones", VC("18612_244-Untitled-108%2520copy")),
     { ...TAPE("Memorex Cool Disks", "pink", "memorex_floppies"), f: true },
   ],
