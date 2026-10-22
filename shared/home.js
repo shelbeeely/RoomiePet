@@ -663,7 +663,7 @@ export const CATALOG = {
     // wall and the closet, from the photo of it. No headboard: a low white base, grey sheets and
     // a grey pillow, the white plaid comforter (lavender, blue and grey lines) thrown back in
     // rumples, the green gingham and black-and-white check blankets over the foot; her plushies
-    // at the head -- the blue dragon with its yellow fin on the left, the brown lion in the right
+    // at the head -- the black bunny in the corner, the blue dragon with its yellow fin on the left, the brown lion in the right
     // corner, the fluffy white one between -- the green knit beanie, a black hoodie by the foot.
     // main is the comforter; drawn sharp, so the plaid's lines show.
     label: "Twin XL bed", group: "bedroom", w: 3.5, d: 6.5, layer: "solid", colors: ["plaid", "lilac", "sage", "blue", "pink", "sun"],
@@ -679,7 +679,11 @@ export const CATALOG = {
       ...[0, 1, 2, 3, 4].flatMap((k) => [[0.1 + k * 0.32, 5.62, 1.62, 0.16, 0.84, 0.01, "plaidGrey"]]),
       ...[0, 1, 2, 3].flatMap((r) => [0, 1, 2, 3, 4, 5].map((c) => [1.6 + c * 0.3, 5.62 + r * 0.22, 1.62, 0.3, 0.22, 0.012, (r + c) % 2 ? "white" : "lushPot"])),
       // The plushies, the beanie and the hoodie.
-      [0.15, 0.35, 1.5, 0.85, 1.0, 0.42, "plushBlue"], [0.25, 0.25, 1.92, 0.45, 0.4, 0.22, "plushBlue"],
+      [0.15, 0.35, 1.5, 0.85, 1.0, 0.42, "plushBlue"], [0.25, 0.42, 1.92, 0.45, 0.4, 0.22, "plushBlue"],
+      // The black bunny, sat in the corner behind the dragon, ears up against the wall.
+      [0.03, 0.03, 1.5, 0.55, 0.32, 0.42, "lushPot"], [0.1, 0.05, 1.92, 0.42, 0.32, 0.26, "lushPot"],
+      [0.13, 0.08, 2.18, 0.1, 0.08, 0.32, "lushPot"], [0.29, 0.08, 2.18, 0.1, 0.08, 0.32, "lushPot"],
+      [0.17, 0.37, 2.03, 0.05, 0.01, 0.05, "white"], [0.33, 0.37, 2.03, 0.05, 0.01, 0.05, "white"],
       [0.6, 1.1, 1.7, 0.35, 0.25, 0.3, "sun"], [0.0, 1.0, 1.5, 0.25, 0.4, 0.3, "plushBlue"],
       [1.3, 1.05, 1.5, 0.85, 0.6, 0.32, "white"], [1.45, 1.15, 1.82, 0.4, 0.35, 0.12, "white"],
       [2.45, 0.2, 1.5, 0.75, 0.6, 0.55, "plushBrown"], [2.55, 0.25, 2.05, 0.55, 0.45, 0.25, "plushMane"],
