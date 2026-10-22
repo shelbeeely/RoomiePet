@@ -165,7 +165,7 @@ export function builtinAt(x, y) {
 export const COLORWAYS = {
   blue: "#7fa8d8", pink: "#e7a1b6", sage: "#a8c99a", sun: "#f0c75e", lilac: "#c3b3e0", coral: "#ee8f6f",
   teal: "#5fb3b3", grey: "#a7a7b8", oak: "#c08a5c", walnut: "#7a553c", white: "#efeae2", black: "#55506a",
-  kitty: "#6f6482",
+  kitty: "#6f6482", plaid: "#ebe5ee",
 };
 // Bedding whose pillows aren't plain white: "kitty" is the twin by Bedroom 2's door, a dusky
 // grey-plum comforter (that half of the room is dark pastel) and pink Hello Kitty pillowcases,
@@ -179,7 +179,7 @@ export const MATERIALS = {
   book1: "#d8645a", book2: "#5a8ad8", book3: "#f0c75e", book4: "#6fbf8a", frame: "#7a4f2e", sky: "#bfe3f5", pink: "#f4a6b8",
   granite: "#cfc9bf",
   // Dark pastel, for the door half of Bedroom 2 and its Kuromi-style pieces.
-  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", monsterBlue: "#3a9ad8", purpleCan: "#5b3a8a", stanley: "#ebe3d6", candleJar: "#efe8dc", amberPill: "#e8902a", glassGreen: "#2f8f5a", coasterPink: "#eaa3ac", stickerBox: "#f2a28c", silverBook: "#c8c8c4", twix: "#c0392b", lushPot: "#141414", lushKraft: "#c9a57a", lushGreen: "#5aa66a", lushBottle: "#f2f0ea", sun: "#efc23a", fabric: "#cfccc8", fabricDark: "#a9a5a1", dock: "#dcd9d5", dockPad: "#f4f2ef", clockBezel: "#141418", clockBlue: "#3c74d4", hood: "#57516a", ink: "#0e0c12", inkHood: "#2a2630", blush: "#eda9cb",
+  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", pillowGrey: "#7d7a86", plaidLav: "#b5abd6", plaidBlue: "#a3c0dc", plaidGrey: "#8f8a99", sageBlanket: "#c4d8a0", plushBlue: "#3b8db8", plushBrown: "#9a6a3e", plushMane: "#7a5030", knitGreen: "#3d7a58", monsterBlue: "#3a9ad8", purpleCan: "#5b3a8a", stanley: "#ebe3d6", candleJar: "#efe8dc", amberPill: "#e8902a", glassGreen: "#2f8f5a", coasterPink: "#eaa3ac", stickerBox: "#f2a28c", silverBook: "#c8c8c4", twix: "#c0392b", lushPot: "#141414", lushKraft: "#c9a57a", lushGreen: "#5aa66a", lushBottle: "#f2f0ea", sun: "#efc23a", fabric: "#cfccc8", fabricDark: "#a9a5a1", dock: "#dcd9d5", dockPad: "#f4f2ef", clockBezel: "#141418", clockBlue: "#3c74d4", hood: "#57516a", ink: "#0e0c12", inkHood: "#2a2630", blush: "#eda9cb",
   bondi: "#3fb6c4", bondiDark: "#24808e", bondiLight: "#8fe0e8", ice: "#e8eef0",
   sheet: "#8f8c98", cork: "#c9a27a", graniteDark: "#a39d94", hob: "#2f2b36", led: "#4f6bff",
 };
@@ -529,6 +529,15 @@ function chestTop(z) {
   return out;
 }
 
+/** A rumple of the plaid comforter: the cloth (main) and its lines across the top, both ways. */
+function plaid(x, y, z, w, d, h) {
+  const out = [[x, y, z, w, d, h, "main"]];
+  const top = z + h;
+  for (let u = 0.15; u < w - 0.05; u += 0.36) out.push([x + u, y, top, 0.05, d, 0.008, (Math.round(u / 0.36) % 2) ? "plaidLav" : "plaidBlue"]);
+  for (let v = 0.2; v < d - 0.05; v += 0.42) out.push([x, y + v, top, w, 0.05, 0.008, (Math.round(v / 0.42) % 2) ? "plaidGrey" : "plaidLav"]);
+  return out;
+}
+
 /**
  * Her things from Lush, on the 3-tier shelf as in the photo of it: on top the kraft-paper gift
  * bag with LUSH across it in big black letters, a green bag behind; on the middle shelf the
@@ -650,14 +659,33 @@ export const CATALOG = {
     bed: true,
   },
   twin_xl: {
-    // A college-length twin, 80 in: the one on the left in Bedroom 2. No headboard: a low white
-    // base, grey sheets and pillows, the comforter thrown over.
-    label: "Twin XL bed", group: "bedroom", w: 3.5, d: 6.5, layer: "solid", colors: ["lilac", "sage", "blue", "pink", "sun"],
+    // A college-length twin, 80 in: the one on the left in Bedroom 2, in its nook between the
+    // wall and the closet, from the photo of it. No headboard: a low white base, grey sheets and
+    // a grey pillow, the white plaid comforter (lavender, blue and grey lines) thrown back in
+    // rumples, the green gingham and black-and-white check blankets over the foot; her plushies
+    // at the head -- the blue dragon with its yellow fin on the left, the brown lion in the right
+    // corner, the fluffy white one between -- the green knit beanie, a black hoodie by the foot.
+    // main is the comforter; drawn sharp, so the plaid's lines show.
+    label: "Twin XL bed", group: "bedroom", w: 3.5, d: 6.5, layer: "solid", colors: ["plaid", "lilac", "sage", "blue", "pink", "sun"],
     boxes: [
       ...[[0.05, 0.05], [3.2, 0.05], [0.05, 6.2], [3.2, 6.2]].map(([x, y]) => [x, y, 0, 0.25, 0.25, 0.2, "white"]),
       [0, 0, 0.2, 3.5, 6.5, 0.7, "white"], [0.3, 6.5, 0.3, 2.9, 0.02, 0.45, "porcelain"],
-      [0.05, 0.05, 0.9, 3.4, 6.4, 0.6, "sheet"], [0.4, 0.2, 1.5, 2.7, 1.0, 0.35, "sheet"],
-      [0.02, 1.8, 1.15, 3.46, 4.65, 0.42, "main"], [0.02, 1.8, 1.57, 3.46, 0.45, 0.06, "main^"],
+      [0.05, 0.05, 0.9, 3.4, 6.4, 0.6, "sheet"], [0.35, 0.15, 1.5, 2.6, 0.95, 0.32, "pillowGrey"],
+      // The comforter, thrown back off the pillow and rumpled.
+      ...plaid(0.02, 2.2, 1.15, 3.46, 4.25, 0.35), ...plaid(0.3, 2.6, 1.5, 1.5, 1.3, 0.16), ...plaid(1.7, 3.3, 1.5, 1.6, 1.5, 0.22),
+      ...plaid(0.5, 4.6, 1.5, 2.3, 1.0, 0.1),
+      // The blankets over the foot: green gingham, then the black-and-white check.
+      [0.02, 5.6, 1.5, 3.46, 0.88, 0.12, "sageBlanket"],
+      ...[0, 1, 2, 3, 4].flatMap((k) => [[0.1 + k * 0.32, 5.62, 1.62, 0.16, 0.84, 0.01, "plaidGrey"]]),
+      ...[0, 1, 2, 3].flatMap((r) => [0, 1, 2, 3, 4, 5].map((c) => [1.6 + c * 0.3, 5.62 + r * 0.22, 1.62, 0.3, 0.22, 0.012, (r + c) % 2 ? "white" : "lushPot"])),
+      // The plushies, the beanie and the hoodie.
+      [0.15, 0.35, 1.5, 0.85, 1.0, 0.42, "plushBlue"], [0.25, 0.25, 1.92, 0.45, 0.4, 0.22, "plushBlue"],
+      [0.6, 1.1, 1.7, 0.35, 0.25, 0.3, "sun"], [0.0, 1.0, 1.5, 0.25, 0.4, 0.3, "plushBlue"],
+      [1.3, 1.05, 1.5, 0.85, 0.6, 0.32, "white"], [1.45, 1.15, 1.82, 0.4, 0.35, 0.12, "white"],
+      [2.45, 0.2, 1.5, 0.75, 0.6, 0.55, "plushBrown"], [2.55, 0.25, 2.05, 0.55, 0.45, 0.25, "plushMane"],
+      [2.66, 0.7, 2.12, 0.07, 0.01, 0.07, "lushPot"], [2.86, 0.7, 2.12, 0.07, 0.01, 0.07, "lushPot"],
+      [2.15, 1.05, 1.5, 0.6, 0.5, 0.22, "knitGreen"],
+      [2.5, 4.6, 1.5, 1.0, 0.95, 0.14, "lushPot"],
     ],
     spots: [[1.2, 4.2, 1.6], [2.4, 4.8, 1.6], [1.75, 3.2, 1.6]],
     bed: true,
@@ -1216,6 +1244,8 @@ for (const [kind, [w, d]] of Object.entries(REAL)) {
   c.w = w;
   c.d = d;
 }
+// The Twin XL drawn sharp as it is, once it's its real size: the plaid's lines read.
+CATALOG.twin_xl.hd = CATALOG.twin_xl.boxes;
 
 export const WALLPAPERS = {
   white: { label: "White", base: "#fdfcf8", pattern: "plain" },
@@ -1474,7 +1504,7 @@ export const DEFAULT_LAYOUTS = {
       W("deep_window", "white", "w", 0, 18), W("floating_shelf", "black", "e", 13, 22.75),
       F("l_desk", "black", 0, 12), F("office_chair", "white", 2.25, 13.75, 2), F("shelf_3tier", "black", 7, 12), F("imac_g3", "white", 4.75, 12),
       F("desk_tv", "black", 9, 12), F("tall_chest", "white", 0, 15, 3), F("clothes_rack", "white", 4.75, 14),
-      F("twin_xl", "lilac", 0, 18, 2), F("platform_bed", "kitty", 9.75, 18.5, 2), F("storage_chest", "black", 10.25, 17, 2),
+      F("twin_xl", "plaid", 0, 18, 2), F("platform_bed", "kitty", 9.75, 18.5, 2), F("storage_chest", "black", 10.25, 17, 2),
       { ...W("cube_shelf", "black", "e", 13, 17), tapes: DEFAULT_TAPES }, F("robot_vacuum", "black", 8.25, 19),
       W("corkboard", "oak", "e", 13, 12.25), W("cards", "white", "w", 0, 22.75),
       // The twin by the door and its half of the room, done up dark pastel with Kuromi about the place.

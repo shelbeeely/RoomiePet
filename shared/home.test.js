@@ -212,7 +212,7 @@ describe("room to live in", () => {
     expect(side.at >= left.y0 && side.at + CATALOG.deep_window.w <= left.y1).toBe(true);
     expect(left.y1 - left.y0).toBe(CATALOG.twin_xl.d);
     expect(at("storage_chest").y1).toBe(right.y0);                    // the lift-lid chest at its foot
-    for (const kind of ["platform_bed", "twin_xl"]) expect(CATALOG[kind].boxes.every((b) => b[2] + b[5] <= 2.1), kind).toBe(true);   // no headboards
+    for (const kind of ["platform_bed", "twin_xl"]) expect(CATALOG[kind].boxes.every((b) => b[2] + b[5] <= 2.1 || b[3] < 1.5), kind).toBe(true);   // no headboards: only plushies stand above the bed
     // And there is still room to add things.
     for (const kind of ["beanbag", "bookshelf", "lamp"]) expect(freeSpot("bedB", l, kind), kind).not.toBe(null);
   });
