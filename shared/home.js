@@ -666,7 +666,7 @@ export const CATALOG = {
     ],
   },
   l_desk: {
-    // The corner desk in the photos of Bedroom 2, a dark wood top on black steel legs: the long arm along the back wall with the
+    // The corner desk in the photos of Bedroom 2, black, top and legs: the long arm along the back wall with the
     // monitor on a riser lit blue underneath and a little two-drawer cabinet under its far end,
     // the short arm down the left wall by the tall chest. parts are its two arms, so the floor in
     // the crook of the L is floor: the chair tucks in there.
@@ -1413,7 +1413,7 @@ export const DEFAULT_LAYOUTS = {
     items: [
       W("basement_window", "white", "s", 25, 0.5), W("tapestry", "black", "s", 25, 9.75),
       W("deep_window", "white", "w", 0, 18), W("floating_shelf", "black", "e", 13, 22.75),
-      F("l_desk", "walnut", 0, 12), F("office_chair", "white", 2.25, 13.75, 2), F("shelf_3tier", "black", 7, 12), F("imac_g3", "white", 4.75, 12),
+      F("l_desk", "black", 0, 12), F("office_chair", "white", 2.25, 13.75, 2), F("shelf_3tier", "black", 7, 12), F("imac_g3", "white", 4.75, 12),
       F("desk_tv", "black", 9, 12), F("tall_chest", "white", 0, 15, 3), F("clothes_rack", "white", 4.75, 14),
       F("twin_xl", "lilac", 0, 18, 2), F("platform_bed", "kitty", 9.75, 18.5, 2), F("storage_chest", "black", 10.25, 17, 2),
       { ...W("cube_shelf", "black", "e", 13, 17), tapes: DEFAULT_TAPES }, F("robot_vacuum", "black", 8.25, 19),
