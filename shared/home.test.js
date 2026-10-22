@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import {
   CATALOG, DEFAULT_LAYOUTS, DOORS, FLAT, FLOORS, GRID, MATERIALS, MAX_ITEMS, PILLOWS, ROOMS, WALLPAPERS,
-  DEFAULT_TAPES, TAPES_PER_CUBE, boxesOf, moveTape,
+  DEFAULT_TAPES, FACE_OUT, TAPES_PER_CUBE, boxesOf, coverPixels, cubeFill, moveTape,
   bounds, cleanLayout, footprint, freeSpot, layoutProblem, place, roomAt, turned, wallSpotNear, wallsOf,
 } from "./home.js";
 
@@ -345,13 +345,30 @@ describe("the VHS tapes in the wall cubes", () => {
     const spines = (item, hd) => boxesOf(item, hd).filter((b) => b.mat.startsWith("tape_") && b.mat !== "tape_case");
     // Hers have their own spines, from the photo: their colours a pixel at a time, finer when sharp.
     const art = (item, hd) => boxesOf(item, hd).filter((b) => b.mat.startsWith("#")).length;
-    expect(art(shelf(), false)).toBe(21 * 9);
-    expect(art(shelf(), true)).toBe(21 * 2 * 18);
+    // 20 stand spine out; the floppies stand face out, their box's cover as pixel art.
+    expect(art(shelf(), false)).toBe(20 * 9 + 5 * 5);                         // its box squat: 5 x 5, 10 x 11
+    expect(art(shelf(), true)).toBe(20 * 2 * 18 + 10 * 11);
     expect(spines(shelf(), false)).toHaveLength(0);
     const one = { ...shelf(), tapes: [[{ t: "Up", c: "red" }], [], []] };
     expect(spines(one, false).map((b) => b.mat)).toEqual(["tape_red"]);
     const marks = (item) => boxesOf(item, true).filter((b) => b.mat === "ink" || b.mat === "white").length;
     expect(marks({ ...one, tapes: [[{ t: "Jaws 2", c: "red" }], [], []] })).toBe(5);   // a mark a letter, none for the space
   });
-});
 
+  test("can stand face out, their cover as pixel art -- every cover there is one of", () => {
+    for (const t of DEFAULT_TAPES.flat().filter((x) => x.cover)) expect(coverPixels(t), t.t).not.toBe(null);
+    const floppies = DEFAULT_TAPES[1].find((t) => t.t.includes("Cool Disks"));
+    expect(floppies.f).toBe(true);
+    expect(coverPixels(DEFAULT_TAPES[2][0]).r).toHaveLength(42);               // a VHS box's shape, 24 x 42
+    expect(coverPixels(floppies).r).toHaveLength(26);                          // the floppies' box squat, 24 x 26
+    // Face out, a box takes the room of FACE_OUT tapes standing spine out.
+    expect(cubeFill([{ t: "a", c: "red", f: true }, { t: "b", c: "red" }])).toBe(FACE_OUT + 1);
+    const crowded = [[...Array.from({ length: TAPES_PER_CUBE - FACE_OUT + 1 }, () => ({ t: "x", c: "black" })), { t: "y", c: "red", f: true }], [], []];
+    expect(layoutProblem("bedB", withTapes(crowded))).toMatch(/holds/);
+    expect(layoutProblem("bedB", withTapes([[{ t: "x", c: "black", f: "yes" }], [], []]))).toMatch(/face out/);
+    const godzilla = DEFAULT_TAPES[2].find((t) => t.t === "Godzilla");
+    const faced = { ...shelf(), tapes: [[{ ...godzilla, f: true }], [], []] };
+    expect(boxesOf(faced, true).filter((b) => b.mat.startsWith("#")).length).toBe(10 * 18);
+    expect(cleanLayout(withTapes([[{ ...godzilla, f: true }], [], []])).items.find((i) => i.kind === "cube_shelf").tapes[0][0].f).toBe(true);
+  });
+});

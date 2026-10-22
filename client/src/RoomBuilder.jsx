@@ -6,7 +6,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   CATALOG, COLORWAYS, FLOORS, PILLOWS, GRID, ROOMS, TAPES_PER_CUBE, TAPE_COLORS, TAPE_TITLE_MAX, WALLPAPERS,
-  COVER_URL_MAX, PALE_SPINES, TAPE_ART, coverOk, freeSpot, layoutProblem, moveTape, tapesOf, turned,
+  COVER_LETTERS, COVER_URL_MAX, FACE_OUT, PALE_SPINES, TAPE_ART, coverOk, coverPixels, cubeFill, freeSpot, layoutProblem, moveTape, tapesOf, turned,
 } from "@shared/home.js";
 import { dollCamera, pieceSprite } from "./dollhouse.js";
 
@@ -66,7 +66,7 @@ function TapeShelf({ tapes, onChange }) {
   const tape = held && tapes[held.cube]?.[held.i];
   const put = (to) => {
     const next = moveTape(tapes, held, to);
-    if (!next) return setNote(`That cube is full: it holds ${TAPES_PER_CUBE}.`);
+    if (!next) return setNote(`That cube is full: it holds ${TAPES_PER_CUBE} tapes, one face out takes ${FACE_OUT}.`);
     setNote(null);
     onChange(next);
     setHeld({ cube: to.cube, i: Math.min(to.i, next[to.cube].length - 1) });
@@ -81,11 +81,11 @@ function TapeShelf({ tapes, onChange }) {
   };
   const edit = (patch) => onChange(tapes.map((c, k) => (k === held.cube ? c.map((t, j) => {
     if (j !== held.i) return t;
-    const { a, cover, ...rest } = { ...t, ...patch };
-    return { ...rest, ...(a ? { a } : {}), ...(cover ? { cover } : {}) };
+    const { a, cover, f, ...rest } = { ...t, ...patch };
+    return { ...rest, ...(a ? { a } : {}), ...(cover ? { cover } : {}), ...(f ? { f } : {}) };
   }) : c)));
   const add = (cube) => {
-    if (tapes[cube].length >= TAPES_PER_CUBE) return setNote(`That cube is full: it holds ${TAPES_PER_CUBE}.`);
+    if (cubeFill(tapes[cube]) >= TAPES_PER_CUBE) return setNote(`That cube is full: it holds ${TAPES_PER_CUBE} tapes, one face out takes ${FACE_OUT}.`);
     onChange(tapes.map((c, k) => (k === cube ? [...c, { t: "New tape", c: "black" }] : c)));
     setHeld({ cube, i: tapes[cube].length });
   };
@@ -97,11 +97,11 @@ function TapeShelf({ tapes, onChange }) {
             {cube.map((t, i) => {
               const on = held && held.cube === k && held.i === i;
               return (
-                <button key={i} className={`tape${on ? " on" : ""}${t.a ? " art" : ""}`} aria-pressed={on}
-                  style={{ "--spine": TAPE_COLORS[t.c], "--ink": PALE_SPINES.has(t.c) ? "#1f1c26" : "#f6f3ec", ...spineBg(t.a) }}
-                  aria-label={`${t.t}, cube ${k + 1}, ${i + 1} of ${cube.length}`}
+                <button key={i} className={`tape${on ? " on" : ""}${t.a && !t.f ? " art" : ""}${t.f ? " face" : ""}`} aria-pressed={on}
+                  style={{ "--spine": TAPE_COLORS[t.c], "--ink": PALE_SPINES.has(t.c) ? "#1f1c26" : "#f6f3ec", ...(t.f ? {} : spineBg(t.a)) }}
+                  aria-label={`${t.t}, cube ${k + 1}, ${i + 1} of ${cube.length}${t.f ? ", face out" : ""}`}
                   onClick={() => (on ? setHeld(null) : held ? put({ cube: k, i }) : setHeld({ cube: k, i }))}>
-                  {!t.a && <span>{t.t}</span>}
+                  {t.f ? <PixelCover tape={t} width={64} /> : !t.a && <span>{t.t}</span>}
                 </button>
               );
             })}
@@ -121,10 +121,13 @@ function TapeShelf({ tapes, onChange }) {
                 className={`swatch${tape.c === c ? " on" : ""}`} style={{ background: hex }} onClick={() => edit({ c })} />
             ))}
           </div>
+          <button className="ghost small" aria-pressed={!!tape.f} onClick={() => {
+            if (!tape.f && cubeFill(tapes[held.cube]) - 1 + FACE_OUT > TAPES_PER_CUBE) return setNote(`No room to stand it face out: that takes ${FACE_OUT} tapes' room.`);
+            setNote(null);
+            edit({ f: !tape.f });
+          }}>{tape.f ? "📼 Stand it spine out" : "🖼 Stand it face out"}</button>
           <div className="cover">
-            {tape.cover && coverOk(tape.cover)
-              ? <img src={tape.cover} alt={`The box of ${tape.t}`} referrerPolicy="no-referrer" />
-              : <span className="hint">No box art yet</span>}
+            <PixelCover tape={tape} />
             <input type="url" inputMode="url" placeholder="Paste a link to a picture of its box" maxLength={COVER_URL_MAX}
               aria-label="Box art link" value={tape.cover || ""} onChange={(e) => edit({ cover: e.target.value.trim() || undefined })} />
             {tape.cover && !coverOk(tape.cover) && <span className="hint warn">That needs to be an https:// link.</span>}
@@ -147,6 +150,42 @@ function TapeShelf({ tapes, onChange }) {
       {note && <p className="hint warn">{note}</p>}
     </div>
   );
+}
+
+/**
+ * A tape's cover as pixel art, 24 x 42 like the house's own: worked out already for the covers
+ * the app knows (art/tapes.py), and for one pasted in, the picture shrunk to that here (drawn
+ * small with smoothing, then shown big with square pixels; never read back, so any site's
+ * picture will do).
+ */
+function PixelCover({ tape, width = 72 }) {
+  const ref = useRef(null);
+  const grid = coverPixels(tape);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ctx = el.getContext("2d");
+    ctx.clearRect(0, 0, el.width, el.height);
+    if (grid) {
+      grid.r.forEach((row, y) => [...row].forEach((ch, x) => {
+        ctx.fillStyle = grid.p[COVER_LETTERS.indexOf(ch)];
+        ctx.fillRect(x, y, 1, 1);
+      }));
+      return;
+    }
+    if (!tape.cover || !coverOk(tape.cover)) return;
+    const img = new Image();
+    img.referrerPolicy = "no-referrer";
+    img.onload = () => {
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(img, 0, 0, 24, 42);
+    };
+    img.src = tape.cover;
+  }, [tape.cover, tape.a]);
+  if (!grid && !(tape.cover && coverOk(tape.cover))) return <span className="hint pixel-cover none" style={{ width, height: width * 1.75 }}>No box art yet</span>;
+  const [w, h] = grid ? [grid.r[0].length, grid.r.length] : [24, 42];
+  return <canvas ref={ref} className="pixel-cover" width={w} height={h} style={{ width, height: (width * h) / w }} role="img" aria-label={`The box of ${tape.t}`} />;
 }
 
 /** A spine's picture as a CSS background: her photo's spine, or the spine strip of an archive sleeve. */

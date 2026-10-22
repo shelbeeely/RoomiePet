@@ -4,7 +4,7 @@ the photo (as it shows at 1500 px wide; it leans), straightened to a 48 x 320 pi
 client/public/tapes/ for the room builder, and boiled down to the few pixels a spine gets in
 the room -- 1 x 9 at the scene's size, 2 x 18 drawn sharp -- in shared/tapeArt.js.
 
-    python3 art/tapes.py path/to/shelf-photo.jpg
+    python3 art/tapes.py path/to/shelf-photo.jpg [path/to/floppies-front.jpg]
 
 The photo itself stays out of the repo. A new tape: add its corners and label below.
 
@@ -13,6 +13,10 @@ The rest of the shelf is filled from the Retro-Daze VHS Tape Cover Collection on
 into the app: each links to archive.org's picture of its page, which the room builder shows
 whole as the cover and cropped to the spine strip as the spine; only the spine's few averaged
 colours, for the room, are worked out here.
+
+Every cover is also turned into pixel art (COVER_PIXELS, a VHS box's shape at 24 x 42 in a few
+colours of its own): the room builder shows that, and a tape standing face out in the room is
+drawn from it. A cover pasted in later, which isn't here, is pixelated by the builder itself.
 """
 import io
 import json
@@ -84,7 +88,40 @@ def grids(im):
             [[hx(lo.getpixel((0, y)))] for y in range(9)])
 
 
-def main(photo):
+# Covers from VHSCollector.com, for hers: the scan, and where on it the front is (a share of its
+# width; one is a whole sleeve). Keyed as the tapes link them.
+VC = "https://vhscollector.com/sites/default/files/styles/250_height_full_page/public/vhsimages/{}.jpg"
+VC_COVERS = {
+    "19992_Independence%2520Day%25201": (0, 1), "20892_Matrix%25201": (0, 1),
+    "30312_The%2520Matrix%2520Reloaded": (0.53, 1), "18612_244-Untitled-108%2520copy": (0, 1),
+}
+COVER_W, COVER_H, COVER_COLOURS = 24, 42, 24
+LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+
+def pixel_cover(im, w=COVER_W, h=COVER_H):
+    """A cover as pixel art: shrunk to the box's shape, its colours cut to a few of its own."""
+    COVER_W, COVER_H = w, h
+    small = im.convert("RGB").resize((COVER_W, COVER_H), Image.BOX)
+    q = small.quantize(colors=COVER_COLOURS, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
+    pal = q.getpalette()
+    used = sorted({q.getpixel((x, y)) for x in range(COVER_W) for y in range(COVER_H)})
+    hexes = ["#%02x%02x%02x" % tuple(pal[i * 3:i * 3 + 3]) for i in used]
+    letter = {i: LETTERS[k] for k, i in enumerate(used)}
+    rows = ["".join(letter[q.getpixel((x, y))] for x in range(COVER_W)) for y in range(COVER_H)]
+    return {"p": hexes, "r": rows}
+
+
+def front(im, x0, x1):
+    return im.crop((round(im.width * x0), 0, round(im.width * x1), im.height))
+
+
+# The box of floppies isn't a tape's shape: a squat file box, its clear lid showing the coloured
+# disks, the Memorex sleeve round its foot. From a photo straight at its front: where the box is.
+FLOPPIES_BOX = (0.117, 0.158, 0.914, 0.803)
+
+
+def main(photo, floppies=None):
     src = ImageOps.exif_transpose(Image.open(photo)).convert("RGB")
     k = src.width / 1500
     out = os.path.join(ROOT, "client", "public", "tapes")
@@ -98,6 +135,11 @@ def main(photo):
         hd, lo = grids(im)
         art[name] = {"label": label, "img": f"/tapes/{name}.png", "hd": hd, "lo": lo}
     archive = {}
+    covers = {"art:memorex_floppies": pixel_cover(Image.open(os.path.join(out, "memorex_floppies.png")))}
+    if floppies:
+        im = ImageOps.exif_transpose(Image.open(floppies)).convert("RGB")
+        box = [round(f * d) for f, d in zip(FLOPPIES_BOX, (im.width, im.height, im.width, im.height))]
+        covers["art:memorex_floppies"] = pixel_cover(im.crop(box), 24, 26)
     for name, (title, page) in ARCHIVE.items():
         sleeve = fetch(page_url(page))
         x0 = round(sleeve.width * SPINE[0])
@@ -106,6 +148,11 @@ def main(photo):
         art[name] = {"label": title, "img": page_url(page), "spine": list(SPINE), "hd": hd, "lo": lo}
         archive[name] = {"t": title, "c": nearest(im.resize((1, 1), Image.BOX).getpixel((0, 0))), "a": name,
                          "cover": page_url(page)}
+        covers[page_url(page)] = pixel_cover(front(sleeve, SPINE[0] + SPINE[1], 1))
+    for file, (x0, x1) in VC_COVERS.items():
+        req = urllib.request.Request(VC.format(file), headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=180) as res:
+            covers[VC.format(file)] = pixel_cover(front(Image.open(io.BytesIO(res.read())), x0, x1))
     body = ",\n".join(f"  {json.dumps(k)}: {json.dumps(v, separators=(',', ':'))}" for k, v in art.items())
     with open(os.path.join(ROOT, "shared", "tapeArt.js"), "w") as fh:
         fh.write("// Spine artwork for the VHS tapes, from the photo of her shelf (client/public/tapes/*.png are the\n"
@@ -114,9 +161,12 @@ def main(photo):
                  f"export const TAPE_ART = {{\n{body},\n}};\n\n"
                  "// The tapes from the Retro-Daze collection on archive.org, as tapes for the shelf: spine colour,\n"
                  "// spine art and a link to the front of the sleeve.\n"
-                 f"export const ARCHIVE_TAPES = {{\n" + ",\n".join(f"  {json.dumps(k)}: {json.dumps(v)}" for k, v in archive.items()) + ",\n};\n")
+                 f"export const ARCHIVE_TAPES = {{\n" + ",\n".join(f"  {json.dumps(k)}: {json.dumps(v)}" for k, v in archive.items()) + ",\n};\n\n"
+                 "// Every cover as pixel art, 24 x 42 (the box of floppies 24 x 26): p its colours, r its rows (a letter a colour), keyed by the\n"
+                 "// cover's link, or art:<spine art> for one from the photo of her shelf.\n"
+                 f"export const COVER_PIXELS = {{\n" + ",\n".join(f"  {json.dumps(k)}: {json.dumps(v, separators=(',', ':'))}" for k, v in covers.items()) + ",\n};\n")
     print("wrote", len(art), "spines")
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    main(*sys.argv[1:3])

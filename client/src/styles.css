@@ -91,8 +91,10 @@ main > * + * { margin-top: 12px; }
 .tape-shelf .tape-edit input { flex: 1; min-width: 120px; }
 /* A tape with its own spine: the photo of it, straightened. */
 .tape-shelf .tape.art { background-repeat: no-repeat; image-rendering: auto; }
-.tape-shelf .cover { flex-basis: 100%; display: grid; grid-template-columns: 150px 1fr; gap: 6px 10px; align-items: center; }
-.tape-shelf .cover img, .tape-shelf .cover > .hint:first-child { width: 150px; height: 110px; object-fit: contain; border-radius: 3px; background: var(--panel); display: grid; place-items: center; text-align: center; font-size: 11px; margin: 0; }
+.tape-shelf .cover { flex-basis: 100%; display: grid; grid-template-columns: 72px 1fr; gap: 6px 10px; align-items: center; }
+/* A cover as pixel art, square pixels however big it's shown. */
+.pixel-cover { image-rendering: pixelated; border-radius: 2px; background: var(--panel); display: grid; place-items: center; text-align: center; font-size: 11px; margin: 0; }
+.tape-shelf .tape.face { width: auto; padding: 0; background: #15131a; align-items: center; }
 .tape-shelf .cover input { min-width: 0; }
 .tape-shelf .cover .warn { grid-column: 2; }
 .tape-shelf .spine-art { display: flex; flex-wrap: wrap; gap: 4px; flex-basis: 100%; }

@@ -8,7 +8,7 @@
 // builder. The server keeps each household's layouts and checks them here,
 // so a phone can't save a bed through a wall or across a doorway.
 
-import { ARCHIVE_TAPES, TAPE_ART } from "./tapeArt.js";
+import { ARCHIVE_TAPES, COVER_PIXELS, TAPE_ART } from "./tapeArt.js";
 
 export const FLAT = { w: 30, d: 25 };
 
@@ -314,8 +314,9 @@ function imacG3(u, v, z, px = PIX) {
 
 // -- VHS tapes ---------------------------------------------------------------------------
 
-// The wall cubes hold VHS tapes: each a title and the colour of its spine, in order, up to
-// TAPES_PER_CUBE in a cube (a tape is an inch thick; seven fill a cube, as in the photo of hers).
+// The wall cubes hold VHS tapes: each a title and the colour of its spine, in order, a foot of
+// them to a cube -- TAPES_PER_CUBE an inch thick standing spine out, or fewer, as one standing
+// face out (f), its cover showing, takes FACE_OUT of them (as her box of floppies does).
 export const TAPE_COLORS = {
   black: "#1f1c26", silver: "#8e96a3", teal: "#2f8f8a", red: "#c8323c", orange: "#e8894a", peach: "#f2b3a0",
   yellow: "#efc23a", green: "#3f8a4a", blue: "#2f5fb8", purple: "#7a4fb0", pink: "#f08cb8", white: "#ece8e0",
@@ -324,7 +325,10 @@ export const TAPE_COLORS = {
 export const PALE_SPINES = new Set(["silver", "peach", "orange", "yellow", "pink", "white"]);
 for (const [k, v] of Object.entries(TAPE_COLORS)) MATERIALS[`tape_${k}`] = v;
 MATERIALS.tape_case = "#15131a";
-export const TAPES_PER_CUBE = 7;
+export const TAPES_PER_CUBE = 10;
+export const FACE_OUT = 4;
+/** How much of a cube its tapes take, a spine's width each, FACE_OUT for one standing face out. */
+export const cubeFill = (cube) => cube.reduce((n, t) => n + (t.f ? FACE_OUT : 1), 0);
 export const TAPE_TITLE_MAX = 24;
 // A tape can also have a link to a picture of its box art (cover), shown in the room builder.
 // Only a link: scans of studio box art aren't ours to copy into the app.
@@ -334,7 +338,12 @@ export const coverOk = (url) => typeof url === "string" && url.length <= COVER_U
 const TAPE = (t, c, a, cover) => ({ t, c, ...(a ? { a } : {}), ...(cover ? { cover } : {}) });
 // Box art for hers, from VHSCollector.com's scans of the same releases (linked, not copied).
 const VC = (file) => `https://vhscollector.com/sites/default/files/styles/250_height_full_page/public/vhsimages/${file}.jpg`;
-export { TAPE_ART };
+export { TAPE_ART, COVER_PIXELS };
+
+/** A tape's cover as pixel art ({p: colours, r: rows of letters}), if there is one worked out. */
+export function coverPixels(tape) {
+  return (tape.cover && COVER_PIXELS[tape.cover]) || (tape.a && COVER_PIXELS[`art:${tape.a}`]) || null;
+}
 // Hers, as in the photo of the shelf, in the raised middle cube -- Independence Day twice, the
 // three Matrix films, an Indiana Jones, and a 10-pack of Memorex floppy disks standing face
 // out among them -- and either side, the shelf filled out from the Retro-Daze collection on
@@ -349,7 +358,7 @@ export const DEFAULT_TAPES = [
     TAPE("Matrix Reloaded", "black", "matrix_reloaded", VC("30312_The%2520Matrix%2520Reloaded")),
     TAPE("Matrix Revolutions", "teal", "matrix_revolutions"),
     TAPE("Indiana Jones", "orange", "indiana_jones", VC("18612_244-Untitled-108%2520copy")),
-    TAPE("Memorex floppy disks", "peach", "memorex_floppies"),
+    { ...TAPE("Memorex Cool Disks", "pink", "memorex_floppies"), f: true },
   ],
   archived("twelve_monkeys", "beetlejuice", "godzilla", "death_wish", "masters_universe", "starchaser", "wizards"),
 ];
@@ -364,7 +373,8 @@ export function tapeProblem(tapes, cubes) {
   if (!Array.isArray(tapes) || tapes.length !== cubes) return `The tapes go in ${cubes} cubes`;
   for (const cube of tapes) {
     if (!Array.isArray(cube)) return "The tapes go in cubes";
-    if (cube.length > TAPES_PER_CUBE) return `A cube holds ${TAPES_PER_CUBE} tapes`;
+    if (cube.some((t) => t && t.f !== undefined && t.f !== true)) return "A tape stands face out or it doesn't";
+    if (cubeFill(cube) > TAPES_PER_CUBE) return `A cube holds ${TAPES_PER_CUBE} tapes (one face out takes ${FACE_OUT})`;
     for (const tape of cube) {
       if (!tape || typeof tape.t !== "string" || tape.t.length > TAPE_TITLE_MAX) return `A tape's title is up to ${TAPE_TITLE_MAX} letters`;
       if (!Object.hasOwn(TAPE_COLORS, tape.c)) return "A tape doesn't come in that colour";
@@ -378,52 +388,86 @@ export function tapeProblem(tapes, cubes) {
 /** The tapes with the one at from moved to sit at to ({cube, i}), or null if that cube is full. */
 export function moveTape(tapes, from, to) {
   const out = tapes.map((cube) => [...cube]);
-  if (from.cube !== to.cube && out[to.cube].length >= TAPES_PER_CUBE) return null;
+  const moving = out[from.cube][from.i];
+  if (from.cube !== to.cube && cubeFill(out[to.cube]) + (moving.f ? FACE_OUT : 1) > TAPES_PER_CUBE) return null;
   const [tape] = out[from.cube].splice(from.i, 1);
   out[to.cube].splice(Math.min(to.i, out[to.cube].length), 0, tape);
   return out;
 }
 
-const CUBES = [[0, 2.5], [0.76, 3.0], [1.52, 2.5]];
+// Each cube a foot wide, 8 1/2 in tall inside, the middle one raised, as hers are.
+const CUBES = [[0, 2.5], [1.0, 3.0], [2.0, 2.5]];
+const CUBE_W = 1.0;
 
 /**
  * The wall cubes and the tapes in them. Each tape: its case, the spine printed in its colour, the
  * studio's mark at the top and the title down it -- drawn sharp, a mark a letter and a gap a
- * space, so a long title and a short one, or two tapes, look different.
+ * space, so a long title and a short one, or two tapes, look different. One standing face out
+ * shows its cover as pixel art, shrunk to the cells the box has (5 x 9, or 10 x 18 drawn sharp).
  */
 function cubeBoxes(item, hd) {
   const px = hd ? PIX / 2 : PIX;
   const out = [];
+  const faceOut = (tape, tx, z) => {
+    // The box standing with its cover to the room, as tall as its cover's shape makes it (a
+    // tape's box; the box of floppies is squat), its cover in square pixels on its face.
+    const bw = FACE_OUT * 0.084 - 0.01;
+    const g = coverPixels(tape);
+    const fw = bw - 0.02;
+    const fh = g ? Math.min(0.56, (fw * g.r.length) / g.r[0].length) : 0.56;
+    out.push([tx, 0.5, z + 0.06, bw, 0.22, fh + 0.02, "tape_case"]);
+    if (!g) {
+      out.push([tx + 0.01, 0.72, z + 0.07, fw, 0.01, fh, `tape_${tape.c}`]);
+      return;
+    }
+    const cols = hd ? 10 : 5;
+    const rows = Math.max(1, Math.round((cols * fh) / fw));
+    const cw = fw / cols;
+    const ch = fh / rows;
+    for (let r = 0; r < rows; r += 1) {
+      const row = g.r[Math.floor(((r + 0.5) / rows) * g.r.length)];
+      for (let c = 0; c < cols; c += 1) {
+        const hex = g.p[COVER_LETTERS.indexOf(row[Math.floor(((c + 0.5) / cols) * row.length)])];
+        out.push([tx + 0.01 + c * cw, 0.72, z + 0.07 + fh - (r + 1) * ch, cw, 0.01, ch, hex]);
+      }
+    }
+  };
+  const spineOut = (tape, tx, z) => {
+    out.push([tx, 0.12, z + 0.06, 0.078, 0.62, 0.58, "tape_case"]);
+    const art = tape.a && TAPE_ART[tape.a];
+    if (art) {
+      // Its own spine, from the photo: the colours of it, a pixel at a time, top to bottom.
+      const grid = hd ? art.hd : art.lo;
+      const h = 0.56 / grid.length;
+      const w = 0.07 / grid[0].length;
+      grid.forEach((row, r) => row.forEach((hex, c) => out.push([tx + 0.004 + c * w, 0.74, z + 0.63 - (r + 1) * h, w, 0.01, h, hex])));
+      return;
+    }
+    const ink = PALE_SPINES.has(tape.c) ? "ink" : "white";
+    out.push([tx + 0.004, 0.74, z + 0.07, 0.07, 0.01, 0.56, `tape_${tape.c}`]);
+    if (!hd) {
+      out.push([tx + 0.025, 0.75, z + 0.2, 0.03, 0.01, 0.3, ink]);
+      return;
+    }
+    out.push([tx + 0.02, 0.75, z + 0.53, 0.035, 0.004, px, "candy"]);              // the studio's mark
+    const letters = tape.t.slice(0, 13);
+    for (let j = 0; j < letters.length; j += 1) {
+      if (letters[j] !== " ") out.push([tx + 0.024, 0.755, z + 0.49 - j * px, 0.028, 0.003, px * 0.8, ink]);
+    }
+  };
   tapesOf(item).forEach((cube, k) => {
     const [x, z] = CUBES[k];
+    const W = CUBE_W;
     out.push(
-      [x, 0, z, 0.72, 0.8, 0.06, "main"], [x, 0, z + 0.66, 0.72, 0.8, 0.06, "main"],
-      [x, 0, z, 0.06, 0.8, 0.72, "main"], [x + 0.66, 0, z, 0.06, 0.8, 0.72, "main"], [x, 0, z, 0.72, 0.04, 0.72, "main_"],
+      [x, 0, z, W, 0.8, 0.06, "main"], [x, 0, z + 0.66, W, 0.8, 0.06, "main"],
+      [x, 0, z, 0.06, 0.8, 0.72, "main"], [x + W - 0.06, 0, z, 0.06, 0.8, 0.72, "main"], [x, 0, z, W, 0.04, 0.72, "main_"],
     );
-    cube.forEach((tape, i) => {
-      const tx = x + 0.07 + i * 0.084;
-      const ink = PALE_SPINES.has(tape.c) ? "ink" : "white";
-      out.push([tx, 0.12, z + 0.06, 0.078, 0.62, 0.58, "tape_case"]);
-      const art = tape.a && TAPE_ART[tape.a];
-      if (art) {
-        // Its own spine, from the photo: the colours of it, a pixel at a time, top to bottom.
-        const grid = hd ? art.hd : art.lo;
-        const h = 0.56 / grid.length;
-        const w = 0.07 / grid[0].length;
-        grid.forEach((row, r) => row.forEach((hex, c) => out.push([tx + 0.004 + c * w, 0.74, z + 0.63 - (r + 1) * h, w, 0.01, h, hex])));
-        return;
-      }
-      out.push([tx + 0.004, 0.74, z + 0.07, 0.07, 0.01, 0.56, `tape_${tape.c}`]);
-      if (!hd) {
-        out.push([tx + 0.025, 0.75, z + 0.2, 0.03, 0.01, 0.3, ink]);
-        return;
-      }
-      out.push([tx + 0.02, 0.75, z + 0.53, 0.035, 0.004, px, "candy"]);            // the studio's mark
-      const letters = tape.t.slice(0, 13);
-      for (let j = 0; j < letters.length; j += 1) {
-        if (letters[j] !== " ") out.push([tx + 0.024, 0.755, z + 0.49 - j * px, 0.028, 0.003, px * 0.8, ink]);
-      }
-    });
+    let tx = x + 0.07;
+    for (const tape of cube) {
+      if (tape.f) faceOut(tape, tx, z);
+      else spineOut(tape, tx, z);
+      tx += (tape.f ? FACE_OUT : 1) * 0.084;
+    }
   });
   return out;
 }
@@ -462,6 +506,9 @@ function smartClock(u, v, z, px = PIX) {
   ];
   return [...out, ...pixelArt(time, { 1: "white" }, [x + W / 2 - 5 * px, f + 0.008, zc + 0.235], 0.003, px)];
 }
+
+// The letters a cover's pixel art names its colours by (art/tapes.py).
+export const COVER_LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 const legs = (w, d, h, inset = 0.1, s = 0.25, mat = "wood") => [
   [inset, inset, 0, s, s, h, mat], [w - inset - s, inset, 0, s, s, h, mat],
@@ -660,7 +707,7 @@ export const CATALOG = {
     // another, her VHS tapes standing on end in them. Which tapes, in what order in which cube,
     // is the item's own (tapes: see TAPES), moved about in the room builder. Drawn sharp, so
     // each spine shows its colour, its white label and the title's marks on it.
-    label: "Wall cubes", group: "wall", w: 2.25, d: 0.8, layer: "wall", colors: ["black", "white", "lilac", "pink"],
+    label: "Wall cubes", group: "wall", w: 3, d: 0.8, layer: "wall", colors: ["black", "white", "lilac", "pink"],
     shelves: 3,
     boxesFor: (item, hd) => cubeBoxes(item, hd),
     hd: true,
@@ -1275,7 +1322,7 @@ export function cleanLayout(layout) {
     items: layout.items.map((i) => (CATALOG[i.kind].layer === "wall"
       ? {
         kind: i.kind, color: i.color, side: i.side, line: i.line, at: i.at,
-        ...(CATALOG[i.kind].shelves && Array.isArray(i.tapes) ? { tapes: i.tapes.map((cube) => cube.map(({ t, c, a, cover }) => ({ t, c, ...(a ? { a } : {}), ...(cover ? { cover } : {}) }))) } : {}),
+        ...(CATALOG[i.kind].shelves && Array.isArray(i.tapes) ? { tapes: i.tapes.map((cube) => cube.map(({ t, c, a, cover, f }) => ({ t, c, ...(a ? { a } : {}), ...(cover ? { cover } : {}), ...(f ? { f } : {}) }))) } : {}),
       }
       : { kind: i.kind, color: i.color, x: i.x, y: i.y, rot: i.rot })),
   };
@@ -1319,7 +1366,7 @@ export const DEFAULT_LAYOUTS = {
       W("corkboard", "oak", "e", 13, 12.25), W("cards", "white", "w", 0, 22.75),
       // The twin by the door and its half of the room, done up dark pastel with Kuromi about the place.
       F("skull_rug", "lilac", 6.75, 16),
-      W("kuromi_poster", "pink", "e", 13, 19.25), W("string_lights", "pink", "w", 9.75, 22.5),
+      W("kuromi_poster", "pink", "e", 13, 20.25), W("string_lights", "pink", "w", 9.75, 22.5),
     ],
   },
   main: {
