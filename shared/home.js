@@ -179,7 +179,7 @@ export const MATERIALS = {
   book1: "#d8645a", book2: "#5a8ad8", book3: "#f0c75e", book4: "#6fbf8a", frame: "#7a4f2e", sky: "#bfe3f5", pink: "#f4a6b8",
   granite: "#cfc9bf",
   // Dark pastel, for the door half of Bedroom 2 and its Kuromi-style pieces.
-  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", pillowGrey: "#7d7a86", plaidLav: "#b5abd6", plaidBlue: "#a3c0dc", plaidGrey: "#8f8a99", fawnFur: "#b47a40", fawnLight: "#efdcc0", fawnEar: "#d9bf9a", hornGrey: "#7a7e88", cheek: "#ee8f86", sageBlanket: "#d6e4bc", ginghamMid: "#a9c48a", ginghamDark: "#4f6e48", plushBlue: "#3b8db8", knitGreen: "#3d7a58", monsterBlue: "#3a9ad8", purpleCan: "#5b3a8a", stanley: "#ebe3d6", candleJar: "#efe8dc", amberPill: "#e8902a", glassGreen: "#2f8f5a", coasterPink: "#eaa3ac", stickerBox: "#f2a28c", silverBook: "#c8c8c4", twix: "#c0392b", lushPot: "#141414", lushKraft: "#c9a57a", lushGreen: "#5aa66a", lushBottle: "#f2f0ea", sun: "#efc23a", fabric: "#cfccc8", fabricDark: "#a9a5a1", dock: "#dcd9d5", dockPad: "#f4f2ef", clockBezel: "#141418", clockBlue: "#3c74d4", hood: "#57516a", ink: "#0e0c12", inkHood: "#2a2630", blush: "#eda9cb",
+  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", pillowGrey: "#7d7a86", plaidLav: "#b5abd6", plaidBlue: "#a3c0dc", plaidGrey: "#8f8a99", fawnFur: "#b47a40", fawnDark: "#8a5a2c", fawnLight: "#efdcc0", fawnEar: "#d9bf9a", hornGrey: "#7a7e88", cheek: "#ee8f86", sageBlanket: "#d6e4bc", ginghamMid: "#a9c48a", ginghamDark: "#4f6e48", plushBlue: "#3b8db8", knitGreen: "#3d7a58", monsterBlue: "#3a9ad8", purpleCan: "#5b3a8a", stanley: "#ebe3d6", candleJar: "#efe8dc", amberPill: "#e8902a", glassGreen: "#2f8f5a", coasterPink: "#eaa3ac", stickerBox: "#f2a28c", silverBook: "#c8c8c4", twix: "#c0392b", lushPot: "#141414", lushKraft: "#c9a57a", lushGreen: "#5aa66a", lushBottle: "#f2f0ea", sun: "#efc23a", fabric: "#cfccc8", fabricDark: "#a9a5a1", dock: "#dcd9d5", dockPad: "#f4f2ef", clockBezel: "#141418", clockBlue: "#3c74d4", hood: "#57516a", ink: "#0e0c12", inkHood: "#2a2630", blush: "#eda9cb",
   bondi: "#3fb6c4", bondiDark: "#24808e", bondiLight: "#8fe0e8", ice: "#e8eef0",
   sheet: "#8f8c98", cork: "#c9a27a", graniteDark: "#a39d94", hob: "#2f2b36", led: "#4f6bff",
 };
@@ -529,6 +529,74 @@ function chestTop(z) {
   return out;
 }
 
+/**
+ * Her bunny: the Plushie Dreadfuls fawn bunny, from its photos (and the brown one in the photo of
+ * the bed, taken at first for a lion). Spotted fawn fur, the long ears hanging from the top of her
+ * head down past her arms with their beige insides towards us, little grey horns, a cream face
+ * and tummy with the black swirl, big sad black eyes, pink cheeks, black paws and hooves. Built
+ * of boxes she read as a monkey -- ears out at the sides of a square head -- so she is drawn as
+ * pixel art, a cut-out of fur an inch thick with her front painted on it, her paws held up
+ * under her chin as she holds them; at [u, v, z] her lower-left back corner, facing +y.
+ */
+function fawnBunny(u, v, z, px = PIX) {
+  const rows = [
+    "..................................",
+    "..........HH..........HH..........",
+    ".........HHH..DDDDDD..HHH.........",
+    "........DHHHDDFFFFFFDDHHHD........",
+    "........DFHHFFFFFFFFFFHHFD........",
+    ".......DFDDFFFFFFFFFFFFDDFD.......",
+    ".......DDDFFFFFFFFFFFFFFDDD.......",
+    ".......DDFFFFFFFFFFFFFFFFDD.......",
+    ".......DDFFFFFFFFFFFFFFFFDD.......",
+    "......DDFFFFFFCCCCCCFFFFFFDD......",
+    "......DDFFFFCCCCCCCCCCFFFFDD......",
+    "......DDFFFCKKCCCCCCKKCFFFDD......",
+    "......DDFFCKWWKCCCCKWWKCFFDD......",
+    ".....DFDFFCKWWKCCCCKWWKCFFDFD.....",
+    ".....DFEDFCKKKKCCCCKKKKCFDEFD.....",
+    ".....DFEDFCKKKWCCCCKKKWCFDEFD.....",
+    "....DFFEDDFCCCCCKKCCCCCFDDEFFD....",
+    "....DFEEEPPCCDDDCKDDDCCPPEEEFD....",
+    "....DFEEEDDDDBBBCCBBBDDDDEEEFD....",
+    "....DFEEDDFFBBBBDDBBBBFFDDEEFD....",
+    "...DFFEEDFFFBBBBDDBBBBFFFDEEFFD...",
+    "...DFEEEDFFFDBBBDDBBBDFFFDEEEFD...",
+    "...DFEEEDFFFFDBDFFDBDFFFFDEEEFD...",
+    "...DFEEEFDDDDDFFKKKFDDDDDFEEEFD...",
+    "..DFEEEEFFDFFFFKFFFKFFFDFFEEEEFD..",
+    "..DFEEEEFDDFFFFKFKFKFFFDDFEEEEFD..",
+    "..DFEEEEFDFFFFFKCCKFFFFFDFEEEEFD..",
+    ".DFFEEEEFDFFFFCCKCCCFFFFDFEEEEFFD.",
+    ".DFEEEEEFDFFFCKCCCCKCFFFDFEEEEEFD.",
+    ".DFEEEEEFDDFFCCKKKKCCFFDDFEEEEEFD.",
+    ".DFEEEEEFDDFCCCCCCCCCCFDDFEEEEEFD.",
+    ".DFFFFFFD.DDFCCCCCCCCFDD.DFFFFFFD.",
+    "..DFFFD...DDDCCCCCCCCDDD...DFFFD..",
+    "...DFD....DFDDCCCCCCDDFD....DFD...",
+    "..........DFFFDDCCDDFFFD..........",
+    "..........DFFFFFDDFFFFFD..........",
+    "..........DFVVVFDDFVVVFD..........",
+    "...........VVVVV..VVVVV...........",
+    "...........VVVVV..VVVVV...........",
+    "............VVV....VVV............",
+  ];
+  const top = z + rows.length * px;
+  const D = 0.08;
+  // The cut-out is fur all through, black only at her hooves (V): painted as her front is, her
+  // eyes, swirl and paws (B) showed through on her back.
+  const fur = { F: "fawnFur", D: "fawnFur", C: "fawnFur", E: "fawnFur", W: "fawnFur", P: "fawnFur", K: "fawnFur", B: "fawnFur", H: "hornGrey", V: "lushPot" };
+  const face = { F: "fawnFur", D: "fawnDark", C: "fawnLight", E: "fawnEar", H: "hornGrey", K: "lushPot", B: "lushPot", V: "lushPot", W: "white", P: "cheek" };
+  const at = (c, r) => [u + c * px, v - 0.005, top - (r + 1) * px];
+  return [
+    ...pixelArt(rows, fur, [u, v, top], D, px), ...pixelArt(rows, face, [u, v + D, top], 0.005, px),
+    // Her back: the fawn's pale spots and the white cotton tail.
+    ...[[13, 8], [20, 9], [16, 12], [11, 14], [22, 15], [14, 24], [19, 23], [12, 28], [21, 28]]
+      .map(([c, r]) => [...at(c, r), px, 0.005, px, "fawnLight"]),
+    [...at(15, 31).slice(0, 2).map((q, i) => (i ? q - 0.04 : q)), top - 32 * px, 4 * px, 0.045, 3 * px, "white"],
+  ];
+}
+
 /** A layer of the plaid comforter: the cloth (main) and its lines across the top, both ways. */
 function plaid(x, y, z, w, d, h) {
   const out = [[x, y, z, w, d, h, "main"]];
@@ -692,27 +760,8 @@ export const CATALOG = {
         .map(([c, r]) => [1.75 + c * 0.25, 5.5 + r * 0.25, 1.79, 0.25, 0.25, 0.006, "lushPot"]),
       ...[0, 2, 4, 6].map((c) => [1.75 + c * 0.25, 6.55, 1.45, 0.25, 0.005, 0.33, "lushPot"]),
       // The plushies at the head, on and around the pillow.
-      // Her bunny, the one that matters most: the Plushie Dreadfuls fawn bunny, from its photos
-      // (and the brown one in the photo of the bed, taken at first for a lion). Sat up in the
-      // middle of the pillow facing out: spotted fawn fur, the long ears hanging down her sides
-      // with their beige insides showing, little grey horns, a cream face and tummy with the black
-      // swirl, big sad black eyes with white lights, pink cheeks, black paws and hooves.
-      [1.35, 0.45, 1.82, 0.22, 0.45, 0.3, "fawnFur"], [1.73, 0.45, 1.82, 0.22, 0.45, 0.3, "fawnFur"],
-      [1.35, 0.9, 1.82, 0.22, 0.12, 0.12, "lushPot"], [1.73, 0.9, 1.82, 0.22, 0.12, 0.12, "lushPot"], [1.3, 0.35, 2.12, 0.7, 0.5, 0.45, "fawnFur"],
-      [1.45, 0.85, 2.15, 0.4, 0.01, 0.38, "fawnLight"],
-      [1.6, 0.86, 2.33, 0.1, 0.005, 0.03, "lushPot"], [1.6, 0.86, 2.33, 0.03, 0.005, 0.1, "lushPot"],
-      [1.66, 0.86, 2.36, 0.04, 0.005, 0.04, "lushPot"],
-      [1.16, 0.5, 2.2, 0.14, 0.3, 0.3, "fawnFur"], [2.0, 0.5, 2.2, 0.14, 0.3, 0.3, "fawnFur"],
-      [1.16, 0.8, 2.18, 0.14, 0.08, 0.14, "lushPot"], [2.0, 0.8, 2.18, 0.14, 0.08, 0.14, "lushPot"],
-      [1.28, 0.33, 2.57, 0.74, 0.55, 0.5, "fawnFur"], [1.38, 0.88, 2.6, 0.54, 0.01, 0.32, "fawnLight"],
-      [1.42, 0.89, 2.76, 0.14, 0.005, 0.14, "lushPot"], [1.74, 0.89, 2.76, 0.14, 0.005, 0.14, "lushPot"],
-      [1.46, 0.895, 2.84, 0.05, 0.003, 0.05, "white"], [1.78, 0.895, 2.84, 0.05, 0.003, 0.05, "white"],
-      [1.4, 0.895, 2.66, 0.09, 0.003, 0.07, "cheek"], [1.81, 0.895, 2.66, 0.09, 0.003, 0.07, "cheek"],
-      [1.62, 0.89, 2.71, 0.06, 0.005, 0.03, "lushPot"],
-      [1.38, 0.5, 3.07, 0.12, 0.12, 0.12, "hornGrey"], [1.8, 0.5, 3.07, 0.12, 0.12, 0.12, "hornGrey"],
-      [1.0, 0.38, 2.2, 0.28, 0.06, 0.85, "fawnFur"], [1.03, 0.44, 2.25, 0.22, 0.01, 0.75, "fawnEar"],
-      [2.02, 0.38, 2.2, 0.28, 0.06, 0.85, "fawnFur"], [2.05, 0.44, 2.25, 0.22, 0.01, 0.75, "fawnEar"],
-      ...[[1.4, 2.3], [1.75, 2.45], [1.55, 2.75], [1.85, 2.9], [1.1, 2.6]].map(([x, z]) => [x, 0.32, z, 0.06, 0.01, 0.05, "fawnLight"]),
+      // Her bunny, the one that matters most, sat up in the middle of the pillow facing out.
+      ...fawnBunny(1.12, 0.6, 1.82, PIX / 2),
       // The blue dragon lying on its front, its yellow fin up.
       [0.1, 0.55, 1.5, 0.75, 0.85, 0.32, "plushBlue"], [0.2, 0.75, 1.82, 0.45, 0.42, 0.24, "plushBlue"],
       [0.25, 1.16, 1.92, 0.06, 0.01, 0.06, "lushPot"], [0.48, 1.16, 1.92, 0.06, 0.01, 0.06, "lushPot"],
