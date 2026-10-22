@@ -179,7 +179,7 @@ export const MATERIALS = {
   book1: "#d8645a", book2: "#5a8ad8", book3: "#f0c75e", book4: "#6fbf8a", frame: "#7a4f2e", sky: "#bfe3f5", pink: "#f4a6b8",
   granite: "#cfc9bf",
   // Dark pastel, for the door half of Bedroom 2 and its Kuromi-style pieces.
-  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", lushPot: "#141414", lushKraft: "#c9a57a", lushGreen: "#5aa66a", lushBottle: "#f2f0ea", sun: "#efc23a", fabric: "#cfccc8", fabricDark: "#a9a5a1", dock: "#dcd9d5", dockPad: "#f4f2ef", clockBezel: "#141418", clockBlue: "#3c74d4", hood: "#57516a", ink: "#0e0c12", inkHood: "#2a2630", blush: "#eda9cb",
+  kuromi: "#2e2638", lavender: "#cdb8ee", candy: "#f6a8c9", steel: "#26222e", monsterBlue: "#3a9ad8", purpleCan: "#5b3a8a", stanley: "#ebe3d6", candleJar: "#efe8dc", amberPill: "#e8902a", glassGreen: "#2f8f5a", coasterPink: "#eaa3ac", stickerBox: "#f2a28c", silverBook: "#c8c8c4", twix: "#c0392b", lushPot: "#141414", lushKraft: "#c9a57a", lushGreen: "#5aa66a", lushBottle: "#f2f0ea", sun: "#efc23a", fabric: "#cfccc8", fabricDark: "#a9a5a1", dock: "#dcd9d5", dockPad: "#f4f2ef", clockBezel: "#141418", clockBlue: "#3c74d4", hood: "#57516a", ink: "#0e0c12", inkHood: "#2a2630", blush: "#eda9cb",
   bondi: "#3fb6c4", bondiDark: "#24808e", bondiLight: "#8fe0e8", ice: "#e8eef0",
   sheet: "#8f8c98", cork: "#c9a27a", graniteDark: "#a39d94", hob: "#2f2b36", led: "#4f6bff",
 };
@@ -473,6 +473,63 @@ function cubeBoxes(item, hd) {
 }
 
 /**
+ * Everything on top of her tall chest, from the photo of it, left to right as she faces it
+ * (u along the chest from its left end, v out from the wall, z up from the top at z):
+ * the "Wild" bunny mug full of pens on its little walnut box; a blue Monster can; a stack of
+ * books lying flat (Cuckoo's Nest, Lolita, No Game No Life...) with Mastering Clip Studio Paint
+ * and Sketch with Arin standing beside them; pill bottles, an orange one on its side, the green
+ * glass dish on its pink coaster; her cream Stanley with the white cat lamp behind it; the clear
+ * pink-to-orange box covered in stickers; a purple Mike's Harder can; the tall stack of white
+ * and grey books (Limitless black at the bottom); the Brown Butter candle in its jar, a little
+ * white bottle; and in front a Twix, two pins and the beads.
+ */
+function chestTop(z) {
+  const out = [];
+  // Round things as near as boxes get: a cross of two.
+  const round = (u, v, z0, d, h, mat) => out.push([u, v + d * 0.18, z0, d, d * 0.64, h, mat], [u + d * 0.18, v, z0, d * 0.64, d, h, mat]);
+  const stack = (u, v, w, d, z0, mats, t = 0.065) => mats.forEach((m, k) => out.push([u + (k % 2) * 0.02, v + (k % 3) * 0.015, z0 + k * t, w, d, t, m]));
+  // The mug of pens on its box.
+  out.push([0.04, 0.7, z, 0.48, 0.45, 0.17, "woodDark"], [0.25, 1.15, z + 0.06, 0.06, 0.004, 0.04, "gold"]);
+  round(0.1, 0.75, z + 0.17, 0.32, 0.34, "white");
+  out.push([0.42, 0.85, z + 0.25, 0.06, 0.08, 0.18, "white"], [0.16, 1.07, z + 0.3, 0.2, 0.004, 0.08, "ink"]);   // its handle, the bunny
+  [["tape_blue", 0.14, 0.82], ["candy", 0.2, 0.9], ["tape_orange", 0.27, 0.8], ["tape_teal", 0.33, 0.9], ["white", 0.24, 0.85]].forEach(([m, u, v], k) =>
+    out.push([u, v, z + 0.4, 0.035, 0.035, 0.18 + (k % 3) * 0.05, m]));
+  round(0.62, 0.95, z, 0.2, 0.42, "monsterBlue");                                 // the Monster can
+  out.push([0.66, 1.15, z + 0.1, 0.12, 0.004, 0.16, "white"]);
+  // The books lying flat, and the two standing up.
+  stack(0.55, 0.12, 0.78, 0.55, z, ["book2", "lushPot", "white", "tape_red", "lushPot", "candy", "book3"]);
+  out.push([1.36, 0.12, z, 0.1, 0.52, 0.62, "lushPot"], [1.47, 0.12, z, 0.08, 0.5, 0.56, "candy"]);
+  // Pill bottles, the orange one lying down, the green dish on its coaster.
+  round(0.98, 0.72, z, 0.14, 0.2, "white"); round(1.13, 0.78, z, 0.13, 0.17, "white"); round(1.04, 0.95, z, 0.13, 0.14, "white");
+  round(1.25, 0.7, z, 0.15, 0.24, "glassGreen");
+  out.push([1.0, 1.12, z, 0.24, 0.12, 0.12, "amberPill"], [1.22, 1.12, z, 0.04, 0.12, 0.12, "white"]);
+  out.push([1.28, 1.05, z, 0.3, 0.3, 0.03, "coasterPink"]);
+  round(1.33, 1.1, z + 0.03, 0.2, 0.1, "glassGreen");
+  // The cat lamp, the Stanley in front of it.
+  round(1.62, 0.12, z, 0.36, 0.45, "white");
+  out.push([1.65, 0.2, z + 0.45, 0.07, 0.07, 0.06, "white"], [1.88, 0.2, z + 0.45, 0.07, 0.07, 0.06, "white"],
+    [1.7, 0.47, z + 0.28, 0.03, 0.004, 0.03, "ink"], [1.86, 0.47, z + 0.28, 0.03, 0.004, 0.03, "ink"]);
+  round(1.55, 0.55, z, 0.26, 0.62, "stanley");
+  out.push([1.81, 0.62, z + 0.32, 0.07, 0.06, 0.22, "stanley"], [1.55, 0.55, z + 0.62, 0.26, 0.26, 0.04, "metal"]);
+  // The sticker box.
+  out.push([1.9, 0.8, z, 0.46, 0.2, 0.5, "stickerBox"], [1.96, 1.0, z + 0.26, 0.2, 0.004, 0.18, "woodDark"],
+    [2.16, 1.0, z + 0.06, 0.16, 0.004, 0.16, "white"], [2.2, 1.0, z + 0.1, 0.08, 0.004, 0.08, "candy"]);
+  // The white and grey books, Limitless at the bottom, the Mike's Harder can in front.
+  stack(2.0, 0.1, 0.72, 0.6, z, ["lushPot", "white", "silverBook", "white", "white", "white", "silverBook", "white", "white", "silverBook"], 0.068);
+  round(2.18, 0.62, z, 0.2, 0.42, "purpleCan");
+  out.push([2.22, 0.82, z + 0.1, 0.12, 0.004, 0.16, "sun"]);
+  // The candle, the little bottle.
+  round(2.32, 0.88, z, 0.36, 0.34, "candleJar");
+  out.push([2.38, 1.24, z + 0.12, 0.24, 0.004, 0.1, "lushPot"]);
+  round(2.16, 0.95, z, 0.12, 0.26, "white");
+  // In front: the Twix, two pins, the beads.
+  out.push([1.55, 1.25, z, 0.22, 0.12, 0.04, "twix"], [1.58, 1.25, z + 0.04, 0.14, 0.004, 0.02, "tape_red"]);
+  round(2.05, 1.25, z, 0.12, 0.02, "candy"); round(2.2, 1.28, z, 0.12, 0.02, "white");
+  for (let k = 0; k < 5; k += 1) out.push([0.02 + k * 0.08, 1.25 + (k % 2) * 0.04, z, 0.06, 0.06, 0.05, k % 2 ? "lavender" : "tape_blue"]);
+  return out;
+}
+
+/**
  * Her things from Lush, on the 3-tier shelf as in the photo of it: on top the kraft-paper gift
  * bag with LUSH across it in big black letters, a green bag behind; on the middle shelf the
  * black pots with their white labels, a white Dream Cream bottle with its black cap and a pink
@@ -720,12 +777,12 @@ export const CATALOG = {
       ...[0.3, 1.05, 1.8, 2.55, 3.3].flatMap((z) => [
         [0.2, 1.5, z, 2.35, 0.04, 0.65, "main^"], [0.45, 1.54, z + 0.28, 0.12, 0.06, 0.12, "dark"], [2.18, 1.54, z + 0.28, 0.12, 0.06, 0.12, "dark"],
       ]),
-      // On top, as in the photo: a lace runner hanging over the ends, books stacked at both
-      // ends, a tumbler and a candle.
+      // On top: a lace runner hanging over the ends, and everything on it (see chestTop).
       [-0.05, 0.1, 4.2, 2.85, 1.3, 0.02, "white"], [-0.05, 0.1, 3.5, 0.05, 1.3, 0.7, "white"], [2.75, 0.1, 3.5, 0.05, 1.3, 0.7, "white"],
-      [0.15, 0.2, 4.22, 0.7, 0.55, 0.35, "book4"], [2.0, 0.2, 4.22, 0.65, 0.55, 0.5, "white"],
-      [1.15, 0.35, 4.22, 0.3, 0.3, 0.55, "cream"], [2.1, 0.95, 4.22, 0.35, 0.35, 0.3, "cream"],
+      ...chestTop(4.22),
     ],
+    // What's on top stands above the room's cut-away height; it shows to here instead.
+    cut: 5.0,
   },
   desk_tv: {
     // The stand on the back wall by the door, as in the photos: black, a wood top and a shelf
@@ -1147,6 +1204,8 @@ const REAL = {
   vanity: [2.5, 1.75],        // the real bathroom's, 30 in
 };
 for (const c of Object.values(CATALOG)) if (c.boxesFor && !c.boxes) c.boxes = c.boxesFor({}, false);
+// The tall chest is drawn sharp as it is: its small things on top read at twice the pixels.
+CATALOG.tall_chest.hd = CATALOG.tall_chest.boxes;
 for (const [kind, [w, d]] of Object.entries(REAL)) {
   const c = CATALOG[kind];
   const kx = w / c.w;

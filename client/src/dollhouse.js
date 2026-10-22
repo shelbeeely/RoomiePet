@@ -26,7 +26,9 @@ export const CUTAWAY = WALL + 0.5;
  * or built in like a closet, where the walls are cut. */
 function cutBoxes(item, part = null, hd = false) {
   const c = CATALOG[item.kind];
-  const top = c.layer === "wall" || c.builtin ? WALL : CUTAWAY;
+  // Cut where the walls are cut, or a little above them; a piece can say it shows higher (the
+  // tall chest, its things on top above the cut).
+  const top = c.cut ?? (c.layer === "wall" || c.builtin ? WALL : CUTAWAY);
   let boxes = boxesOf(item, hd);
   if (part !== null) {
     // One arm of an L-desk: the boxes standing on it, drawn and put in order on their own, so a
