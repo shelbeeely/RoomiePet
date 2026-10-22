@@ -336,9 +336,9 @@ const TAPE = (t, c, a, cover) => ({ t, c, ...(a ? { a } : {}), ...(cover ? { cov
 const VC = (file) => `https://vhscollector.com/sites/default/files/styles/250_height_full_page/public/vhsimages/${file}.jpg`;
 export { TAPE_ART };
 // Hers, as in the photo of the shelf, in the raised middle cube -- Independence Day twice, the
-// three Matrix films, an Indiana Jones and a Memorex blank -- and either side, the shelf filled
-// out from the Retro-Daze collection on archive.org (ARCHIVE_TAPES): cartoons on the left, the
-// spookier ones on the right.
+// three Matrix films, an Indiana Jones, and a 10-pack of Memorex floppy disks standing face
+// out among them -- and either side, the shelf filled out from the Retro-Daze collection on
+// archive.org (ARCHIVE_TAPES): cartoons on the left, the spookier ones on the right.
 const archived = (...ids) => ids.map((id) => ({ ...ARCHIVE_TAPES[id] }));
 export const DEFAULT_TAPES = [
   archived("care_bears", "rugrats", "ducktales", "grinch_night", "dinosaurs", "turtles", "sonic"),
@@ -349,7 +349,7 @@ export const DEFAULT_TAPES = [
     TAPE("Matrix Reloaded", "black", "matrix_reloaded", VC("30312_The%2520Matrix%2520Reloaded")),
     TAPE("Matrix Revolutions", "teal", "matrix_revolutions"),
     TAPE("Indiana Jones", "orange", "indiana_jones", VC("18612_244-Untitled-108%2520copy")),
-    TAPE("Memorex blank", "peach", "memorex_blank"),
+    TAPE("Memorex floppy disks", "peach", "memorex_floppies"),
   ],
   archived("twelve_monkeys", "beetlejuice", "godzilla", "death_wish", "masters_universe", "starchaser", "wizards"),
 ];
